@@ -40,6 +40,7 @@ jobs:
         with:
           # this should match the `pages` option in your adapter-static options
           path: 'build/'
+        run: ls
 
   deploy:
     needs: build_site
