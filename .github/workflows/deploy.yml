@@ -39,8 +39,7 @@ jobs:
         uses: actions/upload-pages-artifact@v2
         with:
           # this should match the `pages` option in your adapter-static options
-          path: 'build/'
-        run: ls
+          path: './mariebmo/build/'
 
   deploy:
     needs: build_site
