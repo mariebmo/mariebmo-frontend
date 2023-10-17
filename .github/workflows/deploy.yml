@@ -19,14 +19,17 @@ jobs:
 
       - name: Install Node.js
         uses: actions/setup-node@v3
+        working-directory: ./mariebmo
         with:
           node-version: 18
           cache: npm
 
       - name: Install dependencies
+        working-directory: ./mariebmo
         run: npm install
 
       - name: build
+        working-directory: ./mariebmo
         env:
           BASE_PATH: '/${{ github.event.repository.name }}/mariebmo'
         run: |
