@@ -24,7 +24,7 @@ jobs:
                 cache: 'npm'
 
             - name: Run Unit Tests
-              run: npm run test:unit
+              run: npm ci && npm run test:unit
 
             - name: Run Integration Tests
-              run: npm run test:integration
+              run: npm ci && npm run test:integration
