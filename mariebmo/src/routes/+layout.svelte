@@ -25,6 +25,7 @@
 
     :global(body) {
         background-color: var(--background-color);
+        margin: 0;
     }
 
     .layout {

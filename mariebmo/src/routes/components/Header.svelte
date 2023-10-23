@@ -3,12 +3,13 @@
 </script>
 
 <nav class="nav-bar">
-  <!-- Title -->
+
+
+	<!-- 
 	<a href="/" class="title">
 		<b>{config.title}</b>
 	</a>
 
-  <!-- Navigation -->
 	<ul class="links">
 		<li>
 			<a href="/about">About</a>
@@ -21,8 +22,9 @@
 		</li>
 	</ul>
 
-  <!-- Theme -->
   <button>Toggle</button>
+	-->
+
 </nav>
 
 <style>
