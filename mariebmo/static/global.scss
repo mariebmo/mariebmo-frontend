@@ -1,0 +1,120 @@
+html {
+	/* font */
+
+	/* base colors */
+	--magenta-1: #140d10; 
+	--magenta-2: #250d18;
+	--magenta-3: #49142D;
+	--magenta-4: #7b1346;
+	--magenta-5: #a31a5d;
+	--magenta-6: #b12c80;
+	--magenta-7: #f27dbb;
+	--magenta-8: #DD9AB2;
+	--magenta-9: #E9B8C9;
+	--magenta-10: #F2E9E4;
+
+	--white-1: #FFFFFF;
+	--white-2: #F2F2F2;
+	--white-3: #E5E5E5;
+	--white-4: #D9D9D9;
+
+
+	/* dark */
+	--brand-dark: var(--magenta-3);
+	--text-1-dark: var(--white-1);
+	--text-2-dark: var(--gray-5);
+	--surface-1-dark: var(--gray-12);
+	--surface-2-dark: var(--gray-11);
+	--surface-3-dark: var(--gray-10);
+	--surface-4-dark: var(--gray-9);
+	--background-dark: var(--magenta-1);
+	--border-dark: var(--gray-9);
+
+	/* light */
+	--brand-light: var(--magenta-8);
+	--text-1-light: var(--gray-8);
+	--text-2-light: var(--gray-7);
+	--surface-1-light: var(--gray-0);
+	--surface-2-light: var(--gray-1);
+	--surface-3-light: var(--gray-2);
+	--surface-4-light: var(--gray-3);
+	--background-light: var(--magenta-10);
+	--border-light: var(--gray-4);
+}
+
+html[data-theme='dark'],
+[color-scheme='dark'] {
+	color-scheme: dark;
+
+	--brand: var(--brand-dark);
+	--text-1: var(--text-1-dark);
+	--text-2: var(--text-2-dark);
+	--surface-1: var(--surface-1-dark);
+	--surface-2: var(--surface-2-dark);
+	--surface-3: var(--surface-3-dark);
+	--surface-4: var(--surface-4-dark);
+	--background: var(--background-dark);
+	--border: var(--border-dark);
+}
+
+html[data-theme='light'],
+[color-scheme='light'] {
+	color-scheme: light;
+
+	--brand: var(--brand-light);
+	--text-1: var(--text-1-light);
+	--text-2: var(--text-2-light);
+	--surface-1: var(--surface-1-light);
+	--surface-2: var(--surface-2-light);
+	--surface-3: var(--surface-3-light);
+	--surface-4: var(--surface-4-light);
+	--background: var(--background-light);
+	--border: var(--border-light);
+}
+
+html,
+body {
+	margin: 0;
+	height: 100%;
+}
+
+html {
+	color: var(--text-1);
+	accent-color: var(--link);
+	background-color: var(--background);
+	background-attachment: fixed;
+}
+
+img {
+	border-radius: var(--radius-3);
+}
+
+ul,
+ol {
+	list-style: none;
+	padding: 0;
+}
+
+li {
+	padding-inline-start: 0;
+}
+
+.surface-1 {
+	background-color: var(--surface-1);
+	color: var(--text-2);
+}
+
+.surface-2 {
+	background-color: var(--surface-2);
+	color: var(--text-2);
+}
+
+.surface-3 {
+	background-color: var(--surface-3);
+	color: var(--text-1);
+}
+
+.surface-4 {
+	background-color: var(--surface-4);
+	color: var(--text-1);
+}

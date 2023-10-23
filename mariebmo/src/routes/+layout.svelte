@@ -1,9 +1,6 @@
 <script lang="typescript">
     import Header from './components/Header.svelte';
 	import Footer from './components/Footer.svelte';
-    import Logo from './components/Logo.svelte';
-    import Variables from '$lib/variables.svelte';
-    import {smallLogo, largeLogo} from '$lib/config';
 </script>
 
 <div class="layout">
@@ -11,9 +8,8 @@
       <Header />
   
       <main>
-          <!-- Black hole for other content -->
           <div class="centered top-padding">
-            <Logo />
+            <slot></slot>
           </div>
       </main>
   
@@ -23,10 +19,7 @@
 
   <style>
 
-    :global(body) {
-        background-color: var(--background-color);
-        margin: 0;
-    }
+    @import '../../static/global.scss';
 
     .layout {
         display: flex;
