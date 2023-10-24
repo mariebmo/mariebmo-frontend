@@ -1,44 +1,44 @@
 <script lang="typescript">
-    import Header from './components/Header.svelte';
+	import Header from './components/Header.svelte';
 	import Footer from './components/Footer.svelte';
+	import 'iconify-icon';
 </script>
 
 <div class="layout">
-    <!-- Header -->
-      <Header />
-  
-      <main>
-          <div class="centered top-padding">
-            <slot></slot>
-          </div>
-      </main>
-  
-    <!-- Footer -->
-      <Footer />
-  </div>
+	<!-- Header -->
+	<Header />
 
-  <style>
+	<main>
+		<div class="centered top-padding">
+			<slot />
+		</div>
+	</main>
 
-    @import '../../static/global.scss';
+	<!-- Footer -->
+	<Footer />
+</div>
 
-    .layout {
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh;
-    }
+<style>
+	@import '../../static/global.scss';
 
-    main {
-        flex: 1;
-    }
+	.layout {
+		display: flex;
+		flex-direction: column;
+		min-height: 100vh;
+	}
 
-    .centered {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100%;
-    }
+	main {
+		flex: 1;
+	}
 
-    .top-padding {
-        padding-top: 5rem;
-    }
-  </style>
+	.centered {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		height: 100%;
+	}
+
+	.top-padding {
+		padding-top: 5rem;
+	}
+</style>
