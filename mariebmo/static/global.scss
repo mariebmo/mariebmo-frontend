@@ -1,5 +1,7 @@
 html {
 	/* font */
+	--serif: 'Merriweather', serif;
+	--sans-serif: 'Open Sans', sans-serif;
 
 	/* base colors */
 	--magenta-1: #140d10; 
@@ -20,7 +22,7 @@ html {
 
 
 	/* dark */
-	--brand-dark: var(--magenta-3);
+	--brand-dark: var(--magenta-4);
 	--text-1-dark: var(--white-1);
 	--text-2-dark: var(--gray-5);
 	--surface-1-dark: var(--gray-12);
@@ -76,6 +78,7 @@ html,
 body {
 	margin: 0;
 	height: 100%;
+	font: 1em var(--sans-serif);
 }
 
 html {

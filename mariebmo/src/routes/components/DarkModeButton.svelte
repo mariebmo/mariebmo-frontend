@@ -1,7 +1,9 @@
 <script lang="typescript">
   import { browser } from '$app/environment';
+	import { IconifyIconComponent } from 'iconify-icon';
 
     var isDarkMode = false;
+    var icon = isDarkMode ? 'ic:round-light-mode' : 'ic:round-dark-mode';
 
     
     if(browser){
@@ -17,9 +19,29 @@
     function toggle(){
         document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
         isDarkMode = !isDarkMode;
+
+        //refresh icon
+        icon = isDarkMode ? 'ic:round-light-mode' : 'ic:round-dark-mode';
     }
 </script>
 
-<button on:click={toggle}>
-    {isDarkMode ? 'Light' : 'Dark'} Mode
+<button id='theme-toggle-btn' on:click={toggle}>
+    <iconify-icon id='theme-toggle-icon' icon={icon}/>
 </button>
+
+<style>
+    #theme-toggle-btn {
+        width: 2rem;
+        height: 2rem;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+        margin: 0;
+        color: var(--background);
+    }
+
+    #theme-toggle-icon {
+        font-size: 2rem;
+    }
+</style>

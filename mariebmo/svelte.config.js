@@ -1,3 +1,4 @@
+import { vitePreprocess } from '@sveltejs/kit/vite';
 import adapter from '@sveltejs/adapter-vercel';
 
 export default {
@@ -5,5 +6,7 @@ export default {
 		adapter: adapter({
 			// see the 'Deployment configuration' section below
 		})
-	}
+	},
+
+	preprocess: [vitePreprocess({})]
 };

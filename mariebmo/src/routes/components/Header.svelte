@@ -12,7 +12,7 @@
 	</a>
 
 	<div class="links">
-		<a href="/knitting">Knitting calculator</a>
+		<a class='header-link' href="/knitting">knitting</a>
 		<DarkModeButton />
 </nav>
 
@@ -29,5 +29,17 @@
 	.title {
 		display: flex;
 		align-items: center;
+	}
+
+	.links {
+		display: flex;
+		align-items: center;
+		vertical-align: middle;
+	}
+
+	.header-link {
+		color: var(--text-1);
+		text-decoration: none;
+		padding: 0 1rem;
 	}
 </style>

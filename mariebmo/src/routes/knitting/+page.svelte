@@ -69,9 +69,23 @@ var decreaseAmount = totalAmountIncluded ? current - amount : amount;
 </script>
 
 <div>
-    <input type="number" bind:value={current} />
-    <input type="number" bind:value={amount} />
-    <input type="checkbox" bind:checked={totalAmountIncluded} />
+    <div>
+        <label for="current">Current</label>
+        <input id="current" class='input-number' type="number" bind:value={current} />
+    </div>
+    
+
+    <div>
+        <label for="amount">Amount</label>
+        <input id="amount" class='input-number' type="number" bind:value={amount} />
+    </div>
+    
+
+    <label for="totalAmountIncluded">Total Amount Included</label>
+    <input id="totalAmountIncluded" type="checkbox" bind:checked={totalAmountIncluded} />
+    <p>
+        Is the amount included in the total amount of stitches, or is it in addition to the total amount of stitches?
+    </p>
     <button on:click={increase}>Increase</button>
     <button on:click={decrease}>Decrease</button>
     
@@ -84,12 +98,13 @@ var decreaseAmount = totalAmountIncluded ? current - amount : amount;
     </div>
 </div>
 
-
-
-
 <style>
     
         .increase-output {
             font-family: monospace;
+        }
+
+        .input-number {
+            width: 3rem;
         }
 </style>
