@@ -4,8 +4,14 @@
 var current = 12;
 var amount = 8;
 var totalAmountIncluded = false;
+$: byOrTo = totalAmountIncluded ? 'to' : 'by';
 var visualizationOutput = '';
 var knittingLingoOutput = '';
+
+function toggleByOrTo(){
+    totalAmountIncluded = !totalAmountIncluded;
+    byOrTo = totalAmountIncluded ? 'to' : 'by';
+}
 
 function increase(){
 
@@ -69,25 +75,18 @@ var decreaseAmount = totalAmountIncluded ? current - amount : amount;
 </script>
 
 <div>
-    <div>
-        <label for="current">Current</label>
-        <input id="current" class='input-number' type="number" bind:value={current} />
-    </div>
+    <label for="current">from</label>
+    <input id="current" class='input-number' type="number" bind:value={current} />
     
+    <button on:click={toggleByOrTo}>{byOrTo}</button>
 
-    <div>
-        <label for="amount">Amount</label>
-        <input id="amount" class='input-number' type="number" bind:value={amount} />
-    </div>
+     <input id="amount" class='input-number' type="number" bind:value={amount} />
     
-
-    <label for="totalAmountIncluded">Total Amount Included</label>
-    <input id="totalAmountIncluded" type="checkbox" bind:checked={totalAmountIncluded} />
-    <p>
-        Is the amount included in the total amount of stitches, or is it in addition to the total amount of stitches?
-    </p>
-    <button on:click={increase}>Increase</button>
-    <button on:click={decrease}>Decrease</button>
+    <div>
+       <button on:click={increase}>Increase</button>
+        <button on:click={decrease}>Decrease</button>
+    </div>
+   
     
     <div>
         <p class="increase-output">
@@ -106,5 +105,17 @@ var decreaseAmount = totalAmountIncluded ? current - amount : amount;
 
         .input-number {
             width: 3rem;
+        }
+
+        #by-to-checkbox {
+            opacity: 0;
+            width: 0;
+        }
+
+        #by-to-label {
+            text-decoration: solid underline;
+            padding: 0 0.5rem;
+            border: 1px solid black;
+            border-radius: var(--radius-3);
         }
 </style>
