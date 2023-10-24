@@ -1,6 +1,5 @@
 <script>
-	import LargeLogo from "../routes/components/LargeLogo.svelte"
-
+	import LargeLogo from '../routes/components/LargeLogo.svelte';
 </script>
 
 <LargeLogo />

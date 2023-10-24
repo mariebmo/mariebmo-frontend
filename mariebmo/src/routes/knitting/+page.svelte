@@ -1,121 +1,100 @@
-
 <script lang="ts">
+	var current = 12;
+	var amount = 8;
+	var totalAmountIncluded = false;
+	$: byOrTo = totalAmountIncluded ? 'to' : 'by';
+	var visualizationOutput = '';
+	var knittingLingoOutput = '';
 
-var current = 12;
-var amount = 8;
-var totalAmountIncluded = false;
-$: byOrTo = totalAmountIncluded ? 'to' : 'by';
-var visualizationOutput = '';
-var knittingLingoOutput = '';
+	function toggleByOrTo() {
+		totalAmountIncluded = !totalAmountIncluded;
+		byOrTo = totalAmountIncluded ? 'to' : 'by';
+	}
 
-function toggleByOrTo(){
-    totalAmountIncluded = !totalAmountIncluded;
-    byOrTo = totalAmountIncluded ? 'to' : 'by';
-}
+	function increase() {
+		var increaseAmount = totalAmountIncluded ? amount - current : amount;
 
-function increase(){
+		visualizationOutput = '';
+		knittingLingoOutput = '';
 
-    var increaseAmount = totalAmountIncluded ? amount - current : amount;
+		//add increases evenly distributed
+		var increaseRatio = current / increaseAmount;
+		var increaseRemainder = increaseAmount;
 
-    visualizationOutput = '';
-    knittingLingoOutput = '';
+		var nextIncrease = increaseRatio;
 
+		var increaseCount = 0;
+		var knitCount = 0;
+		var isCurrentKnit = true;
 
-    //add increases evenly distributed
-    var increaseRatio = current / increaseAmount;
-    var increaseRemainder = increaseAmount;
+		console.log(increaseRatio);
+		for (var i = 0; i < current + increaseAmount; i++) {
+			if (nextIncrease <= 0 && increaseRemainder > 0) {
+				visualizationOutput += '+';
 
-    var nextIncrease = increaseRatio;
+				if (isCurrentKnit) {
+					var knitCountOutput = knitCount > 0 ? knitCount : '';
+					knittingLingoOutput += 'k' + knitCountOutput + ' ';
+					isCurrentKnit = false;
+					knitCount = 0;
+				}
 
-    var increaseCount = 0;
-    var knitCount = 0;
-    var isCurrentKnit = true;
+				increaseCount++;
+				nextIncrease += increaseRatio;
+				increaseRemainder--;
+			} else {
+				if (!isCurrentKnit) {
+					var knitCountOutput = increaseCount > 0 ? increaseCount : '';
+					knittingLingoOutput += 'inc' + increaseCount + ' ';
+					isCurrentKnit = true;
+					increaseCount = 0;
+				}
 
-    console.log(increaseRatio);
-    for(var i = 0; i < current+increaseAmount; i++){
+				knitCount++;
+				nextIncrease--;
+				visualizationOutput += '-';
+			}
 
-        if(nextIncrease <= 0 && increaseRemainder > 0){
-            visualizationOutput += '+';
+			visualizationOutput += ' ';
+		}
+	}
 
-            if(isCurrentKnit){
-                var knitCountOutput = knitCount > 0 ? knitCount : '';
-                knittingLingoOutput += 'k' + knitCountOutput + ' ';
-                isCurrentKnit = false;
-                knitCount = 0;
-            }
+	function decrease() {
+		// should display an even distribution of the decrease, ex
+		// --x---x--x---x
 
-            increaseCount++;
-            nextIncrease += increaseRatio;
-            increaseRemainder--;
-
-        } else {
-            if(!isCurrentKnit){
-                var knitCountOutput = knitCount > 0 ? knitCount : '';
-                knittingLingoOutput += 'inc' + knitCountOutput + ' ';
-                isCurrentKnit = true;
-                increaseCount = 0;
-            }
-
-            knitCount++;
-            nextIncrease--;
-            visualizationOutput += '-';
-        }
-
-        visualizationOutput += ' ';
-    }
-}
-
-function decrease(){
-// should display an even distribution of the decrease, ex
-// --x---x--x---x
-
-var decreaseAmount = totalAmountIncluded ? current - amount : amount;
-
-}
+		var decreaseAmount = totalAmountIncluded ? current - amount : amount;
+	}
 </script>
 
 <div>
-    <label for="current">from</label>
-    <input id="current" class='input-number' type="number" bind:value={current} />
-    
-    <button on:click={toggleByOrTo}>{byOrTo}</button>
+	<label for="current">from</label>
+	<input id="current" class="input-number" type="number" bind:value={current} />
 
-     <input id="amount" class='input-number' type="number" bind:value={amount} />
-    
-    <div>
-       <button on:click={increase}>Increase</button>
-        <button on:click={decrease}>Decrease</button>
-    </div>
-   
-    
-    <div>
-        <p class="increase-output">
-            {visualizationOutput}
-            <br>
-            {knittingLingoOutput}
-        </p>
-    </div>
+	<button on:click={toggleByOrTo}>{byOrTo}</button>
+
+	<input id="amount" class="input-number" type="number" bind:value={amount} />
+
+	<div>
+		<button on:click={increase}>Increase</button>
+		<button on:click={decrease}>Decrease</button>
+	</div>
+
+	<div>
+		<p class="increase-output">
+			{visualizationOutput}
+			<br />
+			{knittingLingoOutput}
+		</p>
+	</div>
 </div>
 
 <style>
-    
-        .increase-output {
-            font-family: monospace;
-        }
+	.increase-output {
+		font-family: monospace;
+	}
 
-        .input-number {
-            width: 3rem;
-        }
-
-        #by-to-checkbox {
-            opacity: 0;
-            width: 0;
-        }
-
-        #by-to-label {
-            text-decoration: solid underline;
-            padding: 0 0.5rem;
-            border: 1px solid black;
-            border-radius: var(--radius-3);
-        }
+	.input-number {
+		width: 3rem;
+	}
 </style>
