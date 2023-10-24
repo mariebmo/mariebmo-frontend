@@ -103,85 +103,84 @@
 
 		var decreaseAmount = totalAmountIncluded ? current - amount : amount;
 
-        if (totalAmountIncluded && current < amount) {
-            visualizationOutput =
-                "You can't decrease from " +
-                current +
-                ' to ' +
-                amount +
-                ' stitches, silly! Did you mean to decrease or increase by ' +
-                amount +
-                ' stitches?';
-            knittingLingoOutput = '';
-            return;
-        }
+		if (totalAmountIncluded && current < amount) {
+			visualizationOutput =
+				"You can't decrease from " +
+				current +
+				' to ' +
+				amount +
+				' stitches, silly! Did you mean to decrease or increase by ' +
+				amount +
+				' stitches?';
+			knittingLingoOutput = '';
+			return;
+		}
 
-        if(
-            (totalAmountIncluded && current - amount > current) ||
-            (!totalAmountIncluded && amount > current)
-        ) {
-            visualizationOutput =
-                "This calculator doesn't support decreasing by more than half the current amount of stitches.";
-            knittingLingoOutput = '';
-            return;
-        }
+		if (
+			(totalAmountIncluded && current - amount > current) ||
+			(!totalAmountIncluded && amount > current)
+		) {
+			visualizationOutput =
+				"This calculator doesn't support decreasing by more than half the current amount of stitches.";
+			knittingLingoOutput = '';
+			return;
+		}
 
-        visualizationOutput = '';
-        knittingLingoOutput = '';
+		visualizationOutput = '';
+		knittingLingoOutput = '';
 
-        //add decreases evenly distributed
-        var finalRemainingStitches = current - decreaseAmount;
-        var decreaseRatio = (finalRemainingStitches / decreaseAmount)-1;
-        var decreaseRemainder = decreaseAmount;
+		//add decreases evenly distributed
+		var finalRemainingStitches = current - decreaseAmount;
+		var decreaseRatio = finalRemainingStitches / decreaseAmount - 1;
+		var decreaseRemainder = decreaseAmount;
 
-        var nextDecrease = decreaseRatio;
+		var nextDecrease = decreaseRatio;
 
-        var decreaseCount = 0;
-        var knitCount = 0;
-        var isCurrentKnit = true;
+		var decreaseCount = 0;
+		var knitCount = 0;
+		var isCurrentKnit = true;
 
-        console.log(decreaseRatio);
+		console.log(decreaseRatio);
 
-        for(var i = 0; i < finalRemainingStitches; i++){
-            if(nextDecrease <= 0 && decreaseRemainder > 0){
-                visualizationOutput += 'x';
+		for (var i = 0; i < finalRemainingStitches; i++) {
+			if (nextDecrease <= 0 && decreaseRemainder > 0) {
+				visualizationOutput += 'x';
 
-                if(isCurrentKnit){
-                    var knitCountOutput = knitCount > 1 ? knitCount : '';
-                    knittingLingoOutput += 'k' + knitCountOutput + ' ';
-                    isCurrentKnit = false;
-                    knitCount = 0;
-                }
+				if (isCurrentKnit) {
+					var knitCountOutput = knitCount > 1 ? knitCount : '';
+					knittingLingoOutput += 'k' + knitCountOutput + ' ';
+					isCurrentKnit = false;
+					knitCount = 0;
+				}
 
-                decreaseCount++;
-                nextDecrease += decreaseRatio;
-                decreaseRemainder--;
-            } else {
+				decreaseCount++;
+				nextDecrease += decreaseRatio;
+				decreaseRemainder--;
+			} else {
+				if (!isCurrentKnit) {
+					var decreaseCountOutput = decreaseCount > 1 ? decreaseCount : '';
+					knittingLingoOutput += 'dec' + decreaseCountOutput + ' ';
+					isCurrentKnit = true;
+					decreaseCount = 0;
+				}
 
-                if(!isCurrentKnit){
-                    var decreaseCountOutput = decreaseCount > 1 ? decreaseCount : '';
-                    knittingLingoOutput += 'dec' + decreaseCountOutput + ' ';
-                    isCurrentKnit = true;
-                    decreaseCount = 0;
-                }
+				knitCount++;
+				nextDecrease--;
+				visualizationOutput += '-';
+			}
 
-                knitCount++;
-                nextDecrease--;
-                visualizationOutput += '-';
-            }
+			visualizationOutput += ' ';
+		}
 
-            visualizationOutput += ' ';
-        }
+		if (decreaseCount > 0) {
+			var knitCountOutput = decreaseCount > 1 ? decreaseCount : '';
+			knittingLingoOutput += 'dec' + knitCountOutput + ' ';
+		}
 
-        if(decreaseCount > 0){
-            var knitCountOutput = decreaseCount > 1 ? decreaseCount : '';
-            knittingLingoOutput += 'dec' + knitCountOutput + ' ';
-        }
-
-        if(knitCount > 0){
-            var knitCountOutput = knitCount > 1 ? knitCount : '';
-            knittingLingoOutput += 'k' + knitCountOutput + ' ';
-        }
+		if (knitCount > 0) {
+			var knitCountOutput = knitCount > 1 ? knitCount : '';
+			knittingLingoOutput += 'k' + knitCountOutput + ' ';
+		}
 	}
 
 	function submit() {
