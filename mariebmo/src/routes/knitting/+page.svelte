@@ -1,6 +1,6 @@
 <script lang="ts">
 
-	enum KnitAction {
+enum KnitAction {
 		KNIT = 'k',
 		INCREASE = 'm',
 		DECREASE = 'k2tog'
@@ -12,13 +12,19 @@
 		DECREASE = 'x'
 	}
 
+	interface Action {
+		action: string;
+		count: number;
+	}
 
-	let current: number = 12;
-	let amount: number = 4;
+	let current: number;
+	let amount: number;
 	let totalAmountIncluded = false;
 	let increaseSelected = true;
+
 	$: byOrTo = totalAmountIncluded ? 'to' : 'by';
 	$: increaseOrDecrease = increaseSelected ? 'increase' : 'decrease';
+
 	let visualizationOutput = '';
 	let knittingLingoOutput = '';
 
@@ -31,50 +37,51 @@
 	}
 
 	function handleStitches(action: KnitAction, ratio: number, totalStitches: number) {
-
-		console.log(ratio)
-
 		visualizationOutput = '';
 		knittingLingoOutput = '';
 
-		//handle edge case
-		if((action == KnitAction.INCREASE && ratio < 1) || (action == KnitAction.DECREASE && ratio < 0)){
-			visualizationOutput = 'This calculator can only handle k2tog or m1 - this is not possible with the given inputs.';
+		if (
+			(action == KnitAction.INCREASE && ratio < 1) ||
+			(action == KnitAction.DECREASE && ratio < 0)
+		) {
+			visualizationOutput =
+				'This calculator can only handle k2tog or m1 - this is not possible with the given inputs.';
 			return;
 		}
 
 		let nextIncrease = ratio;
 		const symbol = action == KnitAction.INCREASE ? KnitSymbol.INCREASE : KnitSymbol.DECREASE;
 
-		let increaseCount = 0;
 		let knitCount = 0;
-		let isCurrentKnit = true;
+		let actions: Action[] = [];
 
 		for (var i = 0; i < totalStitches; i++) {
 			if (nextIncrease <= 0) {
 				visualizationOutput += symbol;
+				var knitCountOutput = knitCount > 1 ? knitCount : '';
+				var knitActionOutput = knitCount > 0 ? KnitAction.KNIT + knitCountOutput + ', ' : '';
+				knittingLingoOutput += knitActionOutput + action + ', ';
 
-				if (isCurrentKnit) {
-					var knitCountOutput = knitCount > 1 ? knitCount : '';
-					knittingLingoOutput += KnitAction.KNIT + knitCountOutput + ' ' + action  + ' ';
-					isCurrentKnit = false;
-					knitCount = 0;
+				//Logging actions
+				var currentAction = knitActionOutput + action;
+				var actionIndex = actions.findIndex((a) => a.action == currentAction);
+
+				if (actionIndex == -1 || actions.length - 1 > actionIndex) {
+					actions.push({ action: currentAction, count: 1 });
+				} else {
+					actions[actionIndex].count++;
 				}
 
-				increaseCount++;
+				knitCount = 0;
 				nextIncrease += ratio;
 			} else {
-				if (!isCurrentKnit) {
-					isCurrentKnit = true;
-				}
-
 				knitCount++;
 				nextIncrease--;
 				visualizationOutput += KnitSymbol.KNIT;
 			}
 		}
 
-			visualizationOutput += ' ';
+		knittingLingoOutput = knittingLingoOutput.slice(0, -2);
 	}
 
 	function increase() {
@@ -89,6 +96,7 @@
 
 		handleStitches(KnitAction.DECREASE, decreaseRatio, current - decreaseAmount);
 	}
+
 
 	function submit() {
 		if (increaseSelected) {
