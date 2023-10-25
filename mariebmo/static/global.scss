@@ -25,10 +25,22 @@ html {
 	--white-3: #e5e5e5;
 	--white-4: #d9d9d9;
 
+	--gray-0: #272727;
+	--gray-1: #3a3a3a;
+	--gray-2: #4d4d4d;
+	--gray-3: #606060;
+	--gray-4: #737373;
+	--gray-5: #868686;
+	--gray-6: #999999;
+	--gray-7: #acacac;
+	--gray-8: #bfbfbf;
+	--gray-9: #d2d2d2;
+	--gray-10: #ededed;
+
 	/* dark */
 	--brand-dark: var(--magenta-4);
-	--text-1-dark: var(--white-1);
-	--text-2-dark: var(--gray-5);
+	--text-1-dark: var(--gray-10);
+	--text-2-dark: var(--gray-6);
 	--surface-1-dark: var(--gray-12);
 	--surface-2-dark: var(--gray-11);
 	--surface-3-dark: var(--gray-10);
@@ -38,8 +50,8 @@ html {
 
 	/* light */
 	--brand-light: var(--magenta-8);
-	--text-1-light: var(--gray-8);
-	--text-2-light: var(--gray-7);
+	--text-1-light: var(--gray-1);
+	--text-2-light: var(--gray-4);
 	--surface-1-light: var(--gray-0);
 	--surface-2-light: var(--gray-1);
 	--surface-3-light: var(--gray-2);
@@ -124,4 +136,9 @@ li {
 .surface-4 {
 	background-color: var(--surface-4);
 	color: var(--text-1);
+}
+
+.info-text {
+	color: car(--text-2);
+	font-style: italic;
 }
