@@ -1,12 +1,26 @@
 <script lang="ts">
-	var current = 12;
-	var amount = 4;
-	var totalAmountIncluded = false;
-	var increaseSelected = false;
+
+	enum KnitAction {
+		KNIT = 'k',
+		INCREASE = 'm',
+		DECREASE = 'k2tog'
+	}
+
+	enum KnitSymbol {
+		KNIT = '-',
+		INCREASE = '+',
+		DECREASE = 'x'
+	}
+
+
+	let current: number = 12;
+	let amount: number = 4;
+	let totalAmountIncluded = false;
+	let increaseSelected = true;
 	$: byOrTo = totalAmountIncluded ? 'to' : 'by';
 	$: increaseOrDecrease = increaseSelected ? 'increase' : 'decrease';
-	var visualizationOutput = '';
-	var knittingLingoOutput = '';
+	let visualizationOutput = '';
+	let knittingLingoOutput = '';
 
 	function toggleByOrTo() {
 		totalAmountIncluded = !totalAmountIncluded;
@@ -16,171 +30,64 @@
 		increaseSelected = !increaseSelected;
 	}
 
-	function increase() {
-		var increaseAmount = totalAmountIncluded ? amount - current : amount;
+	function handleStitches(action: KnitAction, ratio: number, totalStitches: number) {
 
-		if (totalAmountIncluded && current > amount) {
-			visualizationOutput =
-				"You can't increase from " +
-				current +
-				' to ' +
-				amount +
-				' stitches, silly! Did you mean to decrease or increase by ' +
-				amount +
-				' stitches?';
-			knittingLingoOutput = '';
-			return;
-		}
-
-		if (
-			(totalAmountIncluded && amount - current > current) ||
-			(!totalAmountIncluded && amount > current)
-		) {
-			visualizationOutput =
-				"This calculator doesn't support increasing by more than the current amount of stitches.";
-			knittingLingoOutput = '';
-			return;
-		}
+		console.log(ratio)
 
 		visualizationOutput = '';
 		knittingLingoOutput = '';
 
-		//add increases evenly distributed
-		var increaseRatio = current / increaseAmount;
-		var increaseRemainder = increaseAmount;
+		//handle edge case
+		if((action == KnitAction.INCREASE && ratio < 1) || (action == KnitAction.DECREASE && ratio < 0)){
+			visualizationOutput = 'This calculator can only handle k2tog or m1 - this is not possible with the given inputs.';
+			return;
+		}
 
-		var nextIncrease = increaseRatio;
+		let nextIncrease = ratio;
+		const symbol = action == KnitAction.INCREASE ? KnitSymbol.INCREASE : KnitSymbol.DECREASE;
 
-		var increaseCount = 0;
-		var knitCount = 0;
-		var isCurrentKnit = true;
+		let increaseCount = 0;
+		let knitCount = 0;
+		let isCurrentKnit = true;
 
-		console.log(increaseRatio);
-		for (var i = 0; i < current + increaseAmount; i++) {
-			if (nextIncrease <= 0 && increaseRemainder > 0) {
-				visualizationOutput += '+';
+		for (var i = 0; i < totalStitches; i++) {
+			if (nextIncrease <= 0) {
+				visualizationOutput += symbol;
 
 				if (isCurrentKnit) {
 					var knitCountOutput = knitCount > 1 ? knitCount : '';
-					knittingLingoOutput += 'k' + knitCountOutput + ' ';
+					knittingLingoOutput += KnitAction.KNIT + knitCountOutput + ' ' + action  + ' ';
 					isCurrentKnit = false;
 					knitCount = 0;
 				}
 
 				increaseCount++;
-				nextIncrease += increaseRatio;
-				increaseRemainder--;
+				nextIncrease += ratio;
 			} else {
 				if (!isCurrentKnit) {
-					var increaseCountOutput = increaseCount > 1 ? increaseCount : '';
-					knittingLingoOutput += 'inc' + increaseCountOutput + ' ';
 					isCurrentKnit = true;
-					increaseCount = 0;
 				}
 
 				knitCount++;
 				nextIncrease--;
-				visualizationOutput += '-';
+				visualizationOutput += KnitSymbol.KNIT;
 			}
+		}
 
 			visualizationOutput += ' ';
-		}
+	}
 
-		if (increaseCount > 0) {
-			var knitCountOutput = increaseCount > 1 ? increaseCount : '';
-			knittingLingoOutput += 'inc' + knitCountOutput + ' ';
-		}
-
-		if (knitCount > 0) {
-			var knitCountOutput = knitCount > 1 ? knitCount : '';
-			knittingLingoOutput += 'k' + knitCountOutput + ' ';
-		}
+	function increase() {
+		const increaseAmount = totalAmountIncluded ? amount - current : amount;
+		const increaseRatio = current / increaseAmount;
+		handleStitches(KnitAction.INCREASE, increaseRatio, current + increaseAmount);
 	}
 
 	function decrease() {
-		// should display an even distribution of the decrease, ex
-		// --x---x--x---x
+		const decreaseAmount = totalAmountIncluded ? current - amount : amount;
+		const decreaseRatio = (current - decreaseAmount) / decreaseAmount - 1;
 
-		var decreaseAmount = totalAmountIncluded ? current - amount : amount;
-
-		if (totalAmountIncluded && current < amount) {
-			visualizationOutput =
-				"You can't decrease from " +
-				current +
-				' to ' +
-				amount +
-				' stitches, silly! Did you mean to decrease or increase by ' +
-				amount +
-				' stitches?';
-			knittingLingoOutput = '';
-			return;
-		}
-
-		if (
-			(totalAmountIncluded && current - amount > current) ||
-			(!totalAmountIncluded && amount > current)
-		) {
-			visualizationOutput =
-				"This calculator doesn't support decreasing by more than half the current amount of stitches.";
-			knittingLingoOutput = '';
-			return;
-		}
-
-		visualizationOutput = '';
-		knittingLingoOutput = '';
-
-		//add decreases evenly distributed
-		var finalRemainingStitches = current - decreaseAmount;
-		var decreaseRatio = finalRemainingStitches / decreaseAmount - 1;
-		var decreaseRemainder = decreaseAmount;
-
-		var nextDecrease = decreaseRatio;
-
-		var decreaseCount = 0;
-		var knitCount = 0;
-		var isCurrentKnit = true;
-
-		console.log(decreaseRatio);
-
-		for (var i = 0; i < finalRemainingStitches; i++) {
-			if (nextDecrease <= 0 && decreaseRemainder > 0) {
-				visualizationOutput += 'x';
-
-				if (isCurrentKnit) {
-					var knitCountOutput = knitCount > 1 ? knitCount : '';
-					knittingLingoOutput += 'k' + knitCountOutput + ' ';
-					isCurrentKnit = false;
-					knitCount = 0;
-				}
-
-				decreaseCount++;
-				nextDecrease += decreaseRatio;
-				decreaseRemainder--;
-			} else {
-				if (!isCurrentKnit) {
-					var decreaseCountOutput = decreaseCount > 1 ? decreaseCount : '';
-					knittingLingoOutput += 'dec' + decreaseCountOutput + ' ';
-					isCurrentKnit = true;
-					decreaseCount = 0;
-				}
-
-				knitCount++;
-				nextDecrease--;
-				visualizationOutput += '-';
-			}
-
-			visualizationOutput += ' ';
-		}
-
-		if (decreaseCount > 0) {
-			var knitCountOutput = decreaseCount > 1 ? decreaseCount : '';
-			knittingLingoOutput += 'dec' + knitCountOutput + ' ';
-		}
-
-		if (knitCount > 0) {
-			var knitCountOutput = knitCount > 1 ? knitCount : '';
-			knittingLingoOutput += 'k' + knitCountOutput + ' ';
-		}
+		handleStitches(KnitAction.DECREASE, decreaseRatio, current - decreaseAmount);
 	}
 
 	function submit() {
@@ -190,10 +97,17 @@
 			decrease();
 		}
 	}
+
 </script>
 
 <div id="knitting-page">
 	<div id="knitting-calculator-content">
+		<h1>Knitting Calculator</h1>
+
+		<p class="info-text" id="info-text-knitting">
+			The calculator is used for even increases or decreases in knitting.
+		</p>
+
 		<div id="knitting-calculator-search">
 			<label class="calculator-element" for="current">from</label>
 			<input
@@ -244,6 +158,10 @@
 
 	#knitting-page {
 		width: 100%;
+		height: 100%;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
 	}
 
 	#knitting-calculator-content {
@@ -251,6 +169,8 @@
 		display: flex;
 		flex-direction: column;
 		width: 100%;
+		height: 100%;
+		max-width: 600px;
 	}
 
 	#knitting-calculator-search {
@@ -267,6 +187,13 @@
 
 	#by-to-btn {
 		min-width: 30px;
+	}
+
+	#info-text-knitting {
+		max-width: 600px;
+		text-align: center;
+		position: relative;
+		bottom: 0;
 	}
 
 	.calculator-element {

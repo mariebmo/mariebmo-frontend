@@ -9,8 +9,8 @@
 	<Header />
 
 	<main>
-		<div class="centered top-padding">
-			<slot />
+		<div class="centered top-padding full-height">
+			<slot class="full-height" />
 		</div>
 	</main>
 
@@ -35,10 +35,13 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		height: 100%;
 	}
 
 	.top-padding {
 		padding-top: 5rem;
+	}
+
+	.full-height {
+		height: 100%;
 	}
 </style>
