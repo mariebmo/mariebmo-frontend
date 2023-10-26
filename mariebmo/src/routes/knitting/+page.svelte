@@ -1,5 +1,6 @@
 <script lang="ts">
-	enum KnitAction {
+
+enum KnitAction {
 		KNIT = 'k',
 		INCREASE = 'm',
 		DECREASE = 'k2tog'
@@ -16,12 +17,14 @@
 		count: number;
 	}
 
-	let current: number = 12;
-	let amount: number = 7;
+	let current: number;
+	let amount: number;
 	let totalAmountIncluded = false;
 	let increaseSelected = true;
+
 	$: byOrTo = totalAmountIncluded ? 'to' : 'by';
 	$: increaseOrDecrease = increaseSelected ? 'increase' : 'decrease';
+
 	let visualizationOutput = '';
 	let knittingLingoOutput = '';
 
@@ -37,7 +40,6 @@
 		visualizationOutput = '';
 		knittingLingoOutput = '';
 
-		//handle edge case
 		if (
 			(action == KnitAction.INCREASE && ratio < 1) ||
 			(action == KnitAction.DECREASE && ratio < 0)
@@ -79,8 +81,7 @@
 			}
 		}
 
-		visualizationOutput += ' ';
-		handleActions(actions);
+		knittingLingoOutput = knittingLingoOutput.slice(0, -2);
 	}
 
 	function increase() {
@@ -96,95 +97,6 @@
 		handleStitches(KnitAction.DECREASE, decreaseRatio, current - decreaseAmount);
 	}
 
-	function handleActions(actions: Action[]) {
-		console.log(actions);
-		//Combine actions that are the same, if they are next to each other
-		var previousTwoActions = ['', ''];
-		var combinedActions: Action[] = [];
-		let hasPreviousBeenAdded = true;
-
-		var output = '';
-
-		if (actions == null || actions.length == 0) {
-			return;
-		}
-
-		if (actions.length == 1) {
-			combinedActions.push({ action: actions[0].action, count: actions[0].count });
-
-			if (actions[0].count > 1) {
-				output += '(' + actions[0].action + ') ' + actions[0].count + ' times,';
-			} else {
-				output += actions[0].action;
-			}
-		}
-
-		if (actions.length > 3) {
-			for (let i = 0; i < actions.length; i++) {
-				var currentAction = actions[i];
-
-				if (currentAction.count > 2) {
-
-					console.log('currentAction.count > 2 : ' + currentAction.action);
-					combinedActions.push({ action: currentAction.action, count: currentAction.count });
-					previousTwoActions = [currentAction.action, currentAction.action];
-					console.log(previousTwoActions);
-				} else {
-					//fill previousTwoActions
-					if (actions[i - 1].count >= 2) {
-						previousTwoActions = [actions[i - 1].action, actions[i - 1].action];
-					} else if (actions[i - 1].count == 1 && actions[i - 2] == null) {
-						previousTwoActions = ['', actions[i - 1].action];
-					} else {
-						previousTwoActions = [actions[i - 2].action, actions[i - 1].action];
-					}
-
-					if (
-						previousTwoActions[0] == currentAction.action &&
-						previousTwoActions[1] == actions[i + 1].action
-					) {
-						let action = previousTwoActions[0] + ', ' + previousTwoActions[1];
-
-						if (
-							combinedActions.length > 1 &&
-							combinedActions[combinedActions.length - 1].action == action
-						) {
-							combinedActions[combinedActions.length - 1].count++;
-						} else {
-							combinedActions.push({ action: action, count: 2 });
-						}
-
-						hasPreviousBeenAdded = false;
-
-						if(i < actions.length - 2){
-							i += 1;
-						}
-					} 
-					else {
-						combinedActions.push({ action: currentAction.action, count: currentAction.count });
-					}
-				}
-			}
-		}
-
-		console.log(combinedActions);
-		console.log(output);
-
-		for(let i = 0; i<combinedActions.length; i++){
-			var currentAction = combinedActions[i];
-
-			if(currentAction.count > 1){
-				output += '(' + currentAction.action + ') ' + currentAction.count + ' times, ';
-			} else {
-				output += currentAction.action + ', ';
-			}
-		}
-
-		//remove last comma
-		output = output.substring(0, output.length - 2);
-
-		console.log(output);
-	}
 
 	function submit() {
 		if (increaseSelected) {
@@ -193,6 +105,7 @@
 			decrease();
 		}
 	}
+
 </script>
 
 <div id="knitting-page">
