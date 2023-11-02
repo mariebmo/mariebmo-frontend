@@ -1,6 +1,5 @@
 <script lang="ts">
-
-enum KnitAction {
+	enum KnitAction {
 		KNIT = 'k',
 		INCREASE = 'm',
 		DECREASE = 'k2tog'
@@ -13,12 +12,12 @@ enum KnitAction {
 	}
 
 	interface Action {
-		action: string;
+		actions: string[];
 		count: number;
 	}
 
-	let current: number;
-	let amount: number;
+	let current: number = 13;
+	let amount: number = 5;
 	let totalAmountIncluded = false;
 	let increaseSelected = true;
 
@@ -27,6 +26,9 @@ enum KnitAction {
 
 	let visualizationOutput = '';
 	let knittingLingoOutput = '';
+	let shorthandOutput = '';
+
+	let actions: string[] = [];
 
 	function toggleByOrTo() {
 		totalAmountIncluded = !totalAmountIncluded;
@@ -36,7 +38,12 @@ enum KnitAction {
 		increaseSelected = !increaseSelected;
 	}
 
-	function handleStitches(action: KnitAction, ratio: number, totalStitches: number) {
+	function handleStitches(
+		action: KnitAction,
+		ratio: number,
+		totalStitches: number,
+		incDecAmount: number
+	) {
 		visualizationOutput = '';
 		knittingLingoOutput = '';
 
@@ -53,48 +60,135 @@ enum KnitAction {
 		const symbol = action == KnitAction.INCREASE ? KnitSymbol.INCREASE : KnitSymbol.DECREASE;
 
 		let knitCount = 0;
-		let actions: Action[] = [];
 
 		for (var i = 0; i < totalStitches; i++) {
-			if (nextIncrease <= 0) {
-				visualizationOutput += symbol;
-				var knitCountOutput = knitCount > 1 ? knitCount : '';
-				var knitActionOutput = knitCount > 0 ? KnitAction.KNIT + knitCountOutput + ', ' : '';
-				knittingLingoOutput += knitActionOutput + action + ', ';
+			switch (nextIncrease <= 0) {
+				case true:
+					visualizationOutput += symbol;
+					var knitCountOutput = knitCount > 1 ? knitCount : '';
+					var knitActionOutput = knitCount > 0 ? KnitAction.KNIT + knitCountOutput + ', ' : '';
+					knittingLingoOutput += knitActionOutput + action + ', ';
 
-				//Logging actions
-				var currentAction = knitActionOutput + action;
-				var actionIndex = actions.findIndex((a) => a.action == currentAction);
+					actions.push(knitActionOutput + action);
 
-				if (actionIndex == -1 || actions.length - 1 > actionIndex) {
-					actions.push({ action: currentAction, count: 1 });
-				} else {
-					actions[actionIndex].count++;
-				}
-
-				knitCount = 0;
-				nextIncrease += ratio;
-			} else {
-				knitCount++;
-				nextIncrease--;
-				visualizationOutput += KnitSymbol.KNIT;
+					knitCount = 0;
+					nextIncrease += ratio;
+					incDecAmount--;
+					break;
+				case false:
+					knitCount++;
+					nextIncrease--;
+					visualizationOutput += KnitSymbol.KNIT;
+					break;
 			}
 		}
 
-		knittingLingoOutput = knittingLingoOutput.slice(0, -2);
+		if (incDecAmount == 1) {
+			visualizationOutput += symbol;
+			var knitCountOutput = knitCount > 1 ? knitCount : '';
+			var knitActionOutput = knitCount > 0 ? KnitAction.KNIT + knitCountOutput + ', ' : '';
+			knittingLingoOutput += knitActionOutput + action;
+		} else if (incDecAmount > 1) {
+			visualizationOutput =
+				"Hmm. There's something wrong with the calculation. There is a remainder of " +
+				incDecAmount +
+				' stitches.';
+			knitActionOutput = '';
+		} else {
+			knittingLingoOutput = knittingLingoOutput.slice(0, -2);
+		}
 	}
 
 	function increase() {
 		const increaseAmount = totalAmountIncluded ? amount - current : amount;
 		const increaseRatio = current / increaseAmount;
-		handleStitches(KnitAction.INCREASE, increaseRatio, current + increaseAmount);
+		handleStitches(KnitAction.INCREASE, increaseRatio, current + increaseAmount, increaseAmount);
 	}
 
 	function decrease() {
 		const decreaseAmount = totalAmountIncluded ? current - amount : amount;
 		const decreaseRatio = (current - decreaseAmount) / decreaseAmount - 1;
 
-		handleStitches(KnitAction.DECREASE, decreaseRatio, current - decreaseAmount);
+		handleStitches(KnitAction.DECREASE, decreaseRatio, current - decreaseAmount, decreaseAmount);
+	}
+
+	function makeShorthand() {
+		debugger;
+		let combinedActions: Action[] = [];
+		let lookAhead = 3;
+
+		let index = 0;
+		let maxIterations = 100;
+
+		console.log(actions);
+
+		while (index < actions.length && maxIterations-- > 0) {
+			let currentAction = actions[index];
+			let lookAheadIndex = 1;
+			let a: string[] = [];
+			let b: string[] = [];
+
+			let hasAMatch = false;
+
+			while (lookAheadIndex <= lookAhead && index + lookAheadIndex < actions.length) {
+
+				let lastAction = combinedActions[combinedActions.length - 1]
+
+				if (lastAction?.actions != null) {
+					let c = [];
+					for (let i = 0; i < lastAction.actions.length; i++) {
+						c.push(actions[index + i]);
+					}
+
+					if (c.join('') == lastAction.actions.join('')) {
+						lastAction.count++;
+
+						index += lastAction.actions.length;
+
+						hasAMatch = true;
+						break;
+					}
+				}
+
+				if(!hasAMatch){
+					//Adds the compared actions to the array
+					for (let i = 0; i < lookAheadIndex; i++) {
+						b.push(actions[index + i + lookAheadIndex]);
+					}
+
+					for (let i = 0; i < lookAheadIndex; i++) {
+						a.push(actions[index + i]);
+					}
+
+					//Checks if the compared actions are equal
+					if (a.join('') == b.join('') && !hasAMatch) {
+						hasAMatch = true;
+						combinedActions.push({
+							actions: a,
+							count: 2
+						});
+
+						index += lookAheadIndex*2;
+						break;
+					} else {
+						lookAheadIndex++;
+					}
+				}	
+			}
+
+			if (!hasAMatch) {
+				combinedActions.push({
+					actions: [currentAction],
+					count: 1
+				});
+
+				index++;
+			}
+
+			hasAMatch = false;
+		}
+
+		console.log(combinedActions);
 	}
 
 
@@ -104,8 +198,10 @@ enum KnitAction {
 		} else {
 			decrease();
 		}
-	}
 
+		makeShorthand();
+		actions = [];
+	}
 </script>
 
 <div id="knitting-page">
@@ -146,6 +242,7 @@ enum KnitAction {
 			<div class="increase-output">
 				<p>{visualizationOutput}</p>
 				<p>{knittingLingoOutput}</p>
+				<p>{shorthandOutput}</p>
 			</div>
 		</div>
 	</div>
