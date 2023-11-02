@@ -16,8 +16,8 @@
 		count: number;
 	}
 
-	let current: number = 13;
-	let amount: number = 5;
+	let current: number = 137;
+	let amount: number = 52;
 	let totalAmountIncluded = false;
 	let increaseSelected = true;
 
@@ -88,6 +88,7 @@
 			var knitCountOutput = knitCount > 1 ? knitCount : '';
 			var knitActionOutput = knitCount > 0 ? KnitAction.KNIT + knitCountOutput + ', ' : '';
 			knittingLingoOutput += knitActionOutput + action;
+			actions.push(knitActionOutput + action);
 		} else if (incDecAmount > 1) {
 			visualizationOutput =
 				"Hmm. There's something wrong with the calculation. There is a remainder of " +
@@ -113,67 +114,66 @@
 	}
 
 	function makeShorthand() {
-		debugger;
+		//debugger;
 		let combinedActions: Action[] = [];
 		let lookAhead = 3;
 
 		let index = 0;
 		let maxIterations = 100;
 
-		console.log(actions);
-
 		while (index < actions.length && maxIterations-- > 0) {
 			let currentAction = actions[index];
 			let lookAheadIndex = 1;
-			let a: string[] = [];
-			let b: string[] = [];
+
+			let possibleMatches: Action[] = [];
 
 			let hasAMatch = false;
 
+			let lastAction = combinedActions[combinedActions.length - 1];
+
+			if (lastAction?.actions != null) {
+				if (
+					actions.slice(index, index + lastAction.actions.length).join('') ==
+					lastAction.actions.join('')
+				) {
+					lastAction.count++;
+					index += lastAction.actions.length;
+					hasAMatch = true;
+				}
+			}
+
 			while (lookAheadIndex <= lookAhead && index + lookAheadIndex < actions.length) {
-
-				let lastAction = combinedActions[combinedActions.length - 1]
-
-				if (lastAction?.actions != null) {
-					let c = [];
-					for (let i = 0; i < lastAction.actions.length; i++) {
-						c.push(actions[index + i]);
-					}
-
-					if (c.join('') == lastAction.actions.join('')) {
-						lastAction.count++;
-
-						index += lastAction.actions.length;
-
-						hasAMatch = true;
-						break;
-					}
+				if (
+					actions.slice(index, index + lookAheadIndex).join('') ==
+					actions.slice(index + lookAheadIndex, index + lookAheadIndex * 2).join('')
+				) {
+					possibleMatches.push({
+						actions: actions.slice(index, index + lookAheadIndex),
+						count: 2
+					});
 				}
 
-				if(!hasAMatch){
-					//Adds the compared actions to the array
-					for (let i = 0; i < lookAheadIndex; i++) {
-						b.push(actions[index + i + lookAheadIndex]);
-					}
+				lookAheadIndex++;
+			}
 
-					for (let i = 0; i < lookAheadIndex; i++) {
-						a.push(actions[index + i]);
-					}
+			//debugger;
+			if (possibleMatches.length > 1) {
+				//find the best match by comparing the length of the actions
+				let bestMatch = possibleMatches.find(
+					(match) =>
+						match.actions.length ==
+						Math.max(...possibleMatches.map((match) => match.actions.length))
+				);
 
-					//Checks if the compared actions are equal
-					if (a.join('') == b.join('') && !hasAMatch) {
-						hasAMatch = true;
-						combinedActions.push({
-							actions: a,
-							count: 2
-						});
-
-						index += lookAheadIndex*2;
-						break;
-					} else {
-						lookAheadIndex++;
-					}
-				}	
+				if (bestMatch != null) {
+					combinedActions.push(bestMatch);
+					index += bestMatch.actions.length*2;
+					hasAMatch = true;
+				}
+			} else if (possibleMatches.length == 1) {
+				combinedActions.push(possibleMatches[0]);
+				index += possibleMatches[0].actions.length*2;
+				hasAMatch = true;
 			}
 
 			if (!hasAMatch) {
@@ -184,13 +184,26 @@
 
 				index++;
 			}
-
-			hasAMatch = false;
 		}
 
-		console.log(combinedActions);
+		shorthandOutput = printShorthans(combinedActions);
 	}
 
+	function printShorthans(actionArr: Action[]): string {
+		let output = '';
+
+		for (let i = 0; i < actionArr.length; i++) {
+			let action = actionArr[i];
+
+			if (action.count > 1) {
+				output += "(" + action.actions.join(', ') + ") " + action.count + "times, ";
+			} else {
+				output += action.actions.join('') + ', ';
+			}
+		}
+
+		return output;
+	}
 
 	function submit() {
 		if (increaseSelected) {
