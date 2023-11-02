@@ -1,6 +1,5 @@
 <script lang="ts">
-
-enum KnitAction {
+	enum KnitAction {
 		KNIT = 'k',
 		INCREASE = 'm',
 		DECREASE = 'k2tog'
@@ -13,9 +12,11 @@ enum KnitAction {
 	}
 
 	interface Action {
-		action: string;
+		actions: string[];
 		count: number;
 	}
+
+	const MAX_ITERATIONS = 500;
 
 	let current: number;
 	let amount: number;
@@ -27,6 +28,9 @@ enum KnitAction {
 
 	let visualizationOutput = '';
 	let knittingLingoOutput = '';
+	let shorthandOutput = '';
+
+	let actions: string[] = [];
 
 	function toggleByOrTo() {
 		totalAmountIncluded = !totalAmountIncluded;
@@ -36,7 +40,12 @@ enum KnitAction {
 		increaseSelected = !increaseSelected;
 	}
 
-	function handleStitches(action: KnitAction, ratio: number, totalStitches: number) {
+	function handleStitches(
+		action: KnitAction,
+		ratio: number,
+		totalStitches: number,
+		incDecAmount: number
+	) {
 		visualizationOutput = '';
 		knittingLingoOutput = '';
 
@@ -53,50 +62,164 @@ enum KnitAction {
 		const symbol = action == KnitAction.INCREASE ? KnitSymbol.INCREASE : KnitSymbol.DECREASE;
 
 		let knitCount = 0;
-		let actions: Action[] = [];
 
 		for (var i = 0; i < totalStitches; i++) {
-			if (nextIncrease <= 0) {
-				visualizationOutput += symbol;
-				var knitCountOutput = knitCount > 1 ? knitCount : '';
-				var knitActionOutput = knitCount > 0 ? KnitAction.KNIT + knitCountOutput + ', ' : '';
-				knittingLingoOutput += knitActionOutput + action + ', ';
+			switch (nextIncrease <= 0) {
+				case true:
+					visualizationOutput += symbol;
+					var knitCountOutput = knitCount > 1 ? knitCount : '';
+					var knitActionOutput = knitCount > 0 ? KnitAction.KNIT + knitCountOutput + ', ' : '';
+					knittingLingoOutput += knitActionOutput + action + ', ';
 
-				//Logging actions
-				var currentAction = knitActionOutput + action;
-				var actionIndex = actions.findIndex((a) => a.action == currentAction);
+					actions.push(knitActionOutput + action);
 
-				if (actionIndex == -1 || actions.length - 1 > actionIndex) {
-					actions.push({ action: currentAction, count: 1 });
-				} else {
-					actions[actionIndex].count++;
-				}
-
-				knitCount = 0;
-				nextIncrease += ratio;
-			} else {
-				knitCount++;
-				nextIncrease--;
-				visualizationOutput += KnitSymbol.KNIT;
+					knitCount = 0;
+					nextIncrease += ratio;
+					incDecAmount--;
+					break;
+				case false:
+					knitCount++;
+					nextIncrease--;
+					visualizationOutput += KnitSymbol.KNIT;
+					break;
 			}
 		}
 
-		knittingLingoOutput = knittingLingoOutput.slice(0, -2);
+		if (incDecAmount == 1) {
+			visualizationOutput += symbol;
+			var knitCountOutput = knitCount > 1 ? knitCount : '';
+			var knitActionOutput = knitCount > 0 ? KnitAction.KNIT + knitCountOutput + ', ' : '';
+			knittingLingoOutput += knitActionOutput + action;
+			actions.push(knitActionOutput + action);
+		} else if (incDecAmount > 1) {
+			visualizationOutput =
+				"Hmm. There's something wrong with the calculation. There is a remainder of " +
+				incDecAmount +
+				' stitches.';
+			knitActionOutput = '';
+		} else {
+			knittingLingoOutput = knittingLingoOutput.slice(0, -2);
+		}
 	}
 
 	function increase() {
 		const increaseAmount = totalAmountIncluded ? amount - current : amount;
 		const increaseRatio = current / increaseAmount;
-		handleStitches(KnitAction.INCREASE, increaseRatio, current + increaseAmount);
+		handleStitches(KnitAction.INCREASE, increaseRatio, current + increaseAmount, increaseAmount);
 	}
 
 	function decrease() {
 		const decreaseAmount = totalAmountIncluded ? current - amount : amount;
 		const decreaseRatio = (current - decreaseAmount) / decreaseAmount - 1;
 
-		handleStitches(KnitAction.DECREASE, decreaseRatio, current - decreaseAmount);
+		handleStitches(KnitAction.DECREASE, decreaseRatio, current - decreaseAmount, decreaseAmount);
 	}
 
+	function makeShorthand() {
+		let combinedActions: Action[] = [];
+		let lookAhead = 3;
+
+		let index = 0;
+		let outerMaxIterations = MAX_ITERATIONS;
+
+		while (index < actions.length && outerMaxIterations-- > 0) {
+			let currentAction = actions[index];
+			let lookAheadIndex = 1;
+
+			let possibleMatches: Action[] = [];
+
+			let hasAMatch = false;
+
+			let lastAction = combinedActions[combinedActions.length - 1];
+
+			if (lastAction?.actions != null) {
+				if (
+					actions.slice(index, index + lastAction.actions.length).join('') ==
+					lastAction.actions.join('')
+				) {
+					lastAction.count++;
+					index += lastAction.actions.length;
+					hasAMatch = true;
+				}
+			}
+
+			let lookAheadMaxIterations = MAX_ITERATIONS;
+			while (
+				lookAheadIndex <= lookAhead &&
+				index + lookAheadIndex < actions.length &&
+				lookAheadMaxIterations-- > 0
+			) {
+				if (
+					actions.slice(index, index + lookAheadIndex).join('') ==
+					actions.slice(index + lookAheadIndex, index + lookAheadIndex * 2).join('')
+				) {
+					possibleMatches.push({
+						actions: actions.slice(index, index + lookAheadIndex),
+						count: 2
+					});
+				}
+
+				lookAheadIndex++;
+			}
+
+			if (possibleMatches.length > 1) {
+				let bestMatch = possibleMatches.find(
+					(match) =>
+						match.actions.length ==
+						Math.max(...possibleMatches.map((match) => match.actions.length))
+				);
+
+				if (bestMatch != null) {
+					//see if best match consists of same actions
+					let bestMatchSet = new Set(bestMatch.actions);
+					if (bestMatchSet.size == 1) {
+						combinedActions.push({
+							actions: [bestMatch.actions[0]],
+							count: bestMatch.actions.length * 2
+						});
+
+						index += bestMatch.actions.length * 2;
+						hasAMatch = true;
+					} else {
+						combinedActions.push(bestMatch);
+						index += bestMatch.actions.length * 2;
+						hasAMatch = true;
+					}
+				}
+			} else if (possibleMatches.length == 1) {
+				combinedActions.push(possibleMatches[0]);
+				index += possibleMatches[0].actions.length * 2;
+				hasAMatch = true;
+			}
+
+			if (!hasAMatch) {
+				combinedActions.push({
+					actions: [currentAction],
+					count: 1
+				});
+
+				index++;
+			}
+		}
+
+		shorthandOutput = printShorthans(combinedActions);
+	}
+
+	function printShorthans(actionArr: Action[]): string {
+		let output = '';
+
+		for (let i = 0; i < actionArr.length; i++) {
+			let action = actionArr[i];
+
+			if (action.count > 1) {
+				output += '(' + action.actions.join(', ') + ') ' + action.count + 'times, ';
+			} else {
+				output += action.actions.join('') + ', ';
+			}
+		}
+
+		return output;
+	}
 
 	function submit() {
 		if (increaseSelected) {
@@ -104,8 +227,10 @@ enum KnitAction {
 		} else {
 			decrease();
 		}
-	}
 
+		makeShorthand();
+		actions = [];
+	}
 </script>
 
 <div id="knitting-page">
@@ -146,6 +271,7 @@ enum KnitAction {
 			<div class="increase-output">
 				<p>{visualizationOutput}</p>
 				<p>{knittingLingoOutput}</p>
+				<p>{shorthandOutput}</p>
 			</div>
 		</div>
 	</div>
