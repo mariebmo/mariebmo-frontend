@@ -16,8 +16,10 @@
 		count: number;
 	}
 
-	let current: number = 137;
-	let amount: number = 52;
+	const MAX_ITERATIONS = 500;
+
+	let current: number;
+	let amount: number;
 	let totalAmountIncluded = false;
 	let increaseSelected = true;
 
@@ -114,14 +116,13 @@
 	}
 
 	function makeShorthand() {
-		//debugger;
 		let combinedActions: Action[] = [];
 		let lookAhead = 3;
 
 		let index = 0;
-		let maxIterations = 100;
+		let outerMaxIterations = MAX_ITERATIONS;
 
-		while (index < actions.length && maxIterations-- > 0) {
+		while (index < actions.length && outerMaxIterations-- > 0) {
 			let currentAction = actions[index];
 			let lookAheadIndex = 1;
 
@@ -142,7 +143,12 @@
 				}
 			}
 
-			while (lookAheadIndex <= lookAhead && index + lookAheadIndex < actions.length) {
+			let lookAheadMaxIterations = MAX_ITERATIONS;
+			while (
+				lookAheadIndex <= lookAhead &&
+				index + lookAheadIndex < actions.length &&
+				lookAheadMaxIterations-- > 0
+			) {
 				if (
 					actions.slice(index, index + lookAheadIndex).join('') ==
 					actions.slice(index + lookAheadIndex, index + lookAheadIndex * 2).join('')
@@ -156,9 +162,7 @@
 				lookAheadIndex++;
 			}
 
-			//debugger;
 			if (possibleMatches.length > 1) {
-				//find the best match by comparing the length of the actions
 				let bestMatch = possibleMatches.find(
 					(match) =>
 						match.actions.length ==
@@ -166,13 +170,25 @@
 				);
 
 				if (bestMatch != null) {
-					combinedActions.push(bestMatch);
-					index += bestMatch.actions.length*2;
-					hasAMatch = true;
+					//see if best match consists of same actions
+					let bestMatchSet = new Set(bestMatch.actions);
+					if (bestMatchSet.size == 1) {
+						combinedActions.push({
+							actions: [bestMatch.actions[0]],
+							count: bestMatch.actions.length * 2
+						});
+
+						index += bestMatch.actions.length * 2;
+						hasAMatch = true;
+					} else {
+						combinedActions.push(bestMatch);
+						index += bestMatch.actions.length * 2;
+						hasAMatch = true;
+					}
 				}
 			} else if (possibleMatches.length == 1) {
 				combinedActions.push(possibleMatches[0]);
-				index += possibleMatches[0].actions.length*2;
+				index += possibleMatches[0].actions.length * 2;
 				hasAMatch = true;
 			}
 
@@ -196,7 +212,7 @@
 			let action = actionArr[i];
 
 			if (action.count > 1) {
-				output += "(" + action.actions.join(', ') + ") " + action.count + "times, ";
+				output += '(' + action.actions.join(', ') + ') ' + action.count + 'times, ';
 			} else {
 				output += action.actions.join('') + ', ';
 			}
