@@ -66,7 +66,7 @@
 		for (var i = 0; i < totalStitches; i++) {
 			switch (nextIncrease <= 0) {
 				case true:
-					visualizationOutput += symbol;
+					visualizationOutput += symbol + ' ';
 					var knitCountOutput = knitCount > 1 ? knitCount : '';
 					var knitActionOutput = knitCount > 0 ? KnitAction.KNIT + knitCountOutput + ', ' : '';
 					knittingLingoOutput += knitActionOutput + action + ', ';
@@ -80,7 +80,7 @@
 				case false:
 					knitCount++;
 					nextIncrease--;
-					visualizationOutput += KnitSymbol.KNIT;
+					visualizationOutput += KnitSymbol.KNIT + ' ';
 					break;
 			}
 		}
@@ -202,10 +202,12 @@
 			}
 		}
 
-		shorthandOutput = printShorthans(combinedActions);
+		shorthandOutput = printShorthand(combinedActions);
+		shorthandOutput = shorthandOutput.slice(0, -2);
+
 	}
 
-	function printShorthans(actionArr: Action[]): string {
+	function printShorthand(actionArr: Action[]): string {
 		let output = '';
 
 		for (let i = 0; i < actionArr.length; i++) {
