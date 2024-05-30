@@ -8,6 +8,6 @@
 
 <style>
 	svg path {
-		color: var(--background);
+		color: var(--text-1);
 	}
 </style>

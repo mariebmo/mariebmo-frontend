@@ -1,4 +1,5 @@
 <script lang="typescript">
+	import "../app.css";
 	import Header from './components/Header.svelte';
 	import Footer from './components/Footer.svelte';
 	import 'iconify-icon';
@@ -9,7 +10,7 @@
 	<Header />
 
 	<main>
-		<div class="centered top-padding full-height">
+		<div class="left-padding top-padding full-height">
 			<slot class="full-height" />
 		</div>
 	</main>
@@ -31,14 +32,12 @@
 		flex: 1;
 	}
 
-	.centered {
-		display: flex;
-		justify-content: center;
-		align-items: center;
+	.left-padding {
+		padding-left: 2rem;
 	}
 
 	.top-padding {
-		padding-top: 5rem;
+		padding-top: 1rem;
 	}
 
 	.full-height {

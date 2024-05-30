@@ -243,6 +243,10 @@
 			The calculator is used for even increases or decreases in knitting.
 		</p>
 
+		<div class="flex flex-col justify-between p-4 leading-normal">
+			
+		</div>
+
 		<div id="knitting-calculator-search">
 			<label class="calculator-element" for="current">from</label>
 			<input
@@ -280,59 +284,5 @@
 </div>
 
 <style>
-	.increase-output {
-		margin-top: 1rem;
-		font-family: monospace;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-	}
 
-	.input-number {
-		width: 3rem;
-	}
-
-	#knitting-page {
-		width: 100%;
-		height: 100%;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-	}
-
-	#knitting-calculator-content {
-		align-items: center;
-		display: flex;
-		flex-direction: column;
-		width: 100%;
-		height: 100%;
-		max-width: 600px;
-	}
-
-	#knitting-calculator-search {
-		display: flex;
-		flex-direction: row;
-		align-items: center;
-		justify-content: center;
-		width: 100%;
-	}
-
-	#increase-decrease-btn {
-		min-width: 75px;
-	}
-
-	#by-to-btn {
-		min-width: 30px;
-	}
-
-	#info-text-knitting {
-		max-width: 600px;
-		text-align: center;
-		position: relative;
-		bottom: 0;
-	}
-
-	.calculator-element {
-		margin: 0 0 0 0.5rem;
-	}
 </style>

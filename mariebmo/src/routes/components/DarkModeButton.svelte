@@ -39,7 +39,7 @@
 		cursor: pointer;
 		padding: 0;
 		margin: 0;
-		color: var(--background);
+		color: var(--text-1);
 	}
 
 	#theme-toggle-icon {
