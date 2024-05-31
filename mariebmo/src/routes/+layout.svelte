@@ -20,7 +20,6 @@
 </div>
 
 <style>
-	@import '../../static/global.scss';
 
 	.layout {
 		display: flex;

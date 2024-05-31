@@ -243,9 +243,6 @@
 			The calculator is used for even increases or decreases in knitting.
 		</p>
 
-		<div class="flex flex-col justify-between p-4 leading-normal">
-			
-		</div>
 
 		<div id="knitting-calculator-search">
 			<label class="calculator-element" for="current">from</label>

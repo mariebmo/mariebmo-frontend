@@ -1,11 +1,10 @@
 <script lang="ts">
 	import Logo from './Logo.svelte';
-	import DarkModeButton from './DarkModeButton.svelte';
+	import DarkModeButton from './buttons/DarkModeButton.svelte';
 </script>
 
 <nav class="nav-bar">
-
-	<a href="/" class="title">
+	<a href="/" class="mx-auto">
 		<Logo />
 	</a>
 
@@ -20,11 +19,6 @@
 		justify-content: space-between;
 		align-items: center;
 		padding: 1rem 2rem;
-	}
-
-	.title {
-		display: flex;
-		align-items: center;
 	}
 
 	.links {
