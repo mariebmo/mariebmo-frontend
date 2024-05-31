@@ -22,7 +22,7 @@
 			<a class="h-full" href="/knitting">
 				<!-- Card -->
 				<div
-					class="max-w-2xl mx-auto dark:bg-orange-800 bg-orange-200 shadow-lg rounded-lg hover:bg-orange-300 dark:hover:bg-orange-700"
+					class="max-w-2xl mx-auto dark:bg-amber-800 bg-orange-200 shadow-lg rounded-lg hover:bg-orange-300 dark:hover:bg-amber-700"
 				>
 					<div class="px-6 py-5">
 						<div class="flex items-start">
@@ -32,7 +32,7 @@
 								width="60"
 								version="1.1"
 								id="Capa_1"
-								class="fill-current text-orange-800 dark:text-orange-200 p-1 mr-4 bg-orange-300 dark:bg-orange-700 rounded-full"
+								class="fill-current text-amber-800 dark:text-orange-200 p-1 mr-4 bg-orange-300 dark:bg-amber-700 rounded-full"
 								viewBox="0 0 471.112 471.112"
 								xml:space="preserve"
 								><g id="SVGRepo_bgCarrier" stroke-width="0" /><g
@@ -59,10 +59,9 @@
 								<!-- Card body -->
 								<div class="flex items-end justify-between whitespace-normal">
 									<!-- Paragraph -->
-									<div class="max-w-md dark:text-indigo-100 text-indigo-950">
+									<div class="max-w-md dark:text-amber-100 text-amber-950">
 										<p class="mb-2">
-											Simple calculator for evently increasing and/or decreasing stitches while
-											knitting.
+											The calculator is used for even increases or decreases in knitting.
 										</p>
 									</div>
 								</div>
