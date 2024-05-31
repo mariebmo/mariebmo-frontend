@@ -5,9 +5,3 @@
 		stroke-width="25"
 	/>
 </svg>
-
-<style>
-	svg path {
-		color: var(--text-1);
-	}
-</style>

@@ -10,7 +10,7 @@
 	<Header />
 
 	<main>
-		<div class="">
+		<div class="min-h-screen">
 			<slot class="align-top" />
 		</div>
 	</main>

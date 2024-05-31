@@ -46,7 +46,7 @@
 		isDarkMode = !isDarkMode;
 
 		//refresh icon
-		icon = isDarkMode ? 'ic:round-light-mode' : 'ic:round-dark-mode';
+		icon = !isDarkMode ? 'carbon:light' : 'carbon:moon';
 	}
 </script>
 
