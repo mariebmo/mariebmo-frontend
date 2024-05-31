@@ -204,7 +204,6 @@
 
 		shorthandOutput = printShorthand(combinedActions);
 		shorthandOutput = shorthandOutput.slice(0, -2);
-
 	}
 
 	function printShorthand(actionArr: Action[]): string {
@@ -235,104 +234,78 @@
 	}
 </script>
 
-<div id="knitting-page">
-	<div id="knitting-calculator-content">
-		<h1>Knitting Calculator</h1>
+<section class="flex flex-col antialiased p-4 align-top" id="knitting-container">
+	<div class="h-full">
+		<!-- Card -->
+		<div class="max-w-2xl mx-auto dark:bg-amber-800 bg-orange-200 shadow-lg rounded-lg">
+			<div class="px-6 py-5">
+				<div class="flex items-start">
+					<!-- Icon -->
+					<div
+						class="fill-current text-amber-800 dark:text-orange-200 p-1 mr-4 bg-orange-300 dark:bg-amber-700 rounded-full"
+					>
+						<iconify-icon width="30" icon="carbon:user-favorite" />
+					</div>
+					<!-- Card content -->
+					<div id="knitting-calculator-content">
+						<h1
+							class="text-2xl leading-snug font-extrabold dark:text-gray-50 text-gray-900 truncate mb-1 sm:mb-0"
+						>
+							Knitting Calculator
+						</h1>
 
-		<p class="info-text" id="info-text-knitting">
-			The calculator is used for even increases or decreases in knitting.
-		</p>
+						<p class="max-w-md dark:text-amber-100 text-amber-950" id="info-text-knitting">
+							The calculator is used for even increases or decreases in knitting.
+						</p>
 
-		<div id="knitting-calculator-search">
-			<label class="calculator-element" for="current">from</label>
-			<input
-				id="current"
-				class="input-number calculator-element"
-				type="number"
-				bind:value={current}
-			/>
+						<!-- Divider -->
+						<div class="border-t border-amber-950 dark:border-amber-100 my-4" />
 
-			<button
-				on:click={toggleIncreaseDecrease}
-				id="increase-decrease-btn"
-				class="calculator-element">{increaseOrDecrease}</button
-			>
-			<button on:click={toggleByOrTo} id="by-to-btn" class="calculator-element">{byOrTo}</button>
+						<div id="knitting-calculator-search">
+							<label class="calculator-element" for="current">from</label>
+							<input
+								id="current"
+								class="block text-sm font-medium leading-6 text-gray-900 rounded-lg"
+								type="number"
+								bind:value={current}
+							/>
 
-			<input
-				id="amount"
-				class="input-number calculator-element"
-				type="number"
-				bind:value={amount}
-			/>
+							<button
+								on:click={toggleIncreaseDecrease}
+								id="increase-decrease-btn"
+								class="px-3 py-1 my-2 text-xs font-medium text-center inline-flex items-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-900 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+								>{increaseOrDecrease}</button
+							>
+							<button
+								on:click={toggleByOrTo}
+								id="by-to-btn"
+								class="px-3 py-1 my-2 text-xs font-medium text-center inline-flex items-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-900 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+								>{byOrTo}</button
+							>
 
-			<button class="calculator-element" on:click={submit}>Search</button>
-		</div>
+							<input
+								id="amount"
+								class="block text-sm font-medium leading-6 text-gray-900 rounded-lg"
+								type="number"
+								bind:value={amount}
+							/>
 
-		<div>
-			<div class="increase-output">
-				<p>{visualizationOutput}</p>
-				<p>{knittingLingoOutput}</p>
-				<p>{shorthandOutput}</p>
+							<button
+								class="px-3 py-1 my-2 text-xs font-medium text-center inline-flex items-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-900 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+								on:click={submit}>Submit</button
+							>
+						</div>
+
+						<div>
+							<div class="increase-output">
+								<p>{visualizationOutput}</p>
+								<p>{knittingLingoOutput}</p>
+								<p>{shorthandOutput}</p>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
-</div>
-
-<style>
-	.increase-output {
-		margin-top: 1rem;
-		font-family: monospace;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-	}
-
-	.input-number {
-		width: 3rem;
-	}
-
-	#knitting-page {
-		width: 100%;
-		height: 100%;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-	}
-
-	#knitting-calculator-content {
-		align-items: center;
-		display: flex;
-		flex-direction: column;
-		width: 100%;
-		height: 100%;
-		max-width: 600px;
-	}
-
-	#knitting-calculator-search {
-		display: flex;
-		flex-direction: row;
-		align-items: center;
-		justify-content: center;
-		width: 100%;
-	}
-
-	#increase-decrease-btn {
-		min-width: 75px;
-	}
-
-	#by-to-btn {
-		min-width: 30px;
-	}
-
-	#info-text-knitting {
-		max-width: 600px;
-		text-align: center;
-		position: relative;
-		bottom: 0;
-	}
-
-	.calculator-element {
-		margin: 0 0 0 0.5rem;
-	}
-</style>
+</section>
