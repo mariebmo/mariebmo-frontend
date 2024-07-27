@@ -20,8 +20,6 @@
 
 			isDarkMode = false;
 		}
-
-		toggle();
 	}
 
 	function toggle() {

@@ -1,20 +1,9 @@
 <script lang="ts">
-	enum KnitAction {
-		KNIT = 'k',
-		INCREASE = 'm',
-		DECREASE = 'k2tog'
-	}
-
-	enum KnitSymbol {
-		KNIT = '-',
-		INCREASE = '+',
-		DECREASE = 'x'
-	}
-
-	interface Action {
-		actions: string[];
-		count: number;
-	}
+	import ActionToggleList from './ActionToggleList.svelte';
+	import { KnitSymbol, KnitType, type KnittingAction, type KnittingActions } from './interfaces';
+	import KnittingActionFullyWritten from './KnittingActionFullyWritten.svelte';
+	import KnittingActionShorthand from './KnittingActionShorthand.svelte';
+	import KnittingActionVisual from './KnittingActionVisual.svelte';
 
 	const MAX_ITERATIONS = 500;
 
@@ -26,11 +15,8 @@
 	$: byOrTo = totalAmountIncluded ? 'to' : 'by';
 	$: increaseOrDecrease = increaseSelected ? 'increase' : 'decrease';
 
-	let visualizationOutput = '';
-	let knittingLingoOutput = '';
-	let shorthandOutput = '';
-
 	let actions: string[] = [];
+	let knittingActions: KnittingActions | null = null;
 
 	function toggleByOrTo() {
 		totalAmountIncluded = !totalAmountIncluded;
@@ -41,25 +27,22 @@
 	}
 
 	function handleStitches(
-		action: KnitAction,
+		action: KnitType,
 		ratio: number,
 		totalStitches: number,
 		incDecAmount: number
 	) {
-		visualizationOutput = '';
-		knittingLingoOutput = '';
+		let visualizationOutput = ''; // --+---+--+---+
+		let knittingLingoOutput = ''; // k2, m, k3, m, k2, m, k3, m
 
-		if (
-			(action == KnitAction.INCREASE && ratio < 1) ||
-			(action == KnitAction.DECREASE && ratio < 0)
-		) {
+		if ((action == KnitType.INCREASE && ratio < 1) || (action == KnitType.DECREASE && ratio < 0)) {
 			visualizationOutput =
 				'This calculator can only handle k2tog or m1 - this is not possible with the given inputs.';
 			return;
 		}
 
 		let nextIncrease = ratio;
-		const symbol = action == KnitAction.INCREASE ? KnitSymbol.INCREASE : KnitSymbol.DECREASE;
+		const symbol = action == KnitType.INCREASE ? KnitType.INCREASE : KnitType.DECREASE;
 
 		let knitCount = 0;
 
@@ -68,7 +51,7 @@
 				case true:
 					visualizationOutput += symbol + ' ';
 					var knitCountOutput = knitCount > 1 ? knitCount : '';
-					var knitActionOutput = knitCount > 0 ? KnitAction.KNIT + knitCountOutput + ', ' : '';
+					var knitActionOutput = knitCount > 0 ? KnitType.KNIT + knitCountOutput + ', ' : '';
 					knittingLingoOutput += knitActionOutput + action + ', ';
 
 					actions.push(knitActionOutput + action);
@@ -88,10 +71,10 @@
 		if (incDecAmount == 1) {
 			visualizationOutput += symbol;
 			var knitCountOutput = knitCount > 1 ? knitCount : '';
-			var knitActionOutput = knitCount > 0 ? KnitAction.KNIT + knitCountOutput + ', ' : '';
+			var knitActionOutput = knitCount > 0 ? KnitType.KNIT + knitCountOutput + ', ' : '';
 			knittingLingoOutput += knitActionOutput + action;
 			actions.push(knitActionOutput + action);
-		} else if (incDecAmount > 1) {
+		} else if (incDecAmount > 1 || incDecAmount < 0) {
 			visualizationOutput =
 				"Hmm. There's something wrong with the calculation. There is a remainder of " +
 				incDecAmount +
@@ -100,23 +83,31 @@
 		} else {
 			knittingLingoOutput = knittingLingoOutput.slice(0, -2);
 		}
+
+		var knittingAction = getKnittingAction();
+
+		knittingActions = {
+			actions: knittingAction,
+			visualize: visualizationOutput,
+			fullWritten: knittingLingoOutput
+		};
 	}
 
 	function increase() {
 		const increaseAmount = totalAmountIncluded ? amount - current : amount;
 		const increaseRatio = current / increaseAmount;
-		handleStitches(KnitAction.INCREASE, increaseRatio, current + increaseAmount, increaseAmount);
+		handleStitches(KnitType.INCREASE, increaseRatio, current + increaseAmount, increaseAmount);
 	}
 
 	function decrease() {
 		const decreaseAmount = totalAmountIncluded ? current - amount : amount;
 		const decreaseRatio = (current - decreaseAmount) / decreaseAmount - 1;
 
-		handleStitches(KnitAction.DECREASE, decreaseRatio, current - decreaseAmount, decreaseAmount);
+		handleStitches(KnitType.DECREASE, decreaseRatio, current - decreaseAmount, decreaseAmount);
 	}
 
-	function makeShorthand() {
-		let combinedActions: Action[] = [];
+	function getKnittingAction(): KnittingAction[] {
+		let knittingAction: KnittingAction[] = [];
 		let lookAhead = 3;
 
 		let index = 0;
@@ -126,11 +117,11 @@
 			let currentAction = actions[index];
 			let lookAheadIndex = 1;
 
-			let possibleMatches: Action[] = [];
+			let possibleMatches: KnittingAction[] = [];
 
 			let hasAMatch = false;
 
-			let lastAction = combinedActions[combinedActions.length - 1];
+			let lastAction = knittingAction[knittingAction.length - 1];
 
 			if (lastAction?.actions != null) {
 				if (
@@ -173,7 +164,7 @@
 					//see if best match consists of same actions
 					let bestMatchSet = new Set(bestMatch.actions);
 					if (bestMatchSet.size == 1) {
-						combinedActions.push({
+						knittingAction.push({
 							actions: [bestMatch.actions[0]],
 							count: bestMatch.actions.length * 2
 						});
@@ -181,19 +172,19 @@
 						index += bestMatch.actions.length * 2;
 						hasAMatch = true;
 					} else {
-						combinedActions.push(bestMatch);
+						knittingAction.push(bestMatch);
 						index += bestMatch.actions.length * 2;
 						hasAMatch = true;
 					}
 				}
 			} else if (possibleMatches.length == 1) {
-				combinedActions.push(possibleMatches[0]);
+				knittingAction.push(possibleMatches[0]);
 				index += possibleMatches[0].actions.length * 2;
 				hasAMatch = true;
 			}
 
 			if (!hasAMatch) {
-				combinedActions.push({
+				knittingAction.push({
 					actions: [currentAction],
 					count: 1
 				});
@@ -202,24 +193,7 @@
 			}
 		}
 
-		shorthandOutput = printShorthand(combinedActions);
-		shorthandOutput = shorthandOutput.slice(0, -2);
-	}
-
-	function printShorthand(actionArr: Action[]): string {
-		let output = '';
-
-		for (let i = 0; i < actionArr.length; i++) {
-			let action = actionArr[i];
-
-			if (action.count > 1) {
-				output += '(' + action.actions.join(', ') + ') ' + action.count + 'times, ';
-			} else {
-				output += action.actions.join('') + ', ';
-			}
-		}
-
-		return output;
+		return knittingAction;
 	}
 
 	function submit() {
@@ -229,7 +203,6 @@
 			decrease();
 		}
 
-		makeShorthand();
 		actions = [];
 	}
 </script>
@@ -296,13 +269,21 @@
 							>
 						</div>
 
-						<div>
-							<div class="increase-output">
-								<p>{visualizationOutput}</p>
-								<p>{knittingLingoOutput}</p>
-								<p>{shorthandOutput}</p>
+						{#if knittingActions != null}
+							<div>
+								<div class="increase-output">
+									<div class="flex flex-row">
+										<button> Show Visual </button>
+										<button> Show Shorthand </button>
+										<button> Show List </button>
+									</div>
+									<ActionToggleList actions={knittingActions} />
+									<KnittingActionShorthand actions={knittingActions} />
+									<KnittingActionVisual actions={knittingActions} />
+									<KnittingActionFullyWritten actions={knittingActions} />
+								</div>
 							</div>
-						</div>
+						{/if}
 					</div>
 				</div>
 			</div>
