@@ -1,6 +1,4 @@
 <script>
-	import { description } from '$lib/config';
-
 	//import LargeLogo from '../routes/components/LargeLogo.svelte';
 	import ProjectCard from '../routes/components/ProjectCard.svelte';
 

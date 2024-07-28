@@ -1,3 +1,5 @@
+import { SvelteComponent } from 'svelte';
+
 export enum KnitType {
 	KNIT = 'k',
 	INCREASE = 'm',
@@ -19,4 +21,12 @@ export interface KnittingActions {
 	visualize: string;
 	fullWritten: string;
 	actions: KnittingAction[];
+}
+
+export interface KnittingComponent {
+	name: string;
+	component: typeof SvelteComponent;
+	index: number;
+	show: boolean;
+	id: string;
 }

@@ -1,10 +1,19 @@
 <script lang="ts">
+	import { knittingActionsStore } from '$lib/stores/knittingActionStore';
 	import type { KnittingAction, KnittingActions } from './interfaces';
 
-	export let actions: KnittingActions;
+	let actions: KnittingActions = {
+		actions: [],
+		fullWritten: '',
+		visualize: ''
+	};
 
-	let shorthandOutput = printShorthand(actions.actions);
-	shorthandOutput = shorthandOutput.slice(0, -2);
+	knittingActionsStore.subscribe((value) => {
+		actions = value || { actions: [], fullWritten: '', visualize: '' };
+	});
+
+	$: shorthandOutput = printShorthand(actions.actions);
+	shorthandOutput = shorthandOutput ? shorthandOutput.slice(0, -2) : '';
 
 	function printShorthand(actionArr: KnittingAction[]): string {
 		let output = '';
@@ -13,9 +22,9 @@
 			let action = actionArr[i];
 
 			if (action.count > 1) {
-				output += '(' + action.actions.join(', ') + ') ' + action.count + 'times, ';
+				output += '(' + action.actions.join(', ') + ') ' + action.count + ' times, ';
 			} else {
-				output += action.actions.join('') + ', ';
+				output += action.actions.join(', ') + ', ';
 			}
 		}
 
@@ -23,8 +32,6 @@
 	}
 </script>
 
-<div
-	class="flex flex-col p-5 fill-current text-amber-800 dark:text-orange-200 bg-orange-300 dark:bg-amber-700 rounded-sm"
->
+<div>
 	<p>{shorthandOutput}</p>
 </div>
