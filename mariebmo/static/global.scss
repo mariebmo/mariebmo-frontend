@@ -21,7 +21,7 @@ html {
 	--magenta-10: #f2e9e4;
 
 	--white-1: #ffffff;
-	--white-2: #f2f2f2;
+	--white-2: #eeebeb;
 	--white-3: #e5e5e5;
 	--white-4: #d9d9d9;
 
@@ -56,38 +56,8 @@ html {
 	--surface-2-light: var(--gray-1);
 	--surface-3-light: var(--gray-2);
 	--surface-4-light: var(--gray-3);
-	--background-light: var(--magenta-10);
+	--background-light: var(--white-2);
 	--border-light: var(--gray-4);
-}
-
-html[data-theme='dark'],
-[color-scheme='dark'] {
-	color-scheme: dark;
-
-	--brand: var(--brand-dark);
-	--text-1: var(--text-1-dark);
-	--text-2: var(--text-2-dark);
-	--surface-1: var(--surface-1-dark);
-	--surface-2: var(--surface-2-dark);
-	--surface-3: var(--surface-3-dark);
-	--surface-4: var(--surface-4-dark);
-	--background: var(--background-dark);
-	--border: var(--border-dark);
-}
-
-html[data-theme='light'],
-[color-scheme='light'] {
-	color-scheme: light;
-
-	--brand: var(--brand-light);
-	--text-1: var(--text-1-light);
-	--text-2: var(--text-2-light);
-	--surface-1: var(--surface-1-light);
-	--surface-2: var(--surface-2-light);
-	--surface-3: var(--surface-3-light);
-	--surface-4: var(--surface-4-light);
-	--background: var(--background-light);
-	--border: var(--border-light);
 }
 
 html,
@@ -98,9 +68,6 @@ body {
 }
 
 html {
-	color: var(--text-1);
-	accent-color: var(--link);
-	background-color: var(--background);
 	background-attachment: fixed;
 }
 
