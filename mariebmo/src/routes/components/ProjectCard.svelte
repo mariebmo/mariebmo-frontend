@@ -8,7 +8,7 @@
 	export let descriptionTextColorClasses = '';
 </script>
 
-<section class="flex flex-col justify-center antialiased p-4" id="knitting-container">
+<section class="flex flex-col flex-1 justify-center antialiased p-4" id="knitting-container">
 	<a class="h-full" href={link}>
 		<!-- Card -->
 		<div class="max-w-2xl mx-auto shadow-lg rounded-lg {bakcgorundColorClasses}">
