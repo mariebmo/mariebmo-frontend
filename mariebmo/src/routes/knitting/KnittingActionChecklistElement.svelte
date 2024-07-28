@@ -47,7 +47,7 @@
 	<div class="flex flex-row align-middle">
 		<input
 			type="checkbox"
-			class="checkbox checkbox-large"
+			class="accent-amber-600 dark:accent-amber-900 checkbox checkbox-large"
 			bind:checked={allSelected}
 			on:click={toggleAll}
 		/>
@@ -59,7 +59,10 @@
 		</p>
 
 		{#if action.count > 1}
-			<button on:click={toggleExpanded} class="dropdown-icon-btn ml-2 mt-1">
+			<button
+				on:click={toggleExpanded}
+				class="dropdown-icon-btn ml-2 mt-1 bg-amber-600 dark:bg-amber-800"
+			>
 				<iconify-icon icon="gridicons:dropdown" class="icon" bind:this={icon} />
 			</button>
 		{/if}
@@ -69,7 +72,11 @@
 		<div class="flex flex-col mb-3 mt-2">
 			{#each subActions as subAction, i}
 				<div class="flex flex-row ml-5 my-0.5">
-					<input type="checkbox" class="checkbox" bind:checked={subAction.selected} />
+					<input
+						type="checkbox"
+						class="accent-amber-600 dark:accent-amber-900 checkbox"
+						bind:checked={subAction.selected}
+					/>
 					<p class:completed={subAction.selected} class="ml-2">{subAction.action}</p>
 				</div>
 			{/each}
@@ -79,7 +86,6 @@
 
 <style lang="scss">
 	.dropdown-icon-btn {
-		background-color: #92410e8d;
 		width: 1.2rem;
 		height: 1.2rem;
 		border-radius: 5px;
@@ -95,7 +101,6 @@
 		border-radius: 5px;
 		width: 1.1rem;
 		height: 1.1rem;
-		accent-color: #92410e;
 	}
 
 	.checkbox-large {
