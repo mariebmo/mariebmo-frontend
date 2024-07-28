@@ -63,12 +63,13 @@
 			<div
 				class:even={index % 2 === 0}
 				class:odd={index % 2 !== 0}
-				class="flex flex-col justify-between items-center w-full p-5 fill-current text-amber-800 dark:text-orange-200 bg-orange-300 dark:bg-amber-700 rounded-sm"
+				class="flex py-3 flex-col justify-between items-center w-full fill-current text-amber-800 dark:text-orange-200 bg-orange-300 dark:bg-amber-700 rounded-sm"
 			>
 				<div class="flex flex-row justify-between items-center w-full">
 					<!-- Drag handle -->
+
 					<button
-						class="drag-handle mr-5 handle"
+						class="drag-handle handle h-full w-10 pt-5 pl-5 pb-5 pr-5 mr-5"
 						on:mousedown={startDrag}
 						on:touchstart={startDrag}
 						on:mouseup={stopDrag}
@@ -87,23 +88,25 @@
 					</div>
 
 					<!-- Show/Hide button -->
-					{#if visible}
-						<button
-							class="ml-5"
-							on:click={() =>
-								(components = components.map((c) => (c.id === id ? { ...c, visible: false } : c)))}
-						>
-							<iconify-icon icon="mdi:eye" />
-						</button>
-					{:else}
-						<button
-							class="ml-5"
-							on:click={() =>
-								(components = components.map((c) => (c.id === id ? { ...c, visible: true } : c)))}
-						>
-							<iconify-icon icon="mdi:eye-off" />
-						</button>
-					{/if}
+					<div class="ml-5 pr-5">
+						{#if visible}
+							<button
+								on:click={() =>
+									(components = components.map((c) =>
+										c.id === id ? { ...c, visible: false } : c
+									))}
+							>
+								<iconify-icon icon="mdi:eye" />
+							</button>
+						{:else}
+							<button
+								on:click={() =>
+									(components = components.map((c) => (c.id === id ? { ...c, visible: true } : c)))}
+							>
+								<iconify-icon icon="mdi:eye-off" />
+							</button>
+						{/if}
+					</div>
 				</div>
 			</div>
 		</div>
