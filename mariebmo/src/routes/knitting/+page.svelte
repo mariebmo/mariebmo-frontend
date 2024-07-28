@@ -204,7 +204,30 @@
 			}
 		}
 
-		return knittingAction;
+		return makeSmaller(knittingAction);
+	}
+
+	function makeSmaller(knittingAction: KnittingAction[]): KnittingAction[] {
+		let newKnittingAction: KnittingAction[] = [];
+
+		let previousAction = knittingAction[0].actions.join('');
+		let previousActionIndex = 0;
+
+		for (let i = 1; i < knittingAction.length; i++) {
+			let currentAction = knittingAction[i].actions.join('');
+
+			if (previousAction == currentAction) {
+				knittingAction[previousActionIndex].count += knittingAction[i].count;
+				knittingAction[i].count = 0;
+			} else {
+				previousAction = currentAction;
+				previousActionIndex = i;
+			}
+		}
+
+		newKnittingAction = knittingAction.filter((action) => action.count > 0);
+
+		return newKnittingAction;
 	}
 
 	function submit() {

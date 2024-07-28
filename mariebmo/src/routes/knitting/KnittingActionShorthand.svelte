@@ -13,7 +13,6 @@
 	});
 
 	$: shorthandOutput = printShorthand(actions.actions);
-	shorthandOutput = shorthandOutput ? shorthandOutput.slice(0, -2) : '';
 
 	function printShorthand(actionArr: KnittingAction[]): string {
 		let output = '';
@@ -27,6 +26,8 @@
 				output += action.actions.join(', ') + ', ';
 			}
 		}
+
+		output = output.replace(/(, )$/, '');
 
 		return output;
 	}
