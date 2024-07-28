@@ -63,7 +63,7 @@
 			<div
 				class:even={index % 2 === 0}
 				class:odd={index % 2 !== 0}
-				class="flex flex-col justify-between items-center w-full fill-current text-amber-800 dark:text-orange-200 bg-orange-300 dark:bg-amber-700 rounded-sm"
+				class="flex py-3 flex-col justify-between items-center w-full fill-current text-amber-800 dark:text-orange-200 bg-orange-300 dark:bg-amber-700 rounded-sm"
 			>
 				<div class="flex flex-row justify-between items-center w-full">
 					<!-- Drag handle -->

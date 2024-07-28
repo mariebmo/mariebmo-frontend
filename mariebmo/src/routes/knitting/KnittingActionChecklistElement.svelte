@@ -41,44 +41,36 @@
 			});
 		}
 	}
-
-	$: console.log(expanded);
-	$: console.log(subActions);
 </script>
 
 <div>
-	<div class="flex flex-row">
+	<div class="flex flex-row align-middle">
 		<input
 			type="checkbox"
 			class="checkbox checkbox-large"
 			bind:checked={allSelected}
 			on:click={toggleAll}
 		/>
-		{#if allSelected}
-			<p class="ml-2 line-through">
-				{action.actions} <span class="font-bold">(x{action.count})</span>
-			</p>
-		{:else}
-			<p class="ml-2">{action.actions} (x{action.count})</p>
-		{/if}
+		<p class:completed={allSelected} class="ml-2 align-middle">
+			{action.actions.join(', ')}
+			{#if action.count > 1}
+				<span class="font-bold">(x{action.count})</span>
+			{/if}
+		</p>
 
 		{#if action.count > 1}
-			<button on:click={toggleExpanded} class="dropdown-icon-btn ml-2">
+			<button on:click={toggleExpanded} class="dropdown-icon-btn ml-2 mt-1">
 				<iconify-icon icon="gridicons:dropdown" class="icon" bind:this={icon} />
 			</button>
 		{/if}
 	</div>
 
 	{#if expanded}
-		<div class="flex flex-col mb-3">
+		<div class="flex flex-col mb-3 mt-2">
 			{#each subActions as subAction, i}
-				<div class="flex flex-row ml-5">
+				<div class="flex flex-row ml-5 my-0.5">
 					<input type="checkbox" class="checkbox" bind:checked={subAction.selected} />
-					{#if subAction.selected}
-						<p class="ml-2 line-through">{subAction.action}</p>
-					{:else}
-						<p class="ml-2">{subAction.action}</p>
-					{/if}
+					<p class:completed={subAction.selected} class="ml-2">{subAction.action}</p>
 				</div>
 			{/each}
 		</div>
@@ -101,11 +93,17 @@
 	.checkbox {
 		border: none;
 		border-radius: 5px;
+		width: 1.1rem;
+		height: 1.1rem;
 		accent-color: #92410e;
 	}
 
 	.checkbox-large {
 		width: 1.2rem;
 		height: 1.2rem;
+	}
+
+	.completed {
+		text-decoration: line-through;
 	}
 </style>
