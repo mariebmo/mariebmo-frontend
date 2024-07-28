@@ -14,6 +14,16 @@
 	$: byOrTo = totalAmountIncluded ? 'to' : 'by';
 	$: increaseOrDecrease = increaseSelected ? 'increase' : 'decrease';
 
+	let showSettings = false;
+
+	let knitSymbolOverwrite: string | null = null;
+	let increaseSymbolOverwrite: string | null = null;
+	let decreaseSymbolOverwrite: string | null = null;
+
+	let knitTypeOverwrite: string | null = null;
+	let increaseTypeOverwrite: string | null = null;
+	let decreaseTypeOverwrite: string | null = null;
+
 	let actions: string[] = [];
 	let knittingActions: KnittingActions | null = null;
 
@@ -41,7 +51,25 @@
 		}
 
 		let nextIncrease = ratio;
-		const symbol = action == KnitType.INCREASE ? KnitType.INCREASE : KnitType.DECREASE;
+
+		let symbols = {
+			knit: {
+				symbol: knitSymbolOverwrite ?? KnitSymbol.KNIT,
+				type: knitTypeOverwrite ?? KnitType.KNIT
+			},
+			increase: {
+				symbol: increaseSymbolOverwrite ?? KnitSymbol.INCREASE,
+				type: increaseTypeOverwrite ?? KnitType.INCREASE
+			},
+			decrease: {
+				symbol: decreaseSymbolOverwrite ?? KnitSymbol.DECREASE,
+				type: decreaseTypeOverwrite ?? KnitType.DECREASE
+			}
+		};
+
+		const symbol = action == KnitType.INCREASE ? symbols.increase.symbol : symbols.decrease.symbol;
+		const actionSymbol =
+			action == KnitType.INCREASE ? symbols.increase.type : symbols.decrease.type;
 
 		let knitCount = 0;
 
@@ -50,10 +78,10 @@
 				case true:
 					visualizationOutput += symbol + ' ';
 					var knitCountOutput = knitCount > 1 ? knitCount : '';
-					var knitActionOutput = knitCount > 0 ? KnitType.KNIT + knitCountOutput + ', ' : '';
-					knittingLingoOutput += knitActionOutput + action + ', ';
+					var knitActionOutput = knitCount > 0 ? symbols.knit.type + knitCountOutput + ', ' : '';
+					knittingLingoOutput += knitActionOutput + actionSymbol + ', ';
 
-					actions.push(knitActionOutput + action);
+					actions.push(knitActionOutput + actionSymbol);
 
 					knitCount = 0;
 					nextIncrease += ratio;
@@ -62,7 +90,7 @@
 				case false:
 					knitCount++;
 					nextIncrease--;
-					visualizationOutput += KnitSymbol.KNIT + ' ';
+					visualizationOutput += symbols.knit.symbol + ' ';
 					break;
 			}
 		}
@@ -70,9 +98,9 @@
 		if (incDecAmount == 1) {
 			visualizationOutput += symbol;
 			var knitCountOutput = knitCount > 1 ? knitCount : '';
-			var knitActionOutput = knitCount > 0 ? KnitType.KNIT + knitCountOutput + ', ' : '';
-			knittingLingoOutput += knitActionOutput + action;
-			actions.push(knitActionOutput + action);
+			var knitActionOutput = knitCount > 0 ? symbols.knit.type + knitCountOutput + ', ' : '';
+			knittingLingoOutput += knitActionOutput + actionSymbol;
+			actions.push(knitActionOutput + actionSymbol);
 		} else if (incDecAmount > 1 || incDecAmount < 0) {
 			visualizationOutput =
 				"Hmm. There's something wrong with the calculation. There is a remainder of " +
@@ -247,8 +275,8 @@
 		<div class="max-w-2xl mx-auto dark:bg-amber-800 bg-orange-200 shadow-lg rounded-lg">
 			<div class="px-6 py-5">
 				<!--HEADER AREA -->
-				<div>
-					<div class="flex flex-row items-start">
+				<div class="flex flex-row">
+					<div class="flex flex-row items-start flex-grow">
 						<!-- Icon -->
 						<div
 							class=" h-10 w-10 fill-current text-amber-800 dark:text-orange-200 p-1 mr-4 bg-orange-300 dark:bg-amber-700 rounded-full"
@@ -266,6 +294,76 @@
 							<p class="max-w-md dark:text-amber-100 text-amber-950" id="info-text-knitting">
 								The calculator is used for even increases or decreases in knitting.
 							</p>
+						</div>
+					</div>
+
+					<!-- Settings -->
+					<div>
+						<div class="flex flex-row">
+							{#if showSettings}
+								<div class="flex flex-col max-w-xs" id="settings-panel">
+									<div class="flex flex-row">
+										<input
+											type="text"
+											bind:value={knitSymbolOverwrite}
+											placeholder={KnitSymbol.KNIT}
+											class="w-12 m-1 font-medium text-gray-900 rounded-md text-center shrink-0"
+										/>
+
+										<input
+											type="text"
+											bind:value={knitTypeOverwrite}
+											placeholder={KnitType.KNIT}
+											class="w-12 m-1 font-medium text-gray-900 rounded-md text-center shrink-0"
+										/>
+
+										<p class="ml-2 text-sm mt-1.5">Knit</p>
+									</div>
+
+									<div class="flex flex-row">
+										<input
+											type="text"
+											bind:value={increaseSymbolOverwrite}
+											placeholder={KnitSymbol.INCREASE}
+											class="w-12 m-1 font-medium text-gray-900 rounded-md text-center shrink-0"
+										/>
+
+										<input
+											type="text"
+											bind:value={increaseTypeOverwrite}
+											placeholder={KnitType.INCREASE}
+											class="w-12 m-1 font-medium text-gray-900 rounded-md text-center shrink-0"
+										/>
+
+										<p class="ml-2 text-sm mt-1.5">Increase</p>
+									</div>
+
+									<div class="flex flex-row">
+										<input
+											type="text"
+											bind:value={decreaseSymbolOverwrite}
+											placeholder={KnitSymbol.DECREASE}
+											class="w-12 m-1 font-medium text-gray-900 rounded-md text-center shrink-0"
+										/>
+
+										<input
+											type="text"
+											bind:value={decreaseTypeOverwrite}
+											placeholder={KnitType.DECREASE}
+											class="w-12 m-1 font-medium text-gray-900 rounded-md text-center shrink-0"
+										/>
+
+										<p class="ml-2 text-sm mt-1.5">Decrease</p>
+									</div>
+								</div>
+							{/if}
+
+							<button
+								class="p-2 w-8 h-8 text-center inline-flex items-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-900 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+								on:click={() => (showSettings = !showSettings)}
+							>
+								<iconify-icon icon="mdi:cog" />
+							</button>
 						</div>
 					</div>
 
