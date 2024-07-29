@@ -18,8 +18,8 @@
 	$: allSelected = subActions.every((subAction) => subAction.selected);
 	let expanded = false;
 
-	function toggleExpanded() {
-		expanded = !expanded;
+	function toggleExpanded(toggle: boolean | null = null) {
+		expanded = toggle ?? !expanded;
 
 		if (icon) {
 			if (expanded) {
@@ -40,6 +40,19 @@
 				subAction.selected = true;
 			});
 		}
+	}
+
+	function reset(action: KnittingAction) {
+		toggleExpanded(false);
+
+		subActions = [];
+		for (let i = 0; i < action.count; i++) {
+			subActions.push({ action: action.actions.join(', '), selected: false });
+		}
+	}
+
+	$: {
+		reset(action);
 	}
 </script>
 
