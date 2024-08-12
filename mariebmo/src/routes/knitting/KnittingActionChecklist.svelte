@@ -2,7 +2,7 @@
 	import { knittingActionsStore } from '$lib/stores/knittingActionStore';
 	import KnittingActionChecklist from './KnittingActionChecklistElement.svelte';
 	import type { KnittingActions } from './interfaces';
-	let actions: KnittingActions = {
+	let actions: KnittingActions | null = {
 		actions: [],
 		fullWritten: '',
 		visualize: ''
@@ -15,7 +15,7 @@
 
 <div>
 	<div class="flex flex-col">
-		{#if actions.actions}
+		{#if actions?.actions}
 			{#each actions.actions as action, i}
 				<KnittingActionChecklist {action} />
 			{/each}
