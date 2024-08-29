@@ -2,7 +2,8 @@
 	import { knittingActionsStore } from '$lib/stores/knittingActionStore';
 	import KnittingActionChecklist from './KnittingActionChecklistElement.svelte';
 	import type { KnittingActions } from './interfaces';
-	let actions: KnittingActions | null = {
+
+  let actions: KnittingActions | null = {
 		actions: [],
 		fullWritten: '',
 		visualize: ''
