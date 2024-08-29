@@ -2,7 +2,10 @@
 	import '../app.css';
 	import Header from './components/Header.svelte';
 	import Footer from './components/Footer.svelte';
-	import 'iconify-icon';
+
+	import { inject } from '@vercel/analytics';
+
+	inject();
 </script>
 
 <div class="layout">

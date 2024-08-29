@@ -10,6 +10,7 @@
 	let amount: number;
 	let totalAmountIncluded = false;
 	let increaseSelected = true;
+	let warning: string | null = null;
 
 	$: byOrTo = totalAmountIncluded ? 'to' : 'by';
 	$: increaseOrDecrease = increaseSelected ? 'increase' : 'decrease';
@@ -35,13 +36,16 @@
 		let knittingLingoOutput = ''; // k2, m, k3, m, k2, m, k3, m
 
 		if ((action == KnitType.INCREASE && ratio < 1) || (action == KnitType.DECREASE && ratio < 0)) {
-			visualizationOutput =
+			warning =
 				'This calculator can only handle k2tog or m1 - this is not possible with the given inputs.';
+			knittingActions = null;
+			knittingActionsStore.set(knittingActions);
 			return;
 		}
 
+		warning = null;
 		let nextIncrease = ratio;
-		const symbol = action == KnitType.INCREASE ? KnitType.INCREASE : KnitType.DECREASE;
+		const symbol = action == KnitType.INCREASE ? KnitSymbol.INCREASE : KnitSymbol.DECREASE;
 
 		let knitCount = 0;
 
@@ -324,6 +328,10 @@
 						<div class="mt-5">
 							<MovableList />
 						</div>
+					{/if}
+
+					{#if warning}
+						<p class="text-red-500 dark:text-red-400">{warning}</p>
 					{/if}
 				</div>
 			</div>
