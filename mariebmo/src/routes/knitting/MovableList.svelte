@@ -69,6 +69,7 @@
 					<!-- Drag handle -->
 
 					<button
+						class:is-collapsed={!visible}
 						class="drag-handle handle h-full w-10 pt-5 pl-5 pb-5 pr-5 mr-5"
 						on:mousedown={startDrag}
 						on:touchstart={startDrag}
@@ -120,5 +121,12 @@
 
 	.drag-handle:active {
 		cursor: grabbing;
+	}
+
+	.is-collapsed {
+		padding: 0;
+		margin: 0;
+		height: 01rem;
+		overflow: hidden;
 	}
 </style>

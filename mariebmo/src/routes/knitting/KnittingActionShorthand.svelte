@@ -2,17 +2,13 @@
 	import { knittingActionsStore } from '$lib/stores/knittingActionStore';
 	import type { KnittingAction, KnittingActions } from './interfaces';
 
-	let actions: KnittingActions = {
-		actions: [],
-		fullWritten: '',
-		visualize: ''
-	};
+	let actions: KnittingActions | null = null;
 
 	knittingActionsStore.subscribe((value) => {
 		actions = value || { actions: [], fullWritten: '', visualize: '' };
 	});
 
-	$: shorthandOutput = printShorthand(actions.actions);
+	$: shorthandOutput = actions ? printShorthand(actions.actions) : '';
 
 	function printShorthand(actionArr: KnittingAction[]): string {
 		let output = '';
