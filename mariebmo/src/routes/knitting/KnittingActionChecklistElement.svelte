@@ -77,7 +77,7 @@
 	{/if}
 </div>
 
-<style lang="scss">
+<style lang="postcss">
 	.dropdown-icon-btn {
 		background-color: #92410e8d;
 		width: 1.2rem;

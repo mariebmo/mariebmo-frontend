@@ -2,11 +2,7 @@
 	import { knittingActionsStore } from '$lib/stores/knittingActionStore';
 	import KnittingActionChecklist from './KnittingActionChecklistElement.svelte';
 	import type { KnittingActions } from './interfaces';
-	let actions: KnittingActions = {
-		actions: [],
-		fullWritten: '',
-		visualize: ''
-	};
+	let actions: KnittingActions | null;
 
 	knittingActionsStore.subscribe((value) => {
 		actions = value;
@@ -15,7 +11,7 @@
 
 <div>
 	<div class="flex flex-col">
-		{#if actions.actions}
+		{#if actions?.actions}
 			{#each actions.actions as action, i}
 				<KnittingActionChecklist {action} />
 			{/each}
