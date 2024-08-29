@@ -76,7 +76,7 @@
 						on:mouseup={stopDrag}
 						on:touchend={stopDrag}
 					>
-						<span class="material-symbols-outlined"> drag_indicator </span>
+						<iconify-icon icon="mdi:drag" />
 					</button>
 
 					<!-- Component -->
@@ -97,14 +97,14 @@
 										c.id === id ? { ...c, visible: false } : c
 									))}
 							>
-								<span class="material-symbols-outlined"> visibility </span>
+								<iconify-icon icon="mdi:eye" />
 							</button>
 						{:else}
 							<button
 								on:click={() =>
 									(components = components.map((c) => (c.id === id ? { ...c, visible: true } : c)))}
 							>
-								<span class="material-symbols-outlined"> visibility_off </span>
+								<iconify-icon icon="mdi:eye-off" />
 							</button>
 						{/if}
 					</div>
@@ -114,7 +114,7 @@
 	{/each}
 </div>
 
-<style lang="postcss">
+<style lang="scss">
 	.drag-handle {
 		cursor: grab;
 	}

@@ -97,7 +97,7 @@
 	{/if}
 </div>
 
-<style lang="postcss">
+<style lang="scss">
 	.dropdown-icon-btn {
 		width: 1.2rem;
 		height: 1.2rem;
