@@ -5,13 +5,13 @@
 	import KnittingActionVisual from './KnittingActionVisual.svelte';
 	import KnittingActionChecklist from './KnittingActionChecklist.svelte';
 	import { flip } from 'svelte/animate';
-	import { SvelteComponent } from 'svelte';
+	import type { Component } from 'svelte';
 
 	const flipDurationMs = 200;
 
 	interface ComponentItem {
 		id: string;
-		component: typeof SvelteComponent<any, any, any>;
+		component: Component<any, any, any>;
 		visible: boolean;
 		name: string;
 	}

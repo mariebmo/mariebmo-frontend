@@ -1,4 +1,4 @@
-import { SvelteComponent } from 'svelte';
+import type { Component } from 'svelte';
 
 export enum KnitType {
 	KNIT = 'k',
@@ -25,7 +25,7 @@ export interface KnittingActions {
 
 export interface KnittingComponent {
 	name: string;
-	component: typeof SvelteComponent;
+	component: Component;
 	index: number;
 	show: boolean;
 	id: string;

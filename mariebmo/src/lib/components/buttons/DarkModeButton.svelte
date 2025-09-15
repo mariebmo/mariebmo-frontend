@@ -61,8 +61,4 @@
 		margin: 0;
 		color: var(--text-1);
 	}
-
-	#theme-toggle-icon {
-		font-size: 2rem;
-	}
 </style>

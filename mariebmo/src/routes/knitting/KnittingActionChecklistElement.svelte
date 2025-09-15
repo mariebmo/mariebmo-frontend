@@ -82,7 +82,7 @@
 				onclick={() => toggleExpanded(null)}
 				class="dropdown-icon-btn ml-2 mt-1 bg-amber-600 dark:bg-amber-800"
 			>
-				<iconify-icon icon="gridicons:dropdown" class="icon" bind:this={icon}></iconify-icon>
+				<iconify-icon icon="gridicons:dropdown" class="icon" bind:this={icon} />
 			</button>
 		{/if}
 	</div>
