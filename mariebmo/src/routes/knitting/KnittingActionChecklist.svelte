@@ -3,11 +3,11 @@
 	import KnittingActionChecklist from './KnittingActionChecklistElement.svelte';
 	import type { KnittingActions } from './interfaces';
 
-  let actions: KnittingActions | null = {
+  let actions: KnittingActions | null = $state({
 		actions: [],
 		fullWritten: '',
 		visualize: ''
-	};
+	});
 
 	knittingActionsStore.subscribe((value) => {
 		actions = value;

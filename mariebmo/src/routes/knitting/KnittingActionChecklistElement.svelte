@@ -1,22 +1,28 @@
 <script lang="ts">
+	import { run } from 'svelte/legacy';
+
 	import type { KnittingAction } from './interfaces';
 
-	export let action: KnittingAction;
+	interface Props {
+		action: KnittingAction;
+	}
+
+	let { action }: Props = $props();
 
 	interface SubAction {
 		action: string;
 		selected: boolean;
 	}
 
-	let subActions: SubAction[] = [];
-	let icon: HTMLElement;
+	let subActions: SubAction[] = $state([]);
+	let icon: HTMLElement = $state();
 
 	for (let i = 0; i < action.count; i++) {
 		subActions.push({ action: action.actions.join(', '), selected: false });
 	}
 
-	$: allSelected = subActions.every((subAction) => subAction.selected);
-	let expanded = false;
+	let allSelected = $derived(subActions.every((subAction) => subAction.selected));
+	let expanded = $state(false);
 
 	function toggleExpanded(toggle: boolean | null = null) {
 		expanded = toggle ?? !expanded;
@@ -51,9 +57,9 @@
 		}
 	}
 
-	$: {
+	run(() => {
 		reset(action);
-	}
+	});
 </script>
 
 <div>
@@ -62,7 +68,7 @@
 			type="checkbox"
 			class="accent-amber-600 dark:accent-amber-900 checkbox checkbox-large"
 			bind:checked={allSelected}
-			on:click={toggleAll}
+			onclick={toggleAll}
 		/>
 		<p class:completed={allSelected} class="ml-2 align-middle">
 			{action.actions.join(', ')}
@@ -73,10 +79,10 @@
 
 		{#if action.count > 1}
 			<button
-				on:click={() => toggleExpanded(null)}
+				onclick={() => toggleExpanded(null)}
 				class="dropdown-icon-btn ml-2 mt-1 bg-amber-600 dark:bg-amber-800"
 			>
-				<iconify-icon icon="gridicons:dropdown" class="icon" bind:this={icon} />
+				<iconify-icon icon="gridicons:dropdown" class="icon" bind:this={icon}></iconify-icon>
 			</button>
 		{/if}
 	</div>

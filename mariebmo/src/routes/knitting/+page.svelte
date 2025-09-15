@@ -6,17 +6,17 @@
 
 	const MAX_ITERATIONS = 500;
 
-	let current: number;
-	let amount: number;
-	let totalAmountIncluded = false;
-	let increaseSelected = true;
-	let warning: string | null = null;
+	let current: number = $state();
+	let amount: number = $state();
+	let totalAmountIncluded = $state(false);
+	let increaseSelected = $state(true);
+	let warning: string | null = $state(null);
 
-	$: byOrTo = totalAmountIncluded ? 'to' : 'by';
-	$: increaseOrDecrease = increaseSelected ? 'increase' : 'decrease';
+	let byOrTo = $derived(totalAmountIncluded ? 'to' : 'by');
+	let increaseOrDecrease = $derived(increaseSelected ? 'increase' : 'decrease');
 
 	let actions: string[] = [];
-	let knittingActions: KnittingActions | null = null;
+	let knittingActions: KnittingActions | null = $state(null);
 
 	function toggleByOrTo() {
 		totalAmountIncluded = !totalAmountIncluded;
@@ -257,7 +257,7 @@
 						<div
 							class=" h-10 w-10 fill-current text-amber-800 dark:text-orange-200 p-1 mr-4 bg-orange-300 dark:bg-amber-700 rounded-full"
 						>
-							<iconify-icon width="30" icon="carbon:user-favorite" />
+							<iconify-icon width="30" icon="carbon:user-favorite"></iconify-icon>
 						</div>
 						<!-- Card content -->
 						<div id="knitting-calculator-content" class="w-full">
@@ -274,7 +274,7 @@
 					</div>
 
 					<!-- Divider -->
-					<div class="border-t border-amber-800 dark:border-amber-100 my-4" />
+					<div class="border-t border-amber-800 dark:border-amber-100 my-4"></div>
 				</div>
 
 				<!-- CONTENT -->
@@ -296,13 +296,13 @@
 
 							<div class="">
 								<button
-									on:click={toggleIncreaseDecrease}
+									onclick={toggleIncreaseDecrease}
 									id="increase-decrease-btn"
 									class="px-3 py-1 my-2 mr-2 text-xs font-medium text-center inline-flex items-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-900 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
 									>{increaseOrDecrease}</button
 								>
 								<button
-									on:click={toggleByOrTo}
+									onclick={toggleByOrTo}
 									id="by-to-btn"
 									class="px-3 py-1 my-2 text-xs font-medium text-center inline-flex items-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-900 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
 									>{byOrTo}</button
@@ -318,7 +318,7 @@
 
 							<button
 								class="px-3 py-1 my-2 text-xs font-medium text-center inline-flex items-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-900 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-								on:click={submit}>Submit</button
+								onclick={submit}>Submit</button
 							>
 						</div>
 					</div>

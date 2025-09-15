@@ -1,11 +1,21 @@
 <script lang="ts">
 	import { ProjectCardColor } from './project';
 
-	export let header = 'Project';
-	export let description = 'Description';
-	export let link = '/';
-	export let icon = 'ic:round-light-mode';
-	export let color: ProjectCardColor = ProjectCardColor.RED;
+	interface Props {
+		header?: string;
+		description?: string;
+		link?: string;
+		icon?: string;
+		color?: ProjectCardColor;
+	}
+
+	let {
+		header = 'Project',
+		description = 'Description',
+		link = '/',
+		icon = 'ic:round-light-mode',
+		color = ProjectCardColor.RED
+	}: Props = $props();
 </script>
 
 <section

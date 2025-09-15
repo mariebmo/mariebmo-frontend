@@ -2,7 +2,7 @@
 	import { knittingActionsStore } from '$lib/stores/knittingActionStore';
 	import type { KnittingActions } from './interfaces';
 
-	let actions: KnittingActions | null = null;
+	let actions: KnittingActions | null = $state(null);
 
 	knittingActionsStore.subscribe((value) => {
 		actions = value;
