@@ -4,7 +4,8 @@ import {
 	combineActions,
 	type ActionGroup,
 	getEvenAddDistribution,
-	getEvenRemoveToDistribution
+	getEvenRemoveToDistribution,
+	getEvenRemoveByDistribution
 } from '../src/routes/knitting/evenCalculator';
 describe('getEvenDistribution', () => {
 	it('should create correct ADD distribution', () => {
@@ -159,9 +160,9 @@ describe('Integration tests', () => {
 
 		expect(combined).toBeDefined();
 		expect(combined.length).toBeGreaterThan(0);
-		// The pattern should be repeated: { '0': 3 }, { '1': 1 }
+		// The pattern should be repeated: [{ '0': 3 }, { '1': 1 }] 4 times
 		expect(combined[0].group).toEqual([{ '0': 3 }, { '1': 1 }]);
-		expect(combined[0].count).toBeGreaterThanOrEqual(2);
+		expect(combined[0].count).toEqual(4);
 
 		// Verify the distribution has the right properties
 		expect(distribution.filter((x) => x === 1)).toHaveLength(4);
@@ -169,17 +170,30 @@ describe('Integration tests', () => {
 	});
 
 	it('should work end-to-end for REMOVE operation', () => {
-		const distribution = getEvenRemoveToDistribution(12, 4);
+		const distribution = getEvenRemoveByDistribution(12, 4);
 		const groups = groupActions(distribution);
 		const combined = combineActions(groups);
 
 		expect(distribution).toBeDefined();
-		expect(groups).toBeDefined();
-		expect(combined).toBeDefined();
+		expect(distribution).toHaveLength(8);
+		expect(distribution.filter((x) => x === -1)).toHaveLength(4);
+		expect(distribution.filter((x) => x === 0)).toHaveLength(4);
 
-		// Verify the distribution has the right properties
-		expect(distribution.filter((x) => x === -1)).toHaveLength(8); // 12 - 4 = 8 removals
-		expect(distribution.filter((x) => x === 0)).toHaveLength(4); // 4 remaining items
+		expect(groups).toBeDefined();
+		expect(groups).toHaveLength(8);
+		expect(groups[0]).toEqual({ '0': 1 });
+		expect(groups[1]).toEqual({ '-1': 1 });
+		expect(groups[2]).toEqual({ '0': 1 });
+		expect(groups[3]).toEqual({ '-1': 1 });
+		expect(groups[4]).toEqual({ '0': 1 });
+		expect(groups[5]).toEqual({ '-1': 1 });
+		expect(groups[6]).toEqual({ '0': 1 });
+		expect(groups[7]).toEqual({ '-1': 1 });
+
+		expect(combined).toBeDefined();
+		expect(combined.length).toBeGreaterThan(0);
+		expect(combined[0].group).toEqual([{ '0': 1 }, { '-1': 1 }]);
+		expect(combined[0].count).toEqual(4);
 	});
 
 	it('should handle the specific example from requirements', () => {

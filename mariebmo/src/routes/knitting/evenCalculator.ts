@@ -203,7 +203,7 @@ export function combineActions(
 	while (index < groups.length && outerMaxIterations-- > 0) {
 		let currentGroup = groups[index];
 		let lookAheadIndex = 1;
-		let possibleMatches: { group: ActionGroup[]; count: number }[] = [];
+		let possibleMatches: Array<{ group: ActionGroup[]; count: number }> = [];
 		let hasAMatch = false;
 
 		// Look ahead for repeated patterns
@@ -225,41 +225,35 @@ export function combineActions(
 			lookAheadIndex++;
 		}
 
-		if (possibleMatches.length > 1) {
-			let bestMatch = possibleMatches.find(
-				(match) =>
-					match.group.length == Math.max(...possibleMatches.map((match) => match.group.length))
+		if (possibleMatches.length > 0) {
+			// Find the longest pattern
+			let bestMatch = possibleMatches.reduce((prev, current) =>
+				prev.group.length > current.group.length ? prev : current
 			);
 
-			if (bestMatch != null) {
-				// Count how many times this pattern repeats
-				let patternCount = 2; // We already found 2 occurrences
-				let patternLength = bestMatch.group.length;
+			// Count how many times this pattern repeats
+			let patternCount = 2; // We already found 2 occurrences
+			let patternLength = bestMatch.group.length;
 
-				// Check for more repetitions
-				while (
-					index + patternLength * (patternCount + 1) <= groups.length &&
-					patternsEqual(
-						groups.slice(index, index + patternLength),
-						groups.slice(
-							index + patternLength * patternCount,
-							index + patternLength * (patternCount + 1)
-						)
+			// Check for more repetitions
+			while (
+				index + patternLength * (patternCount + 1) <= groups.length &&
+				patternsEqual(
+					groups.slice(index, index + patternLength),
+					groups.slice(
+						index + patternLength * patternCount,
+						index + patternLength * (patternCount + 1)
 					)
-				) {
-					patternCount++;
-				}
-
-				result.push({
-					group: bestMatch.group,
-					count: patternCount
-				});
-				index += patternLength * patternCount;
-				hasAMatch = true;
+				)
+			) {
+				patternCount++;
 			}
-		} else if (possibleMatches.length == 1) {
-			result.push(possibleMatches[0]);
-			index += possibleMatches[0].group.length * 2;
+
+			result.push({
+				group: bestMatch.group,
+				count: patternCount
+			});
+			index += patternLength * patternCount;
 			hasAMatch = true;
 		}
 
