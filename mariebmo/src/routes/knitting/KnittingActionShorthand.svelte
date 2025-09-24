@@ -1,13 +1,8 @@
 <script lang="ts">
 	import { knittingActionsStore } from '$lib/stores/knittingActionStore';
-	import type { KnittingAction, KnittingActions } from './interfaces';
+	import type { KnittingAction, KnittingActions } from './evenCalculator';
 
-	let actions: KnittingActions | null = $state(null);
-
-	knittingActionsStore.subscribe((value) => {
-		actions = value || { actions: [], fullWritten: '', visualize: '' };
-	});
-
+	let actions = $derived($knittingActionsStore);
 
 	function printShorthand(actionArr: KnittingAction[]): string {
 		let output = '';

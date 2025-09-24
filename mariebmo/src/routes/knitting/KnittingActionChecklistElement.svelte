@@ -1,7 +1,5 @@
 <script lang="ts">
-	import { run } from 'svelte/legacy';
-
-	import type { KnittingAction } from './interfaces';
+	import type { KnittingAction } from './evenCalculator';
 
 	interface Props {
 		action: KnittingAction;
@@ -15,25 +13,20 @@
 	}
 
 	let subActions: SubAction[] = $state([]);
-	let icon: HTMLElement = $state();
 
-	for (let i = 0; i < action.count; i++) {
-		subActions.push({ action: action.actions.join(', '), selected: false });
-	}
+	// Initialize subActions when component mounts or action changes
+	$effect(() => {
+		subActions = [];
+		for (let i = 0; i < action.count; i++) {
+			subActions.push({ action: action.actions.join(', '), selected: false });
+		}
+	});
 
 	let allSelected = $derived(subActions.every((subAction) => subAction.selected));
 	let expanded = $state(false);
 
 	function toggleExpanded(toggle: boolean | null = null) {
 		expanded = toggle ?? !expanded;
-
-		if (icon) {
-			if (expanded) {
-				icon.style.transform = 'rotate(90deg)';
-			} else {
-				icon.style.transform = 'rotate(0deg)';
-			}
-		}
 	}
 
 	function toggleAll() {
@@ -47,19 +40,6 @@
 			});
 		}
 	}
-
-	function reset(action: KnittingAction) {
-		toggleExpanded(false);
-
-		subActions = [];
-		for (let i = 0; i < action.count; i++) {
-			subActions.push({ action: action.actions.join(', '), selected: false });
-		}
-	}
-
-	run(() => {
-		reset(action);
-	});
 </script>
 
 <div>
@@ -81,8 +61,9 @@
 			<button
 				onclick={() => toggleExpanded(null)}
 				class="dropdown-icon-btn ml-2 mt-1 bg-amber-600 dark:bg-amber-800"
+				aria-label="Toggle expanded view"
 			>
-				<iconify-icon icon="gridicons:dropdown" class="icon" bind:this={icon} />
+				<span class="material-symbols-outlined">{expanded ? 'expand_less' : 'expand_more'}</span>
 			</button>
 		{/if}
 	</div>
@@ -108,11 +89,6 @@
 		width: 1.2rem;
 		height: 1.2rem;
 		border-radius: 5px;
-	}
-
-	.icon {
-		font-size: 1.2rem;
-		rotate: 270deg;
 	}
 
 	.checkbox {

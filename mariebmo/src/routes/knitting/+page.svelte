@@ -1,13 +1,32 @@
 <script lang="ts">
-	import { KnitSymbol, KnitType, type KnittingAction, type KnittingActions } from './interfaces';
+	import {
+		getEvenDistribution,
+		Operation,
+		groupActions,
+		combineActions,
+		type KnittingActions,
+		type KnittingAction,
+		type ActionGroup
+	} from './evenCalculator';
 	import { knittingActionsStore } from '../../lib/stores/knittingActionStore';
 
 	import MovableList from './MovableList.svelte';
 
-	const MAX_ITERATIONS = 500;
+	// Knitting-specific constants
+	const KnitSymbol = {
+		KNIT: '-',
+		INCREASE: '+',
+		DECREASE: '↓'
+	} as const;
 
-	let current: number = $state();
-	let amount: number = $state();
+	const KnitType = {
+		KNIT: 'k',
+		INCREASE: 'm',
+		DECREASE: 'k2tog'
+	} as const;
+
+	let current = $state(0);
+	let amount = $state(0);
 	let totalAmountIncluded = $state(false);
 	let increaseSelected = $state(true);
 	let warning: string | null = $state(null);
@@ -15,7 +34,6 @@
 	let byOrTo = $derived(totalAmountIncluded ? 'to' : 'by');
 	let increaseOrDecrease = $derived(increaseSelected ? 'increase' : 'decrease');
 
-	let actions: string[] = [];
 	let knittingActions: KnittingActions | null = $state(null);
 
 	function toggleByOrTo() {
@@ -26,222 +44,129 @@
 		increaseSelected = !increaseSelected;
 	}
 
-	function calculateStichIncDec(
-		action: KnitType,
-		ratio: number,
-		totalStitches: number,
-		incDecAmount: number
-	) {
-		let visualizationOutput = ''; // --+---+--+---+
-		let knittingLingoOutput = ''; // k2, m, k3, m, k2, m, k3, m
-
-		if ((action == KnitType.INCREASE && ratio < 1) || (action == KnitType.DECREASE && ratio < 0)) {
-			warning =
-				'This calculator can only handle k2tog or m1 - this is not possible with the given inputs.';
+	function submit() {
+		// Validate inputs
+		if (current <= 0 || amount <= 0) {
+			warning = 'Please enter valid positive numbers for current and amount.';
 			knittingActions = null;
 			knittingActionsStore.set(knittingActions);
 			return;
 		}
 
-		warning = null;
-		let nextIncrease = ratio;
-		const symbol = action == KnitType.INCREASE ? KnitSymbol.INCREASE : KnitSymbol.DECREASE;
+		// Check for impossible scenarios
+		if (!increaseSelected && totalAmountIncluded && amount >= current) {
+			warning = 'Cannot decrease to a number greater than or equal to current stitches.';
+			knittingActions = null;
+			knittingActionsStore.set(knittingActions);
+			return;
+		}
 
-		let knitCount = 0;
+		if (increaseSelected && totalAmountIncluded && amount <= current) {
+			warning = 'Cannot increase to a number less than or equal to current stitches.';
+			knittingActions = null;
+			knittingActionsStore.set(knittingActions);
+			return;
+		}
 
-		for (var i = 0; i < totalStitches; i++) {
-			switch (nextIncrease <= 0) {
-				case true:
-					visualizationOutput += symbol + ' ';
-					var knitCountOutput = knitCount > 1 ? knitCount : '';
-					var knitActionOutput = knitCount > 0 ? KnitType.KNIT + knitCountOutput + ', ' : '';
-					knittingLingoOutput += knitActionOutput + action + ', ';
+		// Calculate knitting actions using the generic calculator
+		const operation = increaseSelected ? Operation.ADD : Operation.REMOVE;
+		let targetAmount: number;
 
-					actions.push(knitActionOutput + action);
+		if (totalAmountIncluded) {
+			targetAmount = amount;
+		} else {
+			targetAmount = increaseSelected ? current + amount : current - amount;
+		}
 
-					knitCount = 0;
-					nextIncrease += ratio;
-					incDecAmount--;
-					break;
-				case false:
-					knitCount++;
-					nextIncrease--;
-					visualizationOutput += KnitSymbol.KNIT + ' ';
-					break;
+		const distribution = getEvenDistribution(current, targetAmount, operation);
+		const result = processDistribution(distribution, increaseSelected);
+
+		if (result) {
+			warning = null;
+			knittingActions = result;
+			knittingActionsStore.set(knittingActions);
+		} else {
+			warning = 'Unable to calculate even distribution for the given inputs.';
+			knittingActions = null;
+			knittingActionsStore.set(knittingActions);
+		}
+	}
+
+	function processDistribution(distribution: number[], isIncrease: boolean): KnittingActions {
+		// Use generic grouping and combining functions
+		const groups = groupActions(distribution);
+		const combinedGroups = combineActions(groups);
+
+		let visualizationOutput = '';
+		let knittingLingoOutput = '';
+		let actions: string[] = [];
+
+		const symbol = isIncrease ? KnitSymbol.INCREASE : KnitSymbol.DECREASE;
+		const actionType = isIncrease ? KnitType.INCREASE : KnitType.DECREASE;
+
+		// Process each combined group
+		for (const combinedGroup of combinedGroups) {
+			const { group: patternGroups, count: patternCount } = combinedGroup;
+
+			// Repeat the pattern for the specified count
+			for (let patternIndex = 0; patternIndex < patternCount; patternIndex++) {
+				for (const group of patternGroups) {
+					let groupActions: string[] = [];
+					let groupVisualization = '';
+
+					// Process each action type in the group
+					for (const [actionTypeStr, count] of Object.entries(group)) {
+						const actionNum = parseInt(actionTypeStr);
+
+						if (actionNum === 0) {
+							// Regular knit stitches
+							const knitCountOutput = count > 1 ? count : '';
+							const knitActionOutput = KnitType.KNIT + knitCountOutput;
+							groupActions.push(knitActionOutput);
+							groupVisualization += KnitSymbol.KNIT.repeat(count) + ' ';
+						} else if (actionNum === 1) {
+							// Increases
+							const increaseAction = actionType;
+							groupActions.push(increaseAction);
+							groupVisualization += symbol.repeat(count) + ' ';
+						} else if (actionNum === -1) {
+							// Decreases
+							const decreaseAction = actionType;
+							groupActions.push(decreaseAction);
+							groupVisualization += symbol.repeat(count) + ' ';
+						}
+					}
+
+					// Add group to outputs
+					if (groupActions.length > 0) {
+						actions.push(...groupActions);
+						knittingLingoOutput += groupActions.join(', ') + ', ';
+						visualizationOutput += groupVisualization;
+					}
+				}
 			}
 		}
 
-		if (incDecAmount == 1) {
-			visualizationOutput += symbol;
-			var knitCountOutput = knitCount > 1 ? knitCount : '';
-			var knitActionOutput = knitCount > 0 ? KnitType.KNIT + knitCountOutput + ', ' : '';
-			knittingLingoOutput += knitActionOutput + action;
-			actions.push(knitActionOutput + action);
-		} else if (incDecAmount > 1 || incDecAmount < 0) {
-			visualizationOutput =
-				"Hmm. There's something wrong with the calculation. There is a remainder of " +
-				incDecAmount +
-				' stitches.';
-			knitActionOutput = '';
-		} else {
+		// Clean up trailing comma
+		if (knittingLingoOutput.endsWith(', ')) {
 			knittingLingoOutput = knittingLingoOutput.slice(0, -2);
 		}
 
-		const knittingAction = getKnittingAction();
+		const knittingAction = getKnittingAction(actions);
 
-		knittingActions = {
+		return {
 			actions: knittingAction,
-			visualize: visualizationOutput,
+			visualize: visualizationOutput.trim(),
 			fullWritten: knittingLingoOutput
 		};
-
-		knittingActionsStore.set(knittingActions);
 	}
 
-	function increase() {
-		const increaseAmount = totalAmountIncluded ? amount - current : amount;
-		const increaseRatio = current / increaseAmount;
-		calculateStichIncDec(
-			KnitType.INCREASE,
-			increaseRatio,
-			current + increaseAmount,
-			increaseAmount
-		);
-	}
-
-	function decrease() {
-		const decreaseAmount = totalAmountIncluded ? current - amount : amount;
-		const decreaseRatio = (current - decreaseAmount) / decreaseAmount - 1;
-
-		calculateStichIncDec(
-			KnitType.DECREASE,
-			decreaseRatio,
-			current - decreaseAmount,
-			decreaseAmount
-		);
-	}
-
-	function getKnittingAction(): KnittingAction[] {
-		let knittingAction: KnittingAction[] = [];
-		let lookAhead = 3;
-
-		let index = 0;
-		let outerMaxIterations = MAX_ITERATIONS;
-
-		while (index < actions.length && outerMaxIterations-- > 0) {
-			let currentAction = actions[index];
-			let lookAheadIndex = 1;
-
-			let possibleMatches: KnittingAction[] = [];
-
-			let hasAMatch = false;
-
-			let lastAction = knittingAction[knittingAction.length - 1];
-
-			if (lastAction?.actions != null) {
-				if (
-					actions.slice(index, index + lastAction.actions.length).join('') ==
-					lastAction.actions.join('')
-				) {
-					lastAction.count++;
-					index += lastAction.actions.length;
-					hasAMatch = true;
-				}
-			}
-
-			let lookAheadMaxIterations = MAX_ITERATIONS;
-			while (
-				lookAheadIndex <= lookAhead &&
-				index + lookAheadIndex < actions.length &&
-				lookAheadMaxIterations-- > 0
-			) {
-				if (
-					actions.slice(index, index + lookAheadIndex).join('') ==
-					actions.slice(index + lookAheadIndex, index + lookAheadIndex * 2).join('')
-				) {
-					possibleMatches.push({
-						actions: actions.slice(index, index + lookAheadIndex),
-						count: 2
-					});
-				}
-
-				lookAheadIndex++;
-			}
-
-			if (possibleMatches.length > 1) {
-				let bestMatch = possibleMatches.find(
-					(match) =>
-						match.actions.length ==
-						Math.max(...possibleMatches.map((match) => match.actions.length))
-				);
-
-				if (bestMatch != null) {
-					//see if best match consists of same actions
-					let bestMatchSet = new Set(bestMatch.actions);
-					if (bestMatchSet.size == 1) {
-						knittingAction.push({
-							actions: [bestMatch.actions[0]],
-							count: bestMatch.actions.length * 2
-						});
-
-						index += bestMatch.actions.length * 2;
-						hasAMatch = true;
-					} else {
-						knittingAction.push(bestMatch);
-						index += bestMatch.actions.length * 2;
-						hasAMatch = true;
-					}
-				}
-			} else if (possibleMatches.length == 1) {
-				knittingAction.push(possibleMatches[0]);
-				index += possibleMatches[0].actions.length * 2;
-				hasAMatch = true;
-			}
-
-			if (!hasAMatch) {
-				knittingAction.push({
-					actions: [currentAction],
-					count: 1
-				});
-
-				index++;
-			}
-		}
-
-		return makeSmaller(knittingAction);
-	}
-
-	function makeSmaller(knittingAction: KnittingAction[]): KnittingAction[] {
-		let newKnittingAction: KnittingAction[] = [];
-
-		let previousAction = knittingAction[0].actions.join('');
-		let previousActionIndex = 0;
-
-		for (let i = 1; i < knittingAction.length; i++) {
-			let currentAction = knittingAction[i].actions.join('');
-
-			if (previousAction == currentAction) {
-				knittingAction[previousActionIndex].count += knittingAction[i].count;
-				knittingAction[i].count = 0;
-			} else {
-				previousAction = currentAction;
-				previousActionIndex = i;
-			}
-		}
-
-		newKnittingAction = knittingAction.filter((action) => action.count > 0);
-
-		return newKnittingAction;
-	}
-
-	function submit() {
-		if (increaseSelected) {
-			increase();
-		} else {
-			decrease();
-		}
-
-		actions = [];
+	function getKnittingAction(actions: string[]): KnittingAction[] {
+		// Convert the processed actions back to KnittingAction format
+		return actions.map((action) => ({
+			actions: [action],
+			count: 1
+		}));
 	}
 </script>
 
@@ -257,7 +182,7 @@
 						<div
 							class=" h-10 w-10 fill-current text-amber-800 dark:text-orange-200 p-1 mr-4 bg-orange-300 dark:bg-amber-700 rounded-full"
 						>
-							<iconify-icon width="30" icon="carbon:user-favorite"></iconify-icon>
+							<span class="material-symbols-outlined">favorite</span>
 						</div>
 						<!-- Card content -->
 						<div id="knitting-calculator-content" class="w-full">
