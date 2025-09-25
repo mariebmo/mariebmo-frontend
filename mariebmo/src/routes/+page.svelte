@@ -21,51 +21,6 @@
 			color: ProjectCardColor.RED,
 			link: '/knitting',
 			showWhenExpanded: null
-		},
-
-		{
-			title: 'Blog',
-			description: 'Blog about making this website and other projects.',
-			icon: 'edit_square',
-			color: ProjectCardColor.GREEN,
-			link: '/blog',
-			showWhenExpanded: null
-		},
-
-		{
-			title: 'Projects',
-			description: 'Projects I have worked on.',
-			icon: 'select_window',
-			color: ProjectCardColor.BLUE,
-			link: '/projects',
-			showWhenExpanded: null
-		},
-
-		{
-			title: 'Resume',
-			description: 'My resume.',
-			icon: 'contract',
-			color: ProjectCardColor.PURPLE,
-			link: '/resume',
-			showWhenExpanded: null
-		},
-
-		{
-			title: 'About',
-			description: 'About me.',
-			icon: 'account_circle',
-			color: ProjectCardColor.ORANGE,
-			link: '/about',
-			showWhenExpanded: null
-		},
-
-		{
-			title: 'Contact',
-			description: 'Contact me.',
-			icon: 'contact_page',
-			color: ProjectCardColor.YELLOW,
-			link: '/contact',
-			showWhenExpanded: null
 		}
 	];
 </script>

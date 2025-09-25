@@ -1,16 +1,16 @@
 <script lang="ts">
 	import {
-		getEvenDistribution,
 		Operation,
-		groupActions,
-		combineActions,
 		type KnittingActions,
 		type KnittingAction,
+		getFinalDistribution,
 		type ActionGroup
 	} from './evenCalculator';
-	import { knittingActionsStore } from '../../lib/stores/knittingActionStore';
 
 	import MovableList from './MovableList.svelte';
+	import { knittingCalculations } from './knitting.svelte';
+
+	$inspect(knittingCalculations);
 
 	// Knitting-specific constants
 	const KnitSymbol = {
@@ -34,7 +34,7 @@
 	let byOrTo = $derived(totalAmountIncluded ? 'to' : 'by');
 	let increaseOrDecrease = $derived(increaseSelected ? 'increase' : 'decrease');
 
-	let knittingActions: KnittingActions | null = $state(null);
+	let knittingActions: KnittingActions | null = $derived(knittingCalculations);
 
 	function toggleByOrTo() {
 		totalAmountIncluded = !totalAmountIncluded;
@@ -48,23 +48,23 @@
 		// Validate inputs
 		if (current <= 0 || amount <= 0) {
 			warning = 'Please enter valid positive numbers for current and amount.';
-			knittingActions = null;
-			knittingActionsStore.set(knittingActions);
+			knittingCalculations.reset();
+			knittingCalculations.actions = [];
 			return;
 		}
 
 		// Check for impossible scenarios
 		if (!increaseSelected && totalAmountIncluded && amount >= current) {
 			warning = 'Cannot decrease to a number greater than or equal to current stitches.';
-			knittingActions = null;
-			knittingActionsStore.set(knittingActions);
+			knittingCalculations.reset();
+			knittingCalculations.actions = [];
 			return;
 		}
 
 		if (increaseSelected && totalAmountIncluded && amount <= current) {
 			warning = 'Cannot increase to a number less than or equal to current stitches.';
-			knittingActions = null;
-			knittingActionsStore.set(knittingActions);
+			knittingCalculations.reset();
+			knittingCalculations.actions = [];
 			return;
 		}
 
@@ -78,25 +78,24 @@
 			targetAmount = increaseSelected ? current + amount : current - amount;
 		}
 
-		const distribution = getEvenDistribution(current, targetAmount, operation);
+		const distribution = getFinalDistribution(current, targetAmount, operation);
 		const result = processDistribution(distribution, increaseSelected);
 
-		if (result) {
+		if (distribution) {
 			warning = null;
-			knittingActions = result;
-			knittingActionsStore.set(knittingActions);
+			knittingCalculations.visualize = result.visualize;
+			knittingCalculations.fullWritten = result.fullWritten;
+			knittingCalculations.actions = result.actions;
 		} else {
 			warning = 'Unable to calculate even distribution for the given inputs.';
-			knittingActions = null;
-			knittingActionsStore.set(knittingActions);
+			knittingCalculations.reset();
 		}
 	}
 
-	function processDistribution(distribution: number[], isIncrease: boolean): KnittingActions {
-		// Use generic grouping and combining functions
-		const groups = groupActions(distribution);
-		const combinedGroups = combineActions(groups);
-
+	function processDistribution(
+		distribution: Array<{ group: ActionGroup[]; count: number }>,
+		isIncrease: boolean
+	): KnittingActions {
 		let visualizationOutput = '';
 		let knittingLingoOutput = '';
 		let actions: string[] = [];
@@ -105,7 +104,7 @@
 		const actionType = isIncrease ? KnitType.INCREASE : KnitType.DECREASE;
 
 		// Process each combined group
-		for (const combinedGroup of combinedGroups) {
+		for (const combinedGroup of distribution) {
 			const { group: patternGroups, count: patternCount } = combinedGroup;
 
 			// Repeat the pattern for the specified count
@@ -249,11 +248,14 @@
 					</div>
 
 					<!-- OUTPUT -->
+
+					<!-- 
 					{#if knittingActions != null}
 						<div class="mt-5">
 							<MovableList />
 						</div>
 					{/if}
+					MOVABLE LIST -->
 
 					{#if warning}
 						<p class="text-red-500 dark:text-red-400">{warning}</p>

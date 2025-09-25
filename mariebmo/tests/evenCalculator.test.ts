@@ -5,7 +5,10 @@ import {
 	type ActionGroup,
 	getEvenAddDistribution,
 	getEvenRemoveToDistribution,
-	getEvenRemoveByDistribution
+	getEvenRemoveByDistribution,
+	getFinalDistribution,
+	Operation,
+	ByOrTo
 } from '../src/routes/knitting/evenCalculator';
 describe('getEvenDistribution', () => {
 	it('should create correct ADD distribution', () => {
@@ -212,5 +215,54 @@ describe('Integration tests', () => {
 		const combined = combineActions(groups);
 		expect(combined).toBeDefined();
 		expect(combined.length).toBeGreaterThan(0);
+	});
+
+	it('should work end-to-end for FINAL distribution', () => {
+		const distribution = getFinalDistribution(12, 4, Operation.ADD);
+		expect(distribution).toBeDefined();
+		expect(distribution.length).toBeGreaterThan(0);
+		expect(distribution[0].group).toEqual([{ '0': 3 }, { '1': 1 }]);
+		expect(distribution[0].count).toEqual(4);
+	});
+
+	it('should work end-to-end for FINAL distribution with TO', () => {
+		const distribution = getFinalDistribution(12, 4, Operation.ADD, ByOrTo.TO);
+		expect(distribution).toBeDefined();
+		expect(distribution.length).toBeGreaterThan(0);
+		expect(distribution[0].group).toEqual([{ '0': 3 }, { '1': 1 }]);
+		expect(distribution[0].count).toEqual(4);
+	});
+
+	it('should work end-to-end for FINAL distribution with BY', () => {
+		const distribution = getFinalDistribution(12, 4, Operation.ADD, ByOrTo.BY);
+		expect(distribution).toBeDefined();
+		expect(distribution.length).toBeGreaterThan(0);
+		expect(distribution[0].group).toEqual([{ '0': 3 }, { '1': 1 }]);
+		expect(distribution[0].count).toEqual(4);
+	});
+
+	it('should work end-to-end for FINAL distribution with REMOVE', () => {
+		const distribution = getFinalDistribution(12, 6, Operation.REMOVE);
+		expect(distribution).toBeDefined();
+		expect(distribution.length).toBeGreaterThan(0);
+		expect(distribution[0].group).toEqual([{ '-1': 6 }]);
+		expect(distribution[0].count).toEqual(1);
+	});
+
+	it('should work end-to-end for FINAL distribution with REMOVE and TO', () => {
+		const distribution = getFinalDistribution(12, 8, Operation.REMOVE, ByOrTo.TO);
+		expect(distribution).toBeDefined();
+		expect(distribution.length).toBeGreaterThan(0);
+		console.log(distribution);
+		expect(distribution[0].group).toEqual([{ '0': 1 }, { '-1': 1 }]);
+		expect(distribution[0].count).toEqual(4);
+	});
+
+	it('should work end-to-end for FINAL distribution with REMOVE and BY', () => {
+		const distribution = getFinalDistribution(12, 4, Operation.REMOVE, ByOrTo.BY);
+		expect(distribution).toBeDefined();
+		expect(distribution.length).toBeGreaterThan(0);
+		expect(distribution[0].group).toEqual([{ '0': 1 }, { '-1': 1 }]);
+		expect(distribution[0].count).toEqual(4);
 	});
 });

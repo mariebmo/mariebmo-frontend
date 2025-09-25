@@ -13,6 +13,17 @@ export enum ByOrTo {
 	TO = 'to'
 }
 
+export function getFinalDistribution(
+	oldAmount: number,
+	newAmount: number,
+	operation: Operation,
+	byOrTo: ByOrTo = ByOrTo.TO
+): Array<{ group: ActionGroup[]; count: number }> {
+	const distribution = getEvenDistribution(oldAmount, newAmount, operation, byOrTo);
+	const groups = groupActions(distribution);
+	return combineActions(groups);
+}
+
 function getDifference(
 	oldAmount: number,
 	newAmount: number,
@@ -70,7 +81,7 @@ export function getEvenDistribution(
 	oldAmount: number,
 	newAmount: number,
 	operation: Operation,
-	byOrTo: ByOrTo = ByOrTo.BY
+	byOrTo: ByOrTo = ByOrTo.TO
 ): number[] {
 	const difference = getDifference(oldAmount, newAmount, operation, byOrTo);
 	const result: number[] = [];
