@@ -17,13 +17,19 @@
 
 	let isExpanded = $state(false);
 
-	let actionTree: ActionTree = $derived(convertToActionTree(action));
+	let actionTree: ActionTree = $state({
+		action: '',
+		subActions: [],
+		count: 0,
+		isDone: false
+	});
 
 	$inspect(action);
 
-	function convertToActionTree(action: KnittingAction): ActionTree {
-		let actionString = action.actions.map((subAction) => subAction).join(', ');
-		return {
+	// Initialize actionTree when action changes
+	$effect(() => {
+		const actionString = action.actions.map((subAction) => subAction).join(', ');
+		actionTree = {
 			action: actionString,
 			subActions: Array.from({ length: action.count }, () => ({
 				action: actionString,
@@ -32,7 +38,7 @@
 			count: action.count,
 			isDone: false
 		};
-	}
+	});
 
 	// Derived state to check if all sub-actions are completed
 	let allSubActionsCompleted = $derived(
@@ -56,8 +62,11 @@
 		}
 	}
 
-	function toggleSubAction(subAction: SubAction) {
-		subAction.isDone = !subAction.isDone;
+	function toggleSubAction(index: number) {
+		console.log('toggleSubAction', index);
+		actionTree.subActions[index].isDone = !actionTree.subActions[index].isDone;
+		// Trigger reactivity by reassigning the array
+		actionTree.subActions = [...actionTree.subActions];
 		// The main action will be updated automatically via the effect above
 	}
 </script>
@@ -104,18 +113,24 @@
 				<span class="sub-actions-title">Individual repetitions:</span>
 			</div>
 			{#each actionTree.subActions as subAction, index (index)}
-				<div class="sub-action-row">
+				<button
+					class="sub-action-row w-full"
+					onclick={() => toggleSubAction(index)}
+					tabindex="0"
+					onkeydown={(e) => e.key === 'Enter' && toggleSubAction(index)}
+				>
 					<input
 						type="checkbox"
 						class="sub-checkbox"
 						checked={subAction.isDone}
-						onchange={() => toggleSubAction(subAction)}
 						aria-label="Mark repetition {index + 1} as complete"
+						tabindex="-1"
+						readonly
 					/>
 					<p class="sub-action-text" class:completed={subAction.isDone}>
 						{subAction.action}
 					</p>
-				</div>
+				</button>
 			{/each}
 		</div>
 	{/if}
@@ -176,7 +191,7 @@
 	}
 
 	.sub-action-row {
-		@apply flex items-center p-3 pl-8 gap-3 hover:bg-amber-100 dark:hover:bg-amber-900 transition-colors duration-150;
+		@apply flex items-center p-3 pl-8 gap-3 hover:bg-amber-100 dark:hover:bg-amber-900 transition-colors duration-150 text-left border-none bg-transparent cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-inset;
 	}
 
 	.sub-checkbox {
