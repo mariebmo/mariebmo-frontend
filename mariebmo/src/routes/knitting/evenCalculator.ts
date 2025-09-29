@@ -13,6 +13,14 @@ export enum ByOrTo {
 	TO = 'to'
 }
 
+/**
+ * This will distribute the amount between the target and current amount
+ * @param oldAmount
+ * @param newAmount
+ * @param operation
+ * @param byOrTo
+ * @returns an shortened array of action groups - eg. {{0: 3}, {1: 1}}
+ */
 export function getFinalDistribution(
 	oldAmount: number,
 	newAmount: number,
@@ -44,6 +52,7 @@ function getDifference(
  * @param oldAmount - The original amount
  * @param newAmount - The target amount (will handle both target and amount to add)
  * @returns Array where 0 = keep existing, 1 = add
+ * eg. (12, 16) -> [0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1]
  */
 export function getEvenAddDistribution(oldAmount: number, newAmount: number): number[] {
 	return getEvenDistribution(oldAmount, newAmount, Operation.ADD);
@@ -54,6 +63,7 @@ export function getEvenAddDistribution(oldAmount: number, newAmount: number): nu
  * @param oldAmount - The original amount
  * @param amountToRemove - The amount to remove (12, 4) -> 8
  * @returns Array where 0 = keep existing, -1 = remove one item
+ * eg. (12, 4) -> [0, -1, 0, -1, 0, -1, 0, -1]
  */
 export function getEvenRemoveByDistribution(oldAmount: number, amountToRemove: number): number[] {
 	return getEvenDistribution(oldAmount, amountToRemove, Operation.REMOVE, ByOrTo.BY);
@@ -64,6 +74,7 @@ export function getEvenRemoveByDistribution(oldAmount: number, amountToRemove: n
  * @param oldAmount - The original amount
  * @param targetAmount - The target amount (12, 7) -> 7
  * @returns Array where 0 = keep existing, -1 = remove one item
+ * eg. (12, 8) -> [0, -1, 0, -1, 0, -1, 0, -1]
  */
 export function getEvenRemoveToDistribution(oldAmount: number, targetAmount: number): number[] {
 	return getEvenDistribution(oldAmount, targetAmount, Operation.REMOVE, ByOrTo.TO);
@@ -154,21 +165,11 @@ export interface ProcessedAction {
 	groups: ActionGroup[];
 }
 
-export interface KnittingAction {
-	actions: string[];
-	count: number;
-}
-
-export interface KnittingActions {
-	actions: KnittingAction[];
-	visualize: string;
-	fullWritten: string;
-}
-
 /**
  * Groups consecutive actions from a distribution array
  * @param distribution - Array of actions (0, 1, -1)
  * @returns Array of action groups with counts
+ * eg. [0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1] -> [{0: 3}, {1: 1}]
  */
 export function groupActions(distribution: number[]): ActionGroup[] {
 	const groups: ActionGroup[] = [];
@@ -201,6 +202,7 @@ export function groupActions(distribution: number[]): ActionGroup[] {
  * Combines repeated action patterns for efficiency
  * @param groups - Array of action groups
  * @returns Optimized array of action groups with pattern information
+ * eg. [{0: 3}, {1: 1}, {0: 3}, {1: 1}, {0: 3}, {1: 1}] -> [{group: [{0: 3}, {1: 1}], count: 3}]
  */
 export function combineActions(
 	groups: ActionGroup[]
@@ -282,6 +284,7 @@ export function combineActions(
 
 /**
  * Helper function to check if two action groups are equal
+ * eg. [{0: 3}, {1: 1}] -> [{0: 3}, {1: 1}] -> true
  */
 function groupsEqual(group1: ActionGroup, group2: ActionGroup): boolean {
 	const keys1 = Object.keys(group1).sort();

@@ -1,83 +1,120 @@
 <script lang="ts">
-	import type { KnittingAction } from './evenCalculator';
+	import type { KnittingAction } from './interfaces';
 
-	interface Props {
-		action: KnittingAction;
+	let { action }: { action: KnittingAction } = $props();
+
+	interface ActionTree {
+		action: string;
+		subActions: SubAction[];
+		count: number;
+		isDone: boolean;
 	}
-
-	let { action }: Props = $props();
 
 	interface SubAction {
 		action: string;
-		selected: boolean;
+		isDone: boolean;
 	}
 
-	let subActions: SubAction[] = $state([]);
+	let isExpanded = $state(false);
 
-	// Initialize subActions when component mounts or action changes
+	let actionTree: ActionTree = $derived(convertToActionTree(action));
+
+	$inspect(action);
+
+	function convertToActionTree(action: KnittingAction): ActionTree {
+		let actionString = action.actions.map((subAction) => subAction).join(', ');
+		return {
+			action: actionString,
+			subActions: Array.from({ length: action.count }, () => ({
+				action: actionString,
+				isDone: false
+			})),
+			count: action.count,
+			isDone: false
+		};
+	}
+
+	// Derived state to check if all sub-actions are completed
+	let allSubActionsCompleted = $derived(
+		actionTree.subActions.length > 0 && actionTree.subActions.every((sub) => sub.isDone)
+	);
+
+	// Effect to sync main action with sub-actions
 	$effect(() => {
-		subActions = [];
-		for (let i = 0; i < action.count; i++) {
-			subActions.push({ action: action.actions.join(', '), selected: false });
+		if (actionTree.count > 1) {
+			actionTree.isDone = allSubActionsCompleted;
 		}
 	});
 
-	let allSelected = $derived(subActions.every((subAction) => subAction.selected));
-	let expanded = $state(false);
-
-	function toggleExpanded(toggle: boolean | null = null) {
-		expanded = toggle ?? !expanded;
-	}
-
-	function toggleAll() {
-		if (allSelected) {
-			subActions.forEach((subAction) => {
-				subAction.selected = false;
-			});
-		} else {
-			subActions.forEach((subAction) => {
-				subAction.selected = true;
+	function toggleMainAction() {
+		actionTree.isDone = !actionTree.isDone;
+		// When toggling main action, sync all sub-actions
+		if (actionTree.count > 1) {
+			actionTree.subActions.forEach((sub) => {
+				sub.isDone = actionTree.isDone;
 			});
 		}
 	}
+
+	function toggleSubAction(subAction: SubAction) {
+		subAction.isDone = !subAction.isDone;
+		// The main action will be updated automatically via the effect above
+	}
 </script>
 
-<div>
-	<div class="flex flex-row align-middle">
+<div class="knitting-action-card">
+	<!-- Main action row -->
+	<div class="main-action-row">
 		<input
 			type="checkbox"
-			class="accent-amber-600 dark:accent-amber-900 checkbox checkbox-large"
-			bind:checked={allSelected}
-			onclick={toggleAll}
+			class="main-checkbox"
+			checked={actionTree.isDone}
+			onchange={toggleMainAction}
+			aria-label="Mark action as complete"
 		/>
-		<p class:completed={allSelected} class="ml-2 align-middle">
-			{action.actions.join(', ')}
-			{#if action.count > 1}
-				<span class="font-bold">(x{action.count})</span>
-			{/if}
-		</p>
 
-		{#if action.count > 1}
+		<div class="action-content">
+			<p class="action-text" class:completed={actionTree.isDone}>
+				{actionTree.action}
+				{#if actionTree.count > 1}
+					<span class="count-badge">×{actionTree.count}</span>
+				{/if}
+			</p>
+		</div>
+
+		{#if actionTree.count > 1}
 			<button
-				onclick={() => toggleExpanded(null)}
-				class="dropdown-icon-btn ml-2 mt-1 bg-amber-600 dark:bg-amber-800"
-				aria-label="Toggle expanded view"
+				class="expand-button"
+				onclick={() => (isExpanded = !isExpanded)}
+				aria-label={isExpanded ? 'Collapse details' : 'Expand details'}
+				tabindex="0"
+				onkeydown={(e) => e.key === 'Enter' && (isExpanded = !isExpanded)}
 			>
-				<span class="material-symbols-outlined">{expanded ? 'expand_less' : 'expand_more'}</span>
+				<span class="material-symbols-outlined expand-icon" class:rotated={isExpanded}>
+					expand_more
+				</span>
 			</button>
 		{/if}
 	</div>
 
-	{#if expanded}
-		<div class="flex flex-col mb-3 mt-2">
-			{#each subActions as subAction, i}
-				<div class="flex flex-row ml-5 my-0.5">
+	<!-- Expanded sub-actions -->
+	{#if isExpanded && actionTree.count > 1}
+		<div class="sub-actions-container">
+			<div class="sub-actions-header">
+				<span class="sub-actions-title">Individual repetitions:</span>
+			</div>
+			{#each actionTree.subActions as subAction, index (index)}
+				<div class="sub-action-row">
 					<input
 						type="checkbox"
-						class="accent-amber-600 dark:accent-amber-900 checkbox"
-						bind:checked={subAction.selected}
+						class="sub-checkbox"
+						checked={subAction.isDone}
+						onchange={() => toggleSubAction(subAction)}
+						aria-label="Mark repetition {index + 1} as complete"
 					/>
-					<p class:completed={subAction.selected} class="ml-2">{subAction.action}</p>
+					<p class="sub-action-text" class:completed={subAction.isDone}>
+						{subAction.action}
+					</p>
 				</div>
 			{/each}
 		</div>
@@ -85,25 +122,73 @@
 </div>
 
 <style lang="postcss">
-	.dropdown-icon-btn {
-		width: 1.2rem;
-		height: 1.2rem;
-		border-radius: 5px;
+	.knitting-action-card {
+		@apply bg-white dark:bg-amber-900 rounded-lg shadow-sm border border-amber-200 dark:border-amber-700 mb-3 overflow-hidden transition-all duration-200 hover:shadow-md;
 	}
 
-	.checkbox {
-		border: none;
-		border-radius: 5px;
-		width: 1.1rem;
-		height: 1.1rem;
+	.main-action-row {
+		@apply flex items-center p-4 gap-3;
 	}
 
-	.checkbox-large {
-		width: 1.2rem;
-		height: 1.2rem;
+	.main-checkbox {
+		@apply w-5 h-5 rounded border-2 border-amber-400 dark:border-amber-600 text-amber-600 dark:text-amber-400 focus:ring-2 focus:ring-amber-500 focus:ring-offset-0 transition-colors duration-200;
+		accent-color: rgb(217 119 6); /* amber-600 */
 	}
 
-	.completed {
-		text-decoration: line-through;
+	.action-content {
+		@apply flex-1;
+	}
+
+	.action-text {
+		@apply text-gray-900 dark:text-amber-50 font-medium text-base leading-relaxed transition-all duration-200;
+	}
+
+	.action-text.completed {
+		@apply line-through text-gray-500 dark:text-amber-300 opacity-75;
+	}
+
+	.count-badge {
+		@apply inline-block ml-2 px-2 py-1 bg-amber-100 dark:bg-amber-800 text-amber-800 dark:text-amber-200 text-sm font-semibold rounded-full;
+	}
+
+	.expand-button {
+		@apply w-8 h-8 flex items-center justify-center rounded-full bg-amber-100 dark:bg-amber-800 hover:bg-amber-200 dark:hover:bg-amber-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-1;
+	}
+
+	.expand-icon {
+		@apply text-amber-700 dark:text-amber-300 text-lg transition-transform duration-200;
+	}
+
+	.expand-icon.rotated {
+		@apply rotate-180;
+	}
+
+	.sub-actions-container {
+		@apply border-t border-amber-200 dark:border-amber-700 bg-amber-50 dark:bg-amber-950;
+	}
+
+	.sub-actions-header {
+		@apply px-4 py-2 border-b border-amber-200 dark:border-amber-700;
+	}
+
+	.sub-actions-title {
+		@apply text-sm font-medium text-amber-700 dark:text-amber-300 uppercase tracking-wide;
+	}
+
+	.sub-action-row {
+		@apply flex items-center p-3 pl-8 gap-3 hover:bg-amber-100 dark:hover:bg-amber-900 transition-colors duration-150;
+	}
+
+	.sub-checkbox {
+		@apply w-4 h-4 rounded border border-amber-300 dark:border-amber-600 text-amber-600 dark:text-amber-400 focus:ring-2 focus:ring-amber-500 focus:ring-offset-0 transition-colors duration-200;
+		accent-color: rgb(217 119 6); /* amber-600 */
+	}
+
+	.sub-action-text {
+		@apply text-gray-800 dark:text-amber-100 text-sm transition-all duration-200;
+	}
+
+	.sub-action-text.completed {
+		@apply line-through text-gray-500 dark:text-amber-400 opacity-75;
 	}
 </style>

@@ -1,14 +1,7 @@
 <script lang="ts">
-	import { knittingActionsStore } from '$lib/stores/knittingActionStore';
-	import type { KnittingActions } from './interfaces';
-
-	let actions: KnittingActions | null = $state(null);
-
-	knittingActionsStore.subscribe((value) => {
-		actions = value;
-	});
+	import { knittingCalculations } from './knitting.svelte';
 </script>
 
 <div>
-	<p>{actions?.fullWritten}</p>
+	<p>{knittingCalculations.fullWritten}</p>
 </div>

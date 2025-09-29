@@ -1,14 +1,12 @@
 <script lang="ts">
-	import {
-		Operation,
-		type KnittingActions,
-		type KnittingAction,
-		getFinalDistribution,
-		type ActionGroup
-	} from './evenCalculator';
+	import { Operation, getFinalDistribution, type ActionGroup } from './evenCalculator';
 
-	import MovableList from './MovableList.svelte';
 	import { knittingCalculations } from './knitting.svelte';
+	import KnittingActionVisual from './KnittingActionVisual.svelte';
+	import KnittingActionShorthand from './KnittingActionShorthand.svelte';
+	import KnittingActionFullyWritten from './KnittingActionFullyWritten.svelte';
+	import type { KnittingActions } from './interfaces';
+	import KnittingActionChecklist from './KnittingActionChecklist.svelte';
 
 	$inspect(knittingCalculations);
 
@@ -151,7 +149,7 @@
 			knittingLingoOutput = knittingLingoOutput.slice(0, -2);
 		}
 
-		const knittingAction = getKnittingAction(actions);
+		const knittingAction = getKnittingActionFromDistribution(distribution);
 
 		return {
 			actions: knittingAction,
@@ -160,12 +158,36 @@
 		};
 	}
 
-	function getKnittingAction(actions: string[]): KnittingAction[] {
-		// Convert the processed actions back to KnittingAction format
-		return actions.map((action) => ({
-			actions: [action],
-			count: 1
-		}));
+	function getKnittingActionFromDistribution(
+		distribution: Array<{
+			group: ActionGroup[];
+			count: number;
+		}>
+	) {
+		//replace the 0, 1, -1 with the corresponding knit type
+		let actions: KnittingAction[] = distribution.map((group) => {
+			return {
+				actions: group.group.flatMap((actionGroup) => {
+					return Object.entries(actionGroup).map(([actionType, count]) => {
+						const actionNum = parseInt(actionType);
+						const knitType = replaceActions(actionNum);
+						return count > 1 ? `${knitType}${count}` : knitType;
+					});
+				}),
+				count: group.count
+			};
+		});
+		return actions;
+	}
+
+	function replaceActions(action: number): string {
+		if (action === 0) {
+			return KnitType.KNIT;
+		}
+		if (action === 1) {
+			return KnitType.INCREASE;
+		}
+		return KnitType.DECREASE;
 	}
 </script>
 
@@ -256,6 +278,14 @@
 						</div>
 					{/if}
 					MOVABLE LIST -->
+
+					<KnittingActionVisual />
+
+					<KnittingActionShorthand />
+
+					<KnittingActionFullyWritten />
+
+					<KnittingActionChecklist />
 
 					{#if warning}
 						<p class="text-red-500 dark:text-red-400">{warning}</p>

@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { knittingActionsStore } from '$lib/stores/knittingActionStore';
-	import type { KnittingAction, KnittingActions } from './evenCalculator';
+	import { knittingCalculations } from './knitting.svelte';
+	import type { KnittingAction } from './evenCalculator';
 
-	let actions = $derived($knittingActionsStore);
+	let shorthandOutput = $derived(printShorthand(knittingCalculations.actions));
 
 	function printShorthand(actionArr: KnittingAction[]): string {
 		let output = '';
@@ -19,9 +19,9 @@
 
 		output = output.replace(/(, )$/, '');
 
+		console.log(output);
 		return output;
 	}
-	let shorthandOutput = $derived(actions ? printShorthand(actions.actions) : '');
 </script>
 
 <div>
