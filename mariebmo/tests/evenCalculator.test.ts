@@ -172,6 +172,38 @@ describe('Integration tests', () => {
 		expect(distribution.filter((x) => x === 0)).toHaveLength(12);
 	});
 
+	it('should work end-to-end for ADD operation with uneven distribution', () => {
+		const distribution = getEvenAddDistribution(12, 17);
+		const groups = groupActions(distribution);
+		const combined = combineActions(groups);
+
+		expect(distribution).toBeDefined();
+		expect(distribution).toHaveLength(17);
+		expect(distribution.filter((x) => x === 1)).toHaveLength(5);
+		expect(distribution.filter((x) => x === 0)).toHaveLength(12);
+
+		expect(groups).toBeDefined();
+		expect(groups).toHaveLength(10);
+		// k3, m, k2, m, k3, m, k2, m, k2, m
+		expect(groups[0]).toEqual({ '0': 3 });
+		expect(groups[1]).toEqual({ '1': 1 });
+		expect(groups[2]).toEqual({ '0': 2 });
+		expect(groups[3]).toEqual({ '1': 1 });
+		expect(groups[4]).toEqual({ '0': 3 });
+		expect(groups[5]).toEqual({ '1': 1 });
+		expect(groups[6]).toEqual({ '0': 2 });
+		expect(groups[7]).toEqual({ '1': 1 });
+		expect(groups[8]).toEqual({ '0': 2 });
+		expect(groups[9]).toEqual({ '1': 1 });
+
+		expect(combined).toBeDefined();
+		expect(combined.length).toEqual(2);
+		expect(combined[0].group).toEqual([{ '0': 3 }, { '1': 1 }, { '0': 2 }, { '1': 1 }]);
+		expect(combined[0].count).toEqual(2);
+		expect(combined[1].group).toEqual([{ '0': 2 }, { '1': 1 }]);
+		expect(combined[1].count).toEqual(1);
+	});
+
 	it('should work end-to-end for REMOVE operation', () => {
 		const distribution = getEvenRemoveByDistribution(12, 4);
 		const groups = groupActions(distribution);
