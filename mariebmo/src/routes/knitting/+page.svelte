@@ -2,11 +2,8 @@
 	import { Operation, getFinalDistribution, type ActionGroup } from './evenCalculator';
 
 	import { knittingCalculations } from './knitting.svelte';
-	import KnittingActionVisual from './KnittingActionVisual.svelte';
-	import KnittingActionShorthand from './KnittingActionShorthand.svelte';
-	import KnittingActionFullyWritten from './KnittingActionFullyWritten.svelte';
 	import type { KnittingActions } from './interfaces';
-	import KnittingActionChecklist from './KnittingActionChecklist.svelte';
+	import KnittingViewTabs from './KnittingViewTabs.svelte';
 
 	$inspect(knittingCalculations);
 
@@ -224,25 +221,10 @@
 					</div>
 
 					<!-- OUTPUT -->
-
-					<!-- 
-					{#if knittingActions != null}
-						<div class="mt-5">
-							<MovableList />
-						</div>
-					{/if}
-					MOVABLE LIST -->
-
-					<KnittingActionVisual />
-
-					<KnittingActionShorthand />
-
-					<KnittingActionFullyWritten />
-
-					<KnittingActionChecklist />
+					<KnittingViewTabs />
 
 					{#if warning}
-						<p class="text-red-500 dark:text-red-400">{warning}</p>
+						<p class="text-red-500 dark:text-red-400 mt-4">{warning}</p>
 					{/if}
 				</div>
 			</div>
