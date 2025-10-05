@@ -10,18 +10,18 @@
 
 	$inspect(knittingCalculations);
 
-	// Knitting-specific constants
-	const KnitSymbol = {
-		KNIT: '-',
-		INCREASE: '+',
-		DECREASE: '↓'
-	} as const;
-
-	const KnitType = {
-		KNIT: 'k',
-		INCREASE: 'm',
-		DECREASE: 'k2tog'
-	} as const;
+	// Import constants and utilities
+	import { KnitType, KnitSymbol } from './interfaces';
+	import {
+		validateKnittingInputs,
+		calculateKnittingTargetAmount,
+		actionToKnitType,
+		getKnittingSymbol,
+		getKnittingActionType,
+		createKnittingActionString,
+		processActionGroups,
+		VALIDATION_MESSAGES
+	} from './knittingUtils';
 
 	let current = $state(0);
 	let amount = $state(0);
@@ -43,51 +43,44 @@
 	}
 
 	function submit() {
-		// Validate inputs
-		if (current <= 0 || amount <= 0) {
-			warning = 'Please enter valid positive numbers for current and amount.';
-			knittingCalculations.reset();
-			knittingCalculations.actions = [];
+		const validationError = validateInputs();
+		if (validationError) {
+			setError(validationError);
 			return;
 		}
 
-		// Check for impossible scenarios
-		if (!increaseSelected && totalAmountIncluded && amount >= current) {
-			warning = 'Cannot decrease to a number greater than or equal to current stitches.';
-			knittingCalculations.reset();
-			knittingCalculations.actions = [];
-			return;
+		try {
+			const operation = increaseSelected ? Operation.ADD : Operation.REMOVE;
+			const targetAmount = calculateTargetAmount();
+
+			const distribution = getFinalDistribution(current, targetAmount, operation);
+			const result = processDistribution(distribution, increaseSelected);
+
+			if (distribution) {
+				warning = null;
+				knittingCalculations.visualize = result.visualize;
+				knittingCalculations.fullWritten = result.fullWritten;
+				knittingCalculations.actions = result.actions;
+			} else {
+				setError(VALIDATION_MESSAGES.CALCULATION_ERROR);
+			}
+		} catch (error) {
+			setError(VALIDATION_MESSAGES.GENERAL_ERROR);
+			console.error('Calculation error:', error);
 		}
+	}
 
-		if (increaseSelected && totalAmountIncluded && amount <= current) {
-			warning = 'Cannot increase to a number less than or equal to current stitches.';
-			knittingCalculations.reset();
-			knittingCalculations.actions = [];
-			return;
-		}
+	function validateInputs(): string | null {
+		return validateKnittingInputs(current, amount, increaseSelected, totalAmountIncluded);
+	}
 
-		// Calculate knitting actions using the generic calculator
-		const operation = increaseSelected ? Operation.ADD : Operation.REMOVE;
-		let targetAmount: number;
+	function setError(message: string) {
+		warning = message;
+		knittingCalculations.reset();
+	}
 
-		if (totalAmountIncluded) {
-			targetAmount = amount;
-		} else {
-			targetAmount = increaseSelected ? current + amount : current - amount;
-		}
-
-		const distribution = getFinalDistribution(current, targetAmount, operation);
-		const result = processDistribution(distribution, increaseSelected);
-
-		if (distribution) {
-			warning = null;
-			knittingCalculations.visualize = result.visualize;
-			knittingCalculations.fullWritten = result.fullWritten;
-			knittingCalculations.actions = result.actions;
-		} else {
-			warning = 'Unable to calculate even distribution for the given inputs.';
-			knittingCalculations.reset();
-		}
+	function calculateTargetAmount(): number {
+		return calculateKnittingTargetAmount(current, amount, increaseSelected, totalAmountIncluded);
 	}
 
 	function processDistribution(
@@ -98,8 +91,8 @@
 		let knittingLingoOutput = '';
 		let actions: string[] = [];
 
-		const symbol = isIncrease ? KnitSymbol.INCREASE : KnitSymbol.DECREASE;
-		const actionType = isIncrease ? KnitType.INCREASE : KnitType.DECREASE;
+		const symbol = getKnittingSymbol(isIncrease);
+		const actionType = getKnittingActionType(isIncrease);
 
 		// Process each combined group
 		for (const combinedGroup of distribution) {
@@ -117,19 +110,12 @@
 
 						if (actionNum === 0) {
 							// Regular knit stitches
-							const knitCountOutput = count > 1 ? count : '';
-							const knitActionOutput = KnitType.KNIT + knitCountOutput;
+							const knitActionOutput = createKnittingActionString(KnitType.KNIT, count);
 							groupActions.push(knitActionOutput);
 							groupVisualization += KnitSymbol.KNIT.repeat(count) + ' ';
-						} else if (actionNum === 1) {
-							// Increases
-							const increaseAction = actionType;
-							groupActions.push(increaseAction);
-							groupVisualization += symbol.repeat(count) + ' ';
-						} else if (actionNum === -1) {
-							// Decreases
-							const decreaseAction = actionType;
-							groupActions.push(decreaseAction);
+						} else if (actionNum === 1 || actionNum === -1) {
+							// Increases or decreases
+							groupActions.push(actionType);
 							groupVisualization += symbol.repeat(count) + ' ';
 						}
 					}
@@ -149,45 +135,13 @@
 			knittingLingoOutput = knittingLingoOutput.slice(0, -2);
 		}
 
-		const knittingAction = getKnittingActionFromDistribution(distribution);
+		const knittingAction = processActionGroups(distribution);
 
 		return {
 			actions: knittingAction,
 			visualize: visualizationOutput.trim(),
 			fullWritten: knittingLingoOutput
 		};
-	}
-
-	function getKnittingActionFromDistribution(
-		distribution: Array<{
-			group: ActionGroup[];
-			count: number;
-		}>
-	) {
-		//replace the 0, 1, -1 with the corresponding knit type
-		let actions: KnittingAction[] = distribution.map((group) => {
-			return {
-				actions: group.group.flatMap((actionGroup) => {
-					return Object.entries(actionGroup).map(([actionType, count]) => {
-						const actionNum = parseInt(actionType);
-						const knitType = replaceActions(actionNum);
-						return count > 1 ? `${knitType}${count}` : knitType;
-					});
-				}),
-				count: group.count
-			};
-		});
-		return actions;
-	}
-
-	function replaceActions(action: number): string {
-		if (action === 0) {
-			return KnitType.KNIT;
-		}
-		if (action === 1) {
-			return KnitType.INCREASE;
-		}
-		return KnitType.DECREASE;
 	}
 </script>
 

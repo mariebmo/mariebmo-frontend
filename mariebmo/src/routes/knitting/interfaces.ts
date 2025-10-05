@@ -1,20 +1,25 @@
 import type { Component } from 'svelte';
 
-export enum KnitType {
-	KNIT = 'k',
-	INCREASE = 'm',
-	DECREASE = 'k2tog'
-}
+export const KnitType = {
+	KNIT: 'k',
+	INCREASE: 'm',
+	DECREASE: 'k2tog'
+} as const;
 
-export enum KnitSymbol {
-	KNIT = '-',
-	INCREASE = '+',
-	DECREASE = 'x'
-}
+export const KnitSymbol = {
+	KNIT: '-',
+	INCREASE: '+',
+	DECREASE: '↓'
+} as const;
 
 export interface KnittingAction {
 	actions: string[];
 	count: number;
+}
+
+// Re-export ActionGroup from evenCalculator for convenience
+export interface ActionGroup {
+	[actionType: string]: number;
 }
 
 export interface KnittingActions {

@@ -16,25 +16,34 @@
 	}
 
 	let isExpanded = $state(false);
+	let actionTree = $state(createInitialActionTree());
 
-	let actionTree: ActionTree = $state({
-		action: '',
-		subActions: [],
-		count: 0,
-		isDone: false
-	});
+	function createInitialActionTree(): ActionTree {
+		return {
+			action: '',
+			subActions: [],
+			count: 0,
+			isDone: false
+		};
+	}
 
-	$inspect(action);
+	function createActionString(actions: string[]): string {
+		return actions.join(', ');
+	}
+
+	function createSubActions(count: number, actionString: string): SubAction[] {
+		return Array.from({ length: count }, () => ({
+			action: actionString,
+			isDone: false
+		}));
+	}
 
 	// Initialize actionTree when action changes
 	$effect(() => {
-		const actionString = action.actions.map((subAction) => subAction).join(', ');
+		const actionString = createActionString(action.actions);
 		actionTree = {
 			action: actionString,
-			subActions: Array.from({ length: action.count }, () => ({
-				action: actionString,
-				isDone: false
-			})),
+			subActions: createSubActions(action.count, actionString),
 			count: action.count,
 			isDone: false
 		};
@@ -55,20 +64,41 @@
 	function toggleMainAction() {
 		actionTree.isDone = !actionTree.isDone;
 		// When toggling main action, sync all sub-actions
-		if (actionTree.count > 1) {
-			actionTree.subActions.forEach((sub) => {
-				sub.isDone = actionTree.isDone;
-			});
+		if (hasMultipleActions) {
+			syncSubActionsWithMain();
 		}
 	}
 
+	function syncSubActionsWithMain() {
+		actionTree.subActions.forEach((sub) => {
+			sub.isDone = actionTree.isDone;
+		});
+	}
+
 	function toggleSubAction(index: number) {
-		console.log('toggleSubAction', index);
+		if (index < 0 || index >= actionTree.subActions.length) {
+			console.warn('Invalid sub-action index:', index);
+			return;
+		}
+
 		actionTree.subActions[index].isDone = !actionTree.subActions[index].isDone;
 		// Trigger reactivity by reassigning the array
 		actionTree.subActions = [...actionTree.subActions];
-		// The main action will be updated automatically via the effect above
 	}
+
+	function toggleExpanded() {
+		isExpanded = !isExpanded;
+	}
+
+	function handleKeyDown(event: KeyboardEvent, callback: () => void) {
+		if (event.key === 'Enter' || event.key === ' ') {
+			event.preventDefault();
+			callback();
+		}
+	}
+
+	// Computed properties
+	const hasMultipleActions = $derived(actionTree.count > 1);
 </script>
 
 <div class="knitting-action-card">
@@ -85,19 +115,19 @@
 		<div class="action-content">
 			<p class="action-text" class:completed={actionTree.isDone}>
 				{actionTree.action}
-				{#if actionTree.count > 1}
+				{#if hasMultipleActions}
 					<span class="count-badge">×{actionTree.count}</span>
 				{/if}
 			</p>
 		</div>
 
-		{#if actionTree.count > 1}
+		{#if hasMultipleActions}
 			<button
 				class="expand-button"
-				onclick={() => (isExpanded = !isExpanded)}
+				onclick={toggleExpanded}
 				aria-label={isExpanded ? 'Collapse details' : 'Expand details'}
 				tabindex="0"
-				onkeydown={(e) => e.key === 'Enter' && (isExpanded = !isExpanded)}
+				onkeydown={(e) => handleKeyDown(e, toggleExpanded)}
 			>
 				<span class="material-symbols-outlined expand-icon" class:rotated={isExpanded}>
 					expand_more
@@ -107,7 +137,7 @@
 	</div>
 
 	<!-- Expanded sub-actions -->
-	{#if isExpanded && actionTree.count > 1}
+	{#if isExpanded && hasMultipleActions}
 		<div class="sub-actions-container">
 			<div class="sub-actions-header">
 				<span class="sub-actions-title">Individual repetitions:</span>
@@ -117,7 +147,7 @@
 					class="sub-action-row w-full"
 					onclick={() => toggleSubAction(index)}
 					tabindex="0"
-					onkeydown={(e) => e.key === 'Enter' && toggleSubAction(index)}
+					onkeydown={(e) => handleKeyDown(e, () => toggleSubAction(index))}
 				>
 					<input
 						type="checkbox"

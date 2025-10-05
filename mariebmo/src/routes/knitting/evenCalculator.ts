@@ -1,3 +1,7 @@
+// Constants
+const MAX_ITERATIONS = 500;
+const DEFAULT_LOOK_AHEAD = 5;
+
 export enum Operation {
 	ADD = 'add',
 	REMOVE = 'remove'
@@ -208,9 +212,7 @@ export function combineActions(
 	groups: ActionGroup[]
 ): Array<{ group: ActionGroup[]; count: number }> {
 	const result: Array<{ group: ActionGroup[]; count: number }> = [];
-	let lookAhead = 5;
 	let index = 0;
-	const MAX_ITERATIONS = 500;
 	let outerMaxIterations = MAX_ITERATIONS;
 
 	while (index < groups.length && outerMaxIterations-- > 0) {
@@ -232,142 +234,27 @@ export function combineActions(
 			}
 		}
 
-		// Look ahead for repeated patterns (like the old algorithm)
+		// Look ahead for repeated patterns
 		if (!hasAMatch) {
-			let lookAheadMaxIterations = MAX_ITERATIONS;
-			while (
-				lookAheadIndex <= lookAhead &&
-				index + lookAheadIndex * 2 <= groups.length &&
-				lookAheadMaxIterations-- > 0
-			) {
-				const pattern = groups.slice(index, index + lookAheadIndex);
-				const nextPattern = groups.slice(index + lookAheadIndex, index + lookAheadIndex * 2);
-
-				if (patternsEqual(pattern, nextPattern)) {
-					possibleMatches.push({
-						group: pattern,
-						count: 2
-					});
-				}
-
-				lookAheadIndex++;
-			}
+			possibleMatches = findPossibleMatches(groups, index, lookAheadIndex);
 
 			if (possibleMatches.length > 1) {
-				// Find the best pattern match - prefer shorter patterns with higher repetition
-				let bestMatch = possibleMatches[0];
+				const bestMatch = findBestMatch(possibleMatches, groups, index);
+				const patternCount = countPatternRepetitions(groups, index, bestMatch.group.length);
 
-				for (const match of possibleMatches) {
-					// Count how many times each pattern actually repeats
-					let currentPatternCount = 2;
-					let bestPatternCount = 2;
-
-					// Count repetitions for current match
-					while (
-						index + match.group.length * (currentPatternCount + 1) <= groups.length &&
-						patternsEqual(
-							groups.slice(index, index + match.group.length),
-							groups.slice(
-								index + match.group.length * currentPatternCount,
-								index + match.group.length * (currentPatternCount + 1)
-							)
-						)
-					) {
-						currentPatternCount++;
-					}
-
-					// Count repetitions for best match
-					while (
-						index + bestMatch.group.length * (bestPatternCount + 1) <= groups.length &&
-						patternsEqual(
-							groups.slice(index, index + bestMatch.group.length),
-							groups.slice(
-								index + bestMatch.group.length * bestPatternCount,
-								index + bestMatch.group.length * (bestPatternCount + 1)
-							)
-						)
-					) {
-						bestPatternCount++;
-					}
-
-					// Prefer the pattern with higher repetition count, or shorter pattern if equal
-					if (
-						currentPatternCount > bestPatternCount ||
-						(currentPatternCount === bestPatternCount &&
-							match.group.length < bestMatch.group.length)
-					) {
-						bestMatch = match;
-					}
-				}
-
-				// Count how many times this pattern actually repeats
-				let patternCount = 2; // We already found 2 occurrences
-				let patternLength = bestMatch.group.length;
-
-				// Check for more repetitions
-				while (
-					index + patternLength * (patternCount + 1) <= groups.length &&
-					patternsEqual(
-						groups.slice(index, index + patternLength),
-						groups.slice(
-							index + patternLength * patternCount,
-							index + patternLength * (patternCount + 1)
-						)
-					)
-				) {
-					patternCount++;
-				}
-
-				// Check if the best match consists of identical groups (like bestMatchSet logic)
-				if (bestMatch.group.length > 1) {
-					const firstGroup = bestMatch.group[0];
-					const allSame = bestMatch.group.every((group) => groupsEqual(group, firstGroup));
-
-					if (allSame) {
-						// Combine identical groups into one with higher count
-						result.push({
-							group: [firstGroup],
-							count: bestMatch.group.length * patternCount
-						});
-					} else {
-						result.push({
-							group: bestMatch.group,
-							count: patternCount
-						});
-					}
-				} else {
-					result.push({
-						group: bestMatch.group,
-						count: patternCount
-					});
-				}
-
+				const processedMatch = processMatchedPattern(bestMatch, patternCount);
+				result.push(processedMatch);
 				index += bestMatch.group.length * patternCount;
 				hasAMatch = true;
 			} else if (possibleMatches.length === 1) {
-				// Count how many times this single pattern repeats
-				let patternCount = 2; // We already found 2 occurrences
-				let patternLength = possibleMatches[0].group.length;
-
-				// Check for more repetitions
-				while (
-					index + patternLength * (patternCount + 1) <= groups.length &&
-					patternsEqual(
-						groups.slice(index, index + patternLength),
-						groups.slice(
-							index + patternLength * patternCount,
-							index + patternLength * (patternCount + 1)
-						)
-					)
-				) {
-					patternCount++;
-				}
+				const singleMatch = possibleMatches[0];
+				const patternCount = countPatternRepetitions(groups, index, singleMatch.group.length);
 
 				result.push({
-					group: possibleMatches[0].group,
+					group: singleMatch.group,
 					count: patternCount
 				});
-				index += possibleMatches[0].group.length * patternCount;
+				index += singleMatch.group.length * patternCount;
 				hasAMatch = true;
 			}
 		}
@@ -461,6 +348,115 @@ function patternsEqual(pattern1: ActionGroup[], pattern2: ActionGroup[]): boolea
 	if (pattern1.length !== pattern2.length) return false;
 
 	return pattern1.every((group, index) => groupsEqual(group, pattern2[index]));
+}
+
+/**
+ * Finds possible pattern matches in the groups array
+ */
+function findPossibleMatches(
+	groups: ActionGroup[],
+	index: number,
+	lookAheadIndex: number
+): Array<{ group: ActionGroup[]; count: number }> {
+	const possibleMatches: Array<{ group: ActionGroup[]; count: number }> = [];
+	let lookAheadMaxIterations = MAX_ITERATIONS;
+
+	while (
+		lookAheadIndex <= DEFAULT_LOOK_AHEAD &&
+		index + lookAheadIndex * 2 <= groups.length &&
+		lookAheadMaxIterations-- > 0
+	) {
+		const pattern = groups.slice(index, index + lookAheadIndex);
+		const nextPattern = groups.slice(index + lookAheadIndex, index + lookAheadIndex * 2);
+
+		if (patternsEqual(pattern, nextPattern)) {
+			possibleMatches.push({
+				group: pattern,
+				count: 2
+			});
+		}
+
+		lookAheadIndex++;
+	}
+
+	return possibleMatches;
+}
+
+/**
+ * Finds the best match from possible matches based on repetition count and pattern length
+ */
+function findBestMatch(
+	possibleMatches: Array<{ group: ActionGroup[]; count: number }>,
+	groups: ActionGroup[],
+	index: number
+): { group: ActionGroup[]; count: number } {
+	let bestMatch = possibleMatches[0];
+
+	for (const match of possibleMatches) {
+		const currentPatternCount = countPatternRepetitions(groups, index, match.group.length);
+		const bestPatternCount = countPatternRepetitions(groups, index, bestMatch.group.length);
+
+		// Prefer the pattern with higher repetition count, or shorter pattern if equal
+		if (
+			currentPatternCount > bestPatternCount ||
+			(currentPatternCount === bestPatternCount && match.group.length < bestMatch.group.length)
+		) {
+			bestMatch = match;
+		}
+	}
+
+	return bestMatch;
+}
+
+/**
+ * Counts how many times a pattern repeats starting from the given index
+ */
+function countPatternRepetitions(
+	groups: ActionGroup[],
+	index: number,
+	patternLength: number
+): number {
+	let patternCount = 2; // We already found 2 occurrences
+
+	// Check for more repetitions
+	while (
+		index + patternLength * (patternCount + 1) <= groups.length &&
+		patternsEqual(
+			groups.slice(index, index + patternLength),
+			groups.slice(index + patternLength * patternCount, index + patternLength * (patternCount + 1))
+		)
+	) {
+		patternCount++;
+	}
+
+	return patternCount;
+}
+
+/**
+ * Processes a matched pattern to handle identical groups
+ */
+function processMatchedPattern(
+	bestMatch: { group: ActionGroup[]; count: number },
+	patternCount: number
+): { group: ActionGroup[]; count: number } {
+	// Check if the best match consists of identical groups
+	if (bestMatch.group.length > 1) {
+		const firstGroup = bestMatch.group[0];
+		const allSame = bestMatch.group.every((group) => groupsEqual(group, firstGroup));
+
+		if (allSame) {
+			// Combine identical groups into one with higher count
+			return {
+				group: [firstGroup],
+				count: bestMatch.group.length * patternCount
+			};
+		}
+	}
+
+	return {
+		group: bestMatch.group,
+		count: patternCount
+	};
 }
 
 /**
