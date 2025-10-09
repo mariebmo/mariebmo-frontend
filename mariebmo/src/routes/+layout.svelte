@@ -5,7 +5,7 @@
 	import '../app.css';
 
 	import { inject } from '@vercel/analytics';
-	
+
 	interface Props {
 		children?: Snippet<[any]>;
 	}
@@ -15,14 +15,12 @@
 	inject();
 </script>
 
-<div class="layout">
+<div class="flex flex-col h-screen">
 	<!-- Header -->
 	<Header />
 
-	<main>
-		<div class="min-h-screen">
-			{@render children?.({ class: 'align-top' })}
-		</div>
+	<main class="flex-grow">
+		{@render children?.({ class: 'h-full' })}
 	</main>
 
 	<!-- Footer -->

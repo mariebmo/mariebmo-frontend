@@ -2,31 +2,28 @@
 	import { ProjectCardColor } from '$lib/components/project/project';
 	import ProjectCard from '../lib/components/project/ProjectCard.svelte';
 
-	function showDiv() {
-		var div = document.getElementById('is-expanded-div');
-		if (div) {
-			if (div.style.display === 'none') {
-				div.style.display = 'block';
-			} else {
-				div.style.display = 'none';
-			}
-		}
-	}
-
 	let projects = [
 		{
-			title: 'Knitting Calculator',
-			description: 'The calculator is used for even increases or decreases in knitting.',
+			title: 'Knitting Utilities',
+			description: 'Utilities used for knitting, such as calculators and row counters.',
 			icon: 'favorite',
 			color: ProjectCardColor.RED,
-			link: '/knitting',
+			link: '/knitting-tools',
 			showWhenExpanded: null
 		}
 	];
 </script>
 
 <div>
-	<div class="w-full flex flex-col">
+	<div class="w-full flex flex-col items-center justify-center gap-4">
+		<ProjectCard
+			header="About"
+			description="Senior Software Engineer, still don't know what I'm doing"
+			icon="favorite"
+			color={ProjectCardColor.PINK}
+			link="/about"
+		/>
+
 		{#each projects as project}
 			<ProjectCard
 				header={project.title}

@@ -5,8 +5,8 @@
 	import KnittingActionChecklist from './KnittingActionChecklist.svelte';
 	import KnittingActionInteractive from './KnittingActionInteractive.svelte';
 	import { knittingCalculations } from './knitting.svelte';
-	import { getSavedActiveTab, saveActiveTab, isValidTabId } from '../../lib/utils/localStorage';
 	import { onMount, onDestroy } from 'svelte';
+	import { isValidTabId, saveActiveTab, getSavedActiveTab } from '$lib/utils/localStorage';
 
 	interface Tab {
 		id: string;

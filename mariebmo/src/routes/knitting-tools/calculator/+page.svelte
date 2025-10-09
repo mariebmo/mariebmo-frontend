@@ -12,7 +12,6 @@
 	import {
 		validateKnittingInputs,
 		calculateKnittingTargetAmount,
-		actionToKnitType,
 		getKnittingSymbol,
 		getKnittingActionType,
 		createKnittingActionString,
@@ -28,8 +27,6 @@
 
 	let byOrTo = $derived(totalAmountIncluded ? 'to' : 'by');
 	let increaseOrDecrease = $derived(increaseSelected ? 'increase' : 'decrease');
-
-	let knittingActions: KnittingActions | null = $derived(knittingCalculations);
 
 	let hasCalculatedData = $derived(knittingCalculations.actions.length > 0);
 

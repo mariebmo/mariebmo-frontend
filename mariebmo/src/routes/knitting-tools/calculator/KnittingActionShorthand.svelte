@@ -1,6 +1,6 @@
 <script lang="ts">
+	import type { KnittingAction } from './interfaces';
 	import { knittingCalculations } from './knitting.svelte';
-	import type { KnittingAction } from './evenCalculator';
 
 	let shorthandOutput = $derived(printShorthand(knittingCalculations.actions));
 
