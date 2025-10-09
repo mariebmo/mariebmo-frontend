@@ -15,6 +15,8 @@ export const KnitSymbol = {
 export interface KnittingAction {
 	actions: string[];
 	count: number;
+	isDone?: boolean;
+	completedRepetitions?: number; // Track how many repetitions are completed
 }
 
 // Re-export ActionGroup from evenCalculator for convenience

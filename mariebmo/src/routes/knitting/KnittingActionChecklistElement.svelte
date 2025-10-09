@@ -32,9 +32,10 @@
 	}
 
 	function createSubActions(count: number, actionString: string): SubAction[] {
-		return Array.from({ length: count }, () => ({
+		const completedCount = action.completedRepetitions || 0;
+		return Array.from({ length: count }, (_, index) => ({
 			action: actionString,
-			isDone: false
+			isDone: index < completedCount
 		}));
 	}
 
@@ -102,7 +103,7 @@
 </script>
 
 <div
-	class="bg-white dark:bg-amber-900 rounded-xl shadow-lg border border-amber-200 dark:border-amber-700 mb-4 overflow-hidden mx-2 sm:mx-0"
+	class="bg-white dark:bg-amber-900 rounded-xl border border-amber-200 dark:border-amber-700 mb-4 overflow-hidden mx-2 sm:mx-0"
 >
 	<!-- Main action row -->
 	<div class="flex items-center p-3 sm:p-5 gap-3 sm:gap-4 relative">
@@ -133,7 +134,7 @@
 
 		{#if hasMultipleActions}
 			<button
-				class="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-xl bg-gradient-to-r from-amber-100 to-orange-100 dark:from-amber-800 dark:to-orange-800 hover:from-amber-200 hover:to-orange-200 dark:hover:from-amber-700 dark:hover:to-orange-700 focus:outline-none focus:ring-4 focus:ring-amber-300 dark:focus:ring-amber-700 focus:ring-offset-2 shadow-md touch-manipulation"
+				class="w-8 h-8 sm:w-10 sm:h-10 border border-amber-200 dark:border-amber-700 flex items-center justify-center rounded-xl bg-gradient-to-r from-amber-100 to-orange-100 dark:from-amber-800 dark:to-orange-800 hover:from-amber-200 hover:to-orange-200 dark:hover:from-amber-700 dark:hover:to-orange-700 focus:outline-none focus:ring-4 focus:ring-amber-300 dark:focus:ring-amber-700 focus:ring-offset-2 touch-manipulation"
 				onclick={toggleExpanded}
 				aria-label={isExpanded ? 'Collapse details' : 'Expand details'}
 				tabindex="0"

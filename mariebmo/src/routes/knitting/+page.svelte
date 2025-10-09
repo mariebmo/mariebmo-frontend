@@ -31,6 +31,8 @@
 
 	let knittingActions: KnittingActions | null = $derived(knittingCalculations);
 
+	let hasCalculatedData = $derived(knittingCalculations.actions.length > 0);
+
 	function toggleByOrTo() {
 		totalAmountIncluded = !totalAmountIncluded;
 	}
@@ -178,79 +180,162 @@
 				<div>
 					<!-- ENHANCED INPUT SECTION -->
 					<div class="mt-4">
-						<div class="max-w-md mx-auto space-y-4 px-2 sm:px-0">
-							<!-- Starting Stitches Input -->
-							<div class="space-y-1">
-								<label for="current" class="text-sm font-semibold text-gray-700 dark:text-amber-200"
-									>Starting stitches</label
-								>
-								<input
-									id="current"
-									class="w-full px-3 py-2 text-gray-900 dark:text-gray-100 bg-white dark:bg-amber-900 border-2 border-gray-200 dark:border-amber-600 rounded-lg focus:border-amber-500 dark:focus:border-amber-400 focus:ring-2 focus:ring-amber-200 dark:focus:ring-amber-800 transition-all duration-200 placeholder-gray-400 dark:placeholder-amber-300 focus:outline-none focus:shadow-md text-base sm:text-sm"
-									type="number"
-									bind:value={current}
-									placeholder="12"
-								/>
-							</div>
-
-							<!-- Action Buttons -->
-							<div class="flex justify-center">
+						{#if hasCalculatedData}
+							<!-- Compact Layout -->
+							<div class="max-w-4xl mx-auto px-2 sm:px-0">
 								<div
-									class="flex gap-2 p-1 bg-white dark:bg-amber-900 rounded-xl border border-gray-200 dark:border-amber-600 flex-col sm:flex-row"
+									class=" dark:bg-amber-900 rounded-lg p-4 border border-gray-200 dark:border-amber-600"
 								>
-									<button
-										onclick={toggleIncreaseDecrease}
-										id="increase-decrease-btn"
-										class="flex items-center justify-center px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 dark:focus:ring-offset-amber-800 {increaseSelected
-											? 'bg-amber-500 dark:bg-amber-600 text-white shadow-md'
-											: 'text-gray-600 dark:text-amber-300 hover:text-gray-800 dark:hover:text-amber-100 hover:bg-gray-50 dark:hover:bg-amber-800'}"
-										aria-pressed={increaseSelected}
-									>
-										{increaseOrDecrease}
-									</button>
-									<button
-										onclick={toggleByOrTo}
-										id="by-to-btn"
-										class="flex items-center justify-center px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 dark:focus:ring-offset-amber-800 {!totalAmountIncluded
-											? 'bg-amber-500 dark:bg-amber-600 text-white shadow-md'
-											: 'text-gray-600 dark:text-amber-300 hover:text-gray-800 dark:hover:text-amber-100 hover:bg-gray-50 dark:hover:bg-amber-800'}"
-										aria-pressed={!totalAmountIncluded}
-									>
-										{byOrTo}
-									</button>
+									<div class="flex flex-col sm:flex-row gap-4 items-end">
+										<!-- Starting Stitches -->
+										<div class="flex-1 min-w-0">
+											<label
+												for="current-compact"
+												class="text-xs font-semibold text-gray-700 dark:text-amber-200 block mb-1"
+											>
+												Starting stitches
+											</label>
+											<input
+												id="current-compact"
+												class="w-full px-2 py-1.5 text-gray-900 dark:text-gray-100 bg-white dark:bg-amber-900 border border-gray-200 dark:border-amber-600 rounded focus:border-amber-500 dark:focus:border-amber-400 focus:ring-1 focus:ring-amber-200 dark:focus:ring-amber-800 transition-all duration-200 placeholder-gray-400 dark:placeholder-amber-300 focus:outline-none text-sm"
+												type="number"
+												bind:value={current}
+												placeholder="12"
+											/>
+										</div>
+
+										<!-- Action Buttons -->
+										<div class="flex gap-1">
+											<button
+												onclick={toggleIncreaseDecrease}
+												class="px-2 py-1.5 text-xs font-medium rounded transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-1 dark:focus:ring-offset-amber-800 bg-amber-500 dark:bg-amber-600 text-white"
+												aria-pressed={increaseSelected}
+											>
+												{increaseOrDecrease}
+											</button>
+											<button
+												onclick={toggleByOrTo}
+												class="px-2 py-1.5 text-xs font-medium rounded transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-1 dark:focus:ring-offset-amber-800 bg-amber-500 dark:bg-amber-600 text-white"
+												aria-pressed={!totalAmountIncluded}
+											>
+												{byOrTo}
+											</button>
+										</div>
+
+										<!-- Amount Input -->
+										<div class="flex-1 min-w-0">
+											<label
+												for="amount-compact"
+												class="text-xs font-semibold text-gray-700 dark:text-amber-200 block mb-1"
+											>
+												Amount to {increaseOrDecrease}
+												{byOrTo}
+											</label>
+											<input
+												id="amount-compact"
+												class="w-full px-2 py-1.5 text-gray-900 dark:text-gray-100 bg-white dark:bg-amber-900 border border-gray-200 dark:border-amber-600 rounded focus:border-amber-500 dark:focus:border-amber-400 focus:ring-1 focus:ring-amber-200 dark:focus:ring-amber-800 transition-all duration-200 placeholder-gray-400 dark:placeholder-amber-300 focus:outline-none text-sm"
+												type="number"
+												bind:value={amount}
+												placeholder="5"
+											/>
+										</div>
+
+										<!-- Submit Button -->
+										<button
+											class="px-4 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 dark:from-amber-600 dark:to-orange-600 text-white font-semibold rounded shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-amber-300 dark:focus:ring-amber-700 transition-all duration-200 text-sm"
+											onclick={submit}
+										>
+											Calculate
+										</button>
+									</div>
+
+									<!-- Result Display -->
+									<div class="mt-3 text-center">
+										<div class="text-sm text-gray-600 dark:text-gray-100 font-semibold">
+											{increaseOrDecrease} from {current}
+											{byOrTo}
+											{amount} = {calculateTargetAmount()} stitches
+										</div>
+									</div>
 								</div>
 							</div>
+						{:else}
+							<!-- Full Layout -->
+							<div class="max-w-md mx-auto space-y-4 px-2 sm:px-0">
+								<!-- Starting Stitches Input -->
+								<div class="space-y-1">
+									<label
+										for="current"
+										class="text-sm font-semibold text-gray-700 dark:text-amber-200"
+										>Starting stitches</label
+									>
+									<input
+										id="current"
+										class="w-full px-3 py-2 text-gray-900 dark:text-gray-100 bg-white dark:bg-amber-900 border-2 border-gray-200 dark:border-amber-600 rounded-lg focus:border-amber-500 dark:focus:border-amber-400 focus:ring-2 focus:ring-amber-200 dark:focus:ring-amber-800 transition-all duration-200 placeholder-gray-400 dark:placeholder-amber-300 focus:outline-none focus:shadow-md text-base sm:text-sm"
+										type="number"
+										bind:value={current}
+										placeholder="12"
+									/>
+								</div>
 
-							<!-- Amount Input -->
-							<div class="space-y-1">
-								<label for="amount" class="text-sm font-semibold text-gray-700 dark:text-amber-200"
-									>Amount to {increaseOrDecrease} {byOrTo}</label
+								<!-- Action Buttons -->
+								<div class="flex justify-center">
+									<div
+										class="flex gap-2 p-1 bg-white dark:bg-amber-900 rounded-xl border border-gray-200 dark:border-amber-600 flex-col sm:flex-row"
+									>
+										<button
+											onclick={toggleIncreaseDecrease}
+											id="increase-decrease-btn"
+											class="flex items-center justify-center px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 dark:focus:ring-offset-amber-800
+											bg-amber-500 dark:bg-amber-600 text-white"
+											aria-pressed={increaseSelected}
+										>
+											{increaseOrDecrease}
+										</button>
+										<button
+											onclick={toggleByOrTo}
+											id="by-to-btn"
+											class="flex items-center justify-center px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 dark:focus:ring-offset-amber-800 bg-amber-500 dark:bg-amber-600 text-white"
+											aria-pressed={!totalAmountIncluded}
+										>
+											{byOrTo}
+										</button>
+									</div>
+								</div>
+
+								<!-- Amount Input -->
+								<div class="space-y-1">
+									<label
+										for="amount"
+										class="text-sm font-semibold text-gray-700 dark:text-amber-200"
+										>Amount to {increaseOrDecrease} {byOrTo}</label
+									>
+									<input
+										id="amount"
+										class="w-full px-3 py-2 text-gray-900 dark:text-gray-100 bg-white dark:bg-amber-900 border-2 border-gray-200 dark:border-amber-600 rounded-lg focus:border-amber-500 dark:focus:border-amber-400 focus:ring-2 focus:ring-amber-200 dark:focus:ring-amber-800 transition-all duration-200 placeholder-gray-400 dark:placeholder-amber-300 focus:outline-none focus:shadow-md text-base sm:text-sm"
+										type="number"
+										bind:value={amount}
+										placeholder="5"
+									/>
+								</div>
+
+								<div
+									class="text-gray-600 dark:text-gray-100 font-semibold italic text-sm mb-4 justify-center flex"
 								>
-								<input
-									id="amount"
-									class="w-full px-3 py-2 text-gray-900 dark:text-gray-100 bg-white dark:bg-amber-900 border-2 border-gray-200 dark:border-amber-600 rounded-lg focus:border-amber-500 dark:focus:border-amber-400 focus:ring-2 focus:ring-amber-200 dark:focus:ring-amber-800 transition-all duration-200 placeholder-gray-400 dark:placeholder-amber-300 focus:outline-none focus:shadow-md text-base sm:text-sm"
-									type="number"
-									bind:value={amount}
-									placeholder="5"
-								/>
-							</div>
+									{increaseOrDecrease} from {current}
+									{byOrTo}
+									{amount} = {calculateTargetAmount()} stitches.
+								</div>
 
-							<div
-								class="text-gray-600 dark:text-gray-100 font-semibold italic text-sm mb-4 justify-center flex"
-							>
-								{increaseOrDecrease} from {current}
-								{byOrTo}
-								{amount} -> {calculateTargetAmount()}.
+								<!-- Submit Button -->
+								<button
+									class="w-full flex items-center justify-center px-3 py-2 sm:px-4 sm:py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 dark:from-amber-600 dark:to-orange-600 text-white font-semibold rounded-lg shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-amber-300 dark:focus:ring-amber-700 transition-all duration-200 hover:from-amber-600 hover:to-orange-600 dark:hover:from-amber-700 dark:hover:to-orange-700"
+									onclick={submit}
+								>
+									Calculate Pattern
+								</button>
 							</div>
-
-							<!-- Submit Button -->
-							<button
-								class="w-full flex items-center justify-center px-3 py-2 sm:px-4 sm:py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 dark:from-amber-600 dark:to-orange-600 text-white font-semibold rounded-lg shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-amber-300 dark:focus:ring-amber-700 transition-all duration-200 hover:from-amber-600 hover:to-orange-600 dark:hover:from-amber-700 dark:hover:to-orange-700"
-								onclick={submit}
-							>
-								Calculate Pattern
-							</button>
-						</div>
+						{/if}
 					</div>
 
 					<!-- OUTPUT -->
