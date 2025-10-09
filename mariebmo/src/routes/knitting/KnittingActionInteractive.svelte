@@ -4,6 +4,7 @@
 
 	let currentActionIndex = $state(0);
 	let currentRepetitionIndex = $state(0);
+	let isInFullscreen = $state(false);
 
 	// Flatten all repetitions from all actions for global progression
 	let allRepetitions = $derived(() => {
@@ -130,6 +131,21 @@
 		}
 	}
 
+	function handleFullscreenClick(event: MouseEvent) {
+		// Check if the click target is a button or inside a button
+		const target = event.target as HTMLElement;
+		if (target.closest('button')) {
+			return; // Don't complete if clicking on a button
+		}
+		completeNextRepetition();
+	}
+
+	function checkFullscreenMode() {
+		// Check if we're inside a fullscreen container
+		const fullscreenContainer = document.querySelector('.fixed.inset-0.z-50');
+		isInFullscreen = !!fullscreenContainer;
+	}
+
 	function resetProgress() {
 		// Reset all actions
 		knittingCalculations.actions.forEach((action) => {
@@ -172,6 +188,14 @@
 	// Global keyboard listener for interactive mode
 	onMount(() => {
 		document.addEventListener('keydown', handleInteractiveKeyDown);
+
+		// Check fullscreen mode initially and periodically
+		checkFullscreenMode();
+		const interval = setInterval(checkFullscreenMode, 100);
+
+		return () => {
+			clearInterval(interval);
+		};
 	});
 
 	onDestroy(() => {
@@ -179,7 +203,16 @@
 	});
 </script>
 
-<div class="p-4 sm:p-6">
+<div
+	class="p-4 sm:p-6 {isInFullscreen ? 'cursor-pointer min-h-screen' : ''}"
+	onclick={isInFullscreen ? handleFullscreenClick : undefined}
+	onkeydown={isInFullscreen ? handleInteractiveKeyDown : undefined}
+	role="button"
+	tabindex={isInFullscreen ? 0 : -1}
+	aria-label={isInFullscreen
+		? 'Click anywhere to complete current knitting step'
+		: 'Interactive knitting pattern'}
+>
 	{#if knittingCalculations.actions.length === 0}
 		<div class="text-center py-8">
 			<div class="text-gray-500 dark:text-gray-400 mb-4">
@@ -226,14 +259,16 @@
 						</div>
 					{/if}
 					<div class="mt-3 text-xs text-green-600 dark:text-green-400">
-						Click anywhere or press Space to complete
+						{isInFullscreen
+							? 'Click anywhere on screen or press Space to complete'
+							: 'Click anywhere or press Space to complete'}
 					</div>
 				</div>
 
 				<!-- Action Buttons -->
 				<div class="flex gap-2 mb-4">
 					<button
-						class="flex-1 bg-gradient-to-r from-red-500 to-pink-500 dark:from-red-600 dark:to-pink-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-red-300 dark:focus:ring-red-700 transition-all duration-200 touch-manipulation"
+						class="flex-1 bg-gradient-to-r from-red-500 to-pink-500 dark:from-red-600 dark:to-pink-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-red-300 dark:focus:ring-red-700 transition-all duration-200 touch-manipulation cursor-pointer"
 						onclick={undoLastAction}
 						tabindex="0"
 						aria-label="Undo last action"
@@ -242,7 +277,7 @@
 						Undo
 					</button>
 					<button
-						class="flex-1 bg-gradient-to-r from-gray-500 to-gray-600 dark:from-gray-600 dark:to-gray-700 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-700 transition-all duration-200 touch-manipulation"
+						class="flex-1 bg-gradient-to-r from-gray-500 to-gray-600 dark:from-gray-600 dark:to-gray-700 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-700 transition-all duration-200 touch-manipulation cursor-pointer"
 						onclick={resetProgress}
 						tabindex="0"
 						aria-label="Reset all progress"
@@ -262,21 +297,8 @@
 						Progress Overview
 					</div>
 
-					<!-- Actions Progress -->
-					<div class="mb-4">
-						<div class="text-sm text-gray-700 dark:text-gray-300 mb-2">
-							Actions: {completedActions} of {totalActions} complete
-						</div>
-						<div class="w-full bg-green-200 dark:bg-green-800 rounded-full h-3">
-							<div
-								class="bg-gradient-to-r from-green-500 to-emerald-500 h-3 rounded-full transition-all duration-300"
-								style="width: {actionProgress}%"
-							></div>
-						</div>
-					</div>
-
 					<!-- Repetitions Progress -->
-					<div class="mb-2">
+					<div class="mb-4">
 						<div class="text-sm text-gray-700 dark:text-gray-300 mb-2">
 							Current Action: {currentActionRepetitions().completed} of {currentActionRepetitions()
 								.total} repetitions
@@ -285,6 +307,19 @@
 							<div
 								class="bg-gradient-to-r from-blue-500 to-cyan-500 h-3 rounded-full transition-all duration-300"
 								style="width: {currentRepetitionProgress()}%"
+							></div>
+						</div>
+					</div>
+
+					<!-- Actions Progress -->
+					<div class="mb-2">
+						<div class="text-sm text-gray-700 dark:text-gray-300 mb-2">
+							Actions: {completedActions} of {totalActions} complete
+						</div>
+						<div class="w-full bg-green-200 dark:bg-green-800 rounded-full h-3">
+							<div
+								class="bg-gradient-to-r from-green-500 to-emerald-500 h-3 rounded-full transition-all duration-300"
+								style="width: {actionProgress}%"
 							></div>
 						</div>
 					</div>
@@ -314,7 +349,7 @@
 			</div>
 
 			<button
-				class="w-full bg-gradient-to-r from-amber-500 to-orange-500 dark:from-amber-600 dark:to-orange-600 text-white font-semibold py-4 px-6 rounded-lg shadow-md hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-amber-300 dark:focus:ring-amber-700 transition-all duration-200 touch-manipulation"
+				class="w-full bg-gradient-to-r from-amber-500 to-orange-500 dark:from-amber-600 dark:to-orange-600 text-white font-semibold py-4 px-6 rounded-lg shadow-md hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-amber-300 dark:focus:ring-amber-700 transition-all duration-200 touch-manipulation cursor-pointer"
 				onclick={resetProgress}
 				tabindex="0"
 				aria-label="Start over"
