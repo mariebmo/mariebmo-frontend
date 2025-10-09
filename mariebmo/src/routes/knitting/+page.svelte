@@ -144,8 +144,8 @@
 
 <section class="flex flex-col antialiased p-4 align-top" id="knitting-container">
 	<div class="h-full">
-		<!-- Card -->
-		<div class="max-w-2xl mx-auto dark:bg-amber-800 bg-orange-200 shadow-lg rounded-lg">
+		<!-- Enhanced Card -->
+		<div class="max-w-2xl rounded-2xl border overflow-hidden mx-2 sm:mx-auto">
 			<div class="px-6 py-5">
 				<!--HEADER AREA -->
 				<div>
@@ -176,47 +176,80 @@
 
 				<!-- CONTENT -->
 				<div>
-					<!-- SEARCH -->
-					<div class="">
-						<div
-							id="knitting-calculator-search"
-							class=" flex flex-col justify-items-center max-w-sm mx-auto"
-						>
-							<label class="calculator-element" for="current">from</label>
-
-							<input
-								id="current"
-								class="block text-sm font-medium leading-6 text-gray-900 rounded-lg"
-								type="number"
-								bind:value={current}
-							/>
-
-							<div class="">
-								<button
-									onclick={toggleIncreaseDecrease}
-									id="increase-decrease-btn"
-									class="px-3 py-1 my-2 mr-2 text-xs font-medium text-center inline-flex items-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-900 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-									>{increaseOrDecrease}</button
+					<!-- ENHANCED INPUT SECTION -->
+					<div class="mt-4">
+						<div class="max-w-md mx-auto space-y-4 px-2 sm:px-0">
+							<!-- Starting Stitches Input -->
+							<div class="space-y-1">
+								<label for="current" class="text-sm font-semibold text-gray-700 dark:text-amber-200"
+									>Starting stitches</label
 								>
-								<button
-									onclick={toggleByOrTo}
-									id="by-to-btn"
-									class="px-3 py-1 my-2 text-xs font-medium text-center inline-flex items-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-900 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-									>{byOrTo}</button
-								>
+								<input
+									id="current"
+									class="w-full px-3 py-2 text-gray-900 dark:text-gray-100 bg-white dark:bg-amber-900 border-2 border-gray-200 dark:border-amber-600 rounded-lg focus:border-amber-500 dark:focus:border-amber-400 focus:ring-2 focus:ring-amber-200 dark:focus:ring-amber-800 transition-all duration-200 placeholder-gray-400 dark:placeholder-amber-300 focus:outline-none focus:shadow-md text-base sm:text-sm"
+									type="number"
+									bind:value={current}
+									placeholder="12"
+								/>
 							</div>
 
-							<input
-								id="amount"
-								class="block text-sm font-medium leading-6 text-gray-900 rounded-lg"
-								type="number"
-								bind:value={amount}
-							/>
+							<!-- Action Buttons -->
+							<div class="flex justify-center">
+								<div
+									class="flex gap-2 p-1 bg-white dark:bg-amber-900 rounded-xl border border-gray-200 dark:border-amber-600 flex-col sm:flex-row"
+								>
+									<button
+										onclick={toggleIncreaseDecrease}
+										id="increase-decrease-btn"
+										class="flex items-center justify-center px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 dark:focus:ring-offset-amber-800 {increaseSelected
+											? 'bg-amber-500 dark:bg-amber-600 text-white shadow-md'
+											: 'text-gray-600 dark:text-amber-300 hover:text-gray-800 dark:hover:text-amber-100 hover:bg-gray-50 dark:hover:bg-amber-800'}"
+										aria-pressed={increaseSelected}
+									>
+										{increaseOrDecrease}
+									</button>
+									<button
+										onclick={toggleByOrTo}
+										id="by-to-btn"
+										class="flex items-center justify-center px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 dark:focus:ring-offset-amber-800 {!totalAmountIncluded
+											? 'bg-amber-500 dark:bg-amber-600 text-white shadow-md'
+											: 'text-gray-600 dark:text-amber-300 hover:text-gray-800 dark:hover:text-amber-100 hover:bg-gray-50 dark:hover:bg-amber-800'}"
+										aria-pressed={!totalAmountIncluded}
+									>
+										{byOrTo}
+									</button>
+								</div>
+							</div>
 
-							<button
-								class="px-3 py-1 my-2 text-xs font-medium text-center inline-flex items-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-900 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-								onclick={submit}>Submit</button
+							<!-- Amount Input -->
+							<div class="space-y-1">
+								<label for="amount" class="text-sm font-semibold text-gray-700 dark:text-amber-200"
+									>Amount to {increaseOrDecrease} {byOrTo}</label
+								>
+								<input
+									id="amount"
+									class="w-full px-3 py-2 text-gray-900 dark:text-gray-100 bg-white dark:bg-amber-900 border-2 border-gray-200 dark:border-amber-600 rounded-lg focus:border-amber-500 dark:focus:border-amber-400 focus:ring-2 focus:ring-amber-200 dark:focus:ring-amber-800 transition-all duration-200 placeholder-gray-400 dark:placeholder-amber-300 focus:outline-none focus:shadow-md text-base sm:text-sm"
+									type="number"
+									bind:value={amount}
+									placeholder="5"
+								/>
+							</div>
+
+							<div
+								class="text-gray-600 dark:text-gray-100 font-semibold italic text-sm mb-4 justify-center flex"
 							>
+								{increaseOrDecrease} from {current}
+								{byOrTo}
+								{amount} -> {calculateTargetAmount()}.
+							</div>
+
+							<!-- Submit Button -->
+							<button
+								class="w-full flex items-center justify-center px-3 py-2 sm:px-4 sm:py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 dark:from-amber-600 dark:to-orange-600 text-white font-semibold rounded-lg shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-amber-300 dark:focus:ring-amber-700 transition-all duration-200 hover:from-amber-600 hover:to-orange-600 dark:hover:from-amber-700 dark:hover:to-orange-700"
+								onclick={submit}
+							>
+								Calculate Pattern
+							</button>
 						</div>
 					</div>
 

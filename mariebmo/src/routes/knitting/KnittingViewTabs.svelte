@@ -104,18 +104,25 @@
 </script>
 
 {#if shouldShowTabs}
-	<div class="knitting-tabs-container">
+	<div
+		class="mt-8 bg-white dark:bg-amber-900 rounded-2xl shadow-lg border border-amber-200 dark:border-amber-700 overflow-hidden mx-2 sm:mx-0"
+	>
 		<!-- Tab Navigation -->
 		<div
-			class="tab-navigation"
+			class="flex bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950 dark:to-orange-950 border-b border-amber-200 dark:border-amber-700 relative"
 			role="tablist"
 			aria-label="Knitting pattern views"
+			tabindex="0"
 			onkeydown={handleArrowKeys}
 		>
 			{#each tabs as tab (tab.id)}
 				<button
-					class="tab-button"
-					class:active={activeTabId === tab.id}
+					class="flex-1 flex items-center justify-center gap-2 px-2 py-3 sm:px-4 sm:py-4 text-xs sm:text-sm font-semibold text-amber-700 dark:text-amber-300 bg-transparent border-none cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-800 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-inset relative overflow-hidden flex-col sm:flex-row {activeTabId ===
+					tab.id
+						? 'bg-white text-amber-900 '
+						: ''}"
+					class:rounded-tl-2xl={tab.id === 'checklist'}
+					class:rounded-tr-2xl={tab.id === 'visual'}
 					role="tab"
 					tabindex={activeTabId === tab.id ? 0 : -1}
 					aria-selected={activeTabId === tab.id}
@@ -123,81 +130,36 @@
 					onclick={() => selectTab(tab.id)}
 					onkeydown={(e: KeyboardEvent) => handleKeyDown(e, tab.id)}
 				>
-					<span class="material-symbols-outlined tab-icon">{tab.icon}</span>
-					<span class="tab-label">{tab.label}</span>
+					<span
+						class="material-symbols-outlined text-lg sm:text-xl relative z-10 transition-transform duration-200 {activeTabId ===
+						tab.id
+							? 'scale-110'
+							: 'hover:scale-110'}">{tab.icon}</span
+					>
+					<span class="hidden sm:inline relative z-10 font-medium">{tab.label}</span>
+					<span class="sm:hidden relative z-10 font-medium text-xs">{tab.label}</span>
 				</button>
 			{/each}
 		</div>
 
 		<!-- Tab Content -->
-		<div class="tab-content">
+		<div
+			class="p-4 sm:p-6 bg-gradient-to-br from-white to-amber-50 dark:from-amber-900 dark:to-orange-900"
+		>
 			{#each tabs as tab (tab.id)}
 				<div
 					id="panel-{tab.id}"
-					class="tab-panel"
-					class:active={activeTabId === tab.id}
+					class={activeTabId === tab.id ? 'block' : 'hidden'}
 					role="tabpanel"
 					aria-labelledby="tab-{tab.id}"
 					aria-hidden={activeTabId !== tab.id}
 				>
 					{#if activeTabId === tab.id}
-						<svelte:component this={tab.component} />
+						{@const Component = tab.component}
+						<Component />
 					{/if}
 				</div>
 			{/each}
 		</div>
 	</div>
 {/if}
-
-<style lang="postcss">
-	.knitting-tabs-container {
-		@apply mt-6 bg-white dark:bg-amber-900 rounded-lg shadow-sm border border-amber-200 dark:border-amber-700 overflow-hidden;
-	}
-
-	.tab-navigation {
-		@apply flex bg-amber-50 dark:bg-amber-950 border-b border-amber-200 dark:border-amber-700;
-	}
-
-	.tab-button {
-		@apply flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium text-amber-700 dark:text-amber-300 bg-transparent border-none cursor-pointer transition-all duration-200 hover:bg-amber-100 dark:hover:bg-amber-800 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-inset;
-	}
-
-	.tab-button.active {
-		@apply bg-white dark:bg-amber-900 text-amber-900 dark:text-amber-100 shadow-sm border-b-2 border-amber-600 dark:border-amber-400;
-	}
-
-	.tab-icon {
-		@apply text-lg;
-	}
-
-	.tab-label {
-		@apply hidden sm:inline;
-	}
-
-	.tab-content {
-		@apply p-4;
-	}
-
-	.tab-panel {
-		@apply hidden;
-	}
-
-	.tab-panel.active {
-		@apply block;
-	}
-
-	/* Mobile responsive adjustments */
-	@media (max-width: 640px) {
-		.tab-button {
-			@apply flex-col gap-1 px-2 py-2 text-xs;
-		}
-
-		.tab-icon {
-			@apply text-base;
-		}
-
-		.tab-label {
-			@apply inline text-xs;
-		}
-	}
-</style>

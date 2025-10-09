@@ -101,35 +101,49 @@
 	const hasMultipleActions = $derived(actionTree.count > 1);
 </script>
 
-<div class="knitting-action-card">
+<div
+	class="bg-white dark:bg-amber-900 rounded-xl shadow-lg border border-amber-200 dark:border-amber-700 mb-4 overflow-hidden"
+>
 	<!-- Main action row -->
-	<div class="main-action-row">
+	<div class="flex items-center p-5 gap-4 relative">
 		<input
 			type="checkbox"
-			class="main-checkbox"
+			class="w-6 h-6 rounded-lg border-2 border-amber-400 dark:border-amber-600 text-amber-600 dark:text-amber-400 focus:ring-4 focus:ring-amber-200 dark:focus:ring-amber-800 focus:ring-offset-0 cursor-pointer hover:border-amber-500 dark:hover:border-amber-500 checked:bg-amber-500 dark:checked:bg-amber-600 checked:border-amber-500 dark:checked:border-amber-600"
+			style="accent-color: rgb(217 119 6);"
 			checked={actionTree.isDone}
 			onchange={toggleMainAction}
 			aria-label="Mark action as complete"
 		/>
 
-		<div class="action-content">
-			<p class="action-text" class:completed={actionTree.isDone}>
+		<div class="flex-1">
+			<p
+				class="text-gray-900 dark:text-amber-50 font-semibold text-lg leading-relaxed {actionTree.isDone
+					? 'line-through text-gray-500 dark:text-amber-300 opacity-60'
+					: ''}"
+			>
 				{actionTree.action}
 				{#if hasMultipleActions}
-					<span class="count-badge">×{actionTree.count}</span>
+					<span
+						class="inline-block ml-3 px-3 py-1.5 bg-gradient-to-r from-amber-100 to-orange-100 dark:from-amber-800 dark:to-orange-800 text-amber-800 dark:text-amber-200 text-sm font-bold rounded-full shadow-sm border border-amber-200 dark:border-amber-600"
+						>×{actionTree.count}</span
+					>
 				{/if}
 			</p>
 		</div>
 
 		{#if hasMultipleActions}
 			<button
-				class="expand-button"
+				class="w-10 h-10 flex items-center justify-center rounded-xl bg-gradient-to-r from-amber-100 to-orange-100 dark:from-amber-800 dark:to-orange-800 hover:from-amber-200 hover:to-orange-200 dark:hover:from-amber-700 dark:hover:to-orange-700 focus:outline-none focus:ring-4 focus:ring-amber-300 dark:focus:ring-amber-700 focus:ring-offset-2 shadow-md"
 				onclick={toggleExpanded}
 				aria-label={isExpanded ? 'Collapse details' : 'Expand details'}
 				tabindex="0"
 				onkeydown={(e) => handleKeyDown(e, toggleExpanded)}
 			>
-				<span class="material-symbols-outlined expand-icon" class:rotated={isExpanded}>
+				<span
+					class="material-symbols-outlined text-amber-700 dark:text-amber-300 text-xl {isExpanded
+						? 'rotate-180'
+						: ''}"
+				>
 					expand_more
 				</span>
 			</button>
@@ -138,26 +152,39 @@
 
 	<!-- Expanded sub-actions -->
 	{#if isExpanded && hasMultipleActions}
-		<div class="sub-actions-container">
-			<div class="sub-actions-header">
-				<span class="sub-actions-title">Individual repetitions:</span>
+		<div
+			class="border-t border-amber-200 dark:border-amber-700 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950 dark:to-orange-950"
+		>
+			<div
+				class="px-5 py-3 border-b border-amber-200 dark:border-amber-700 bg-gradient-to-r from-amber-100 to-orange-100 dark:from-amber-800 dark:to-orange-800"
+			>
+				<span
+					class="text-sm font-bold text-amber-800 dark:text-amber-200 uppercase tracking-wider flex items-center gap-2"
+				>
+					Individual repetitions:
+				</span>
 			</div>
 			{#each actionTree.subActions as subAction, index (index)}
 				<button
-					class="sub-action-row w-full"
+					class="w-full flex items-center p-4 pl-10 gap-4 hover:bg-amber-100 dark:hover:bg-amber-900 text-left border-none bg-transparent cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-inset relative"
 					onclick={() => toggleSubAction(index)}
 					tabindex="0"
 					onkeydown={(e) => handleKeyDown(e, () => toggleSubAction(index))}
 				>
 					<input
 						type="checkbox"
-						class="sub-checkbox"
+						class="w-5 h-5 rounded-md border-2 border-amber-300 dark:border-amber-600 text-amber-600 dark:text-amber-400 focus:ring-3 focus:ring-amber-200 dark:focus:ring-amber-800 focus:ring-offset-0 cursor-pointer hover:border-amber-400 dark:hover:border-amber-500 checked:bg-amber-500 dark:checked:bg-amber-600 checked:border-amber-500 dark:checked:border-amber-600"
+						style="accent-color: rgb(217 119 6);"
 						checked={subAction.isDone}
 						aria-label="Mark repetition {index + 1} as complete"
 						tabindex="-1"
 						readonly
 					/>
-					<p class="sub-action-text" class:completed={subAction.isDone}>
+					<p
+						class="text-gray-800 dark:text-amber-100 text-base font-medium {subAction.isDone
+							? 'line-through text-gray-500 dark:text-amber-400 opacity-70'
+							: ''}"
+					>
 						{subAction.action}
 					</p>
 				</button>
@@ -165,75 +192,3 @@
 		</div>
 	{/if}
 </div>
-
-<style lang="postcss">
-	.knitting-action-card {
-		@apply bg-white dark:bg-amber-900 rounded-lg shadow-sm border border-amber-200 dark:border-amber-700 mb-3 overflow-hidden transition-all duration-200 hover:shadow-md;
-	}
-
-	.main-action-row {
-		@apply flex items-center p-4 gap-3;
-	}
-
-	.main-checkbox {
-		@apply w-5 h-5 rounded border-2 border-amber-400 dark:border-amber-600 text-amber-600 dark:text-amber-400 focus:ring-2 focus:ring-amber-500 focus:ring-offset-0 transition-colors duration-200;
-		accent-color: rgb(217 119 6); /* amber-600 */
-	}
-
-	.action-content {
-		@apply flex-1;
-	}
-
-	.action-text {
-		@apply text-gray-900 dark:text-amber-50 font-medium text-base leading-relaxed transition-all duration-200;
-	}
-
-	.action-text.completed {
-		@apply line-through text-gray-500 dark:text-amber-300 opacity-75;
-	}
-
-	.count-badge {
-		@apply inline-block ml-2 px-2 py-1 bg-amber-100 dark:bg-amber-800 text-amber-800 dark:text-amber-200 text-sm font-semibold rounded-full;
-	}
-
-	.expand-button {
-		@apply w-8 h-8 flex items-center justify-center rounded-full bg-amber-100 dark:bg-amber-800 hover:bg-amber-200 dark:hover:bg-amber-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-1;
-	}
-
-	.expand-icon {
-		@apply text-amber-700 dark:text-amber-300 text-lg transition-transform duration-200;
-	}
-
-	.expand-icon.rotated {
-		@apply rotate-180;
-	}
-
-	.sub-actions-container {
-		@apply border-t border-amber-200 dark:border-amber-700 bg-amber-50 dark:bg-amber-950;
-	}
-
-	.sub-actions-header {
-		@apply px-4 py-2 border-b border-amber-200 dark:border-amber-700;
-	}
-
-	.sub-actions-title {
-		@apply text-sm font-medium text-amber-700 dark:text-amber-300 uppercase tracking-wide;
-	}
-
-	.sub-action-row {
-		@apply flex items-center p-3 pl-8 gap-3 hover:bg-amber-100 dark:hover:bg-amber-900 transition-colors duration-150 text-left border-none bg-transparent cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-inset;
-	}
-
-	.sub-checkbox {
-		@apply w-4 h-4 rounded border border-amber-300 dark:border-amber-600 text-amber-600 dark:text-amber-400 focus:ring-2 focus:ring-amber-500 focus:ring-offset-0 transition-colors duration-200;
-		accent-color: rgb(217 119 6); /* amber-600 */
-	}
-
-	.sub-action-text {
-		@apply text-gray-800 dark:text-amber-100 text-sm transition-all duration-200;
-	}
-
-	.sub-action-text.completed {
-		@apply line-through text-gray-500 dark:text-amber-400 opacity-75;
-	}
-</style>
