@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { ProjectCardColor } from './project';
+	import type { Component } from 'svelte';
 
 	interface Props {
 		header?: string;
@@ -8,6 +9,9 @@
 		icon?: string;
 		color?: ProjectCardColor;
 		filled?: boolean;
+		expanded?: boolean;
+
+		expandedContent?: Component;
 	}
 
 	let {
@@ -16,7 +20,8 @@
 		link = '/',
 		color = ProjectCardColor.PINK,
 		icon = undefined,
-		filled = false
+		filled = false,
+		expanded = false
 	}: Props = $props();
 
 	let cardClass = $derived(getCardClass(color));

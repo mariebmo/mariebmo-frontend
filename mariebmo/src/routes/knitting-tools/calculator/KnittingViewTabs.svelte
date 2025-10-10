@@ -50,9 +50,15 @@
 
 	let activeTabId = $state('visual');
 	let isFullscreen = $state(false);
+	let isMobile = $state(false);
 
 	// Get valid tab IDs for validation
 	const validTabIds = tabs.map((tab) => tab.id);
+
+	// Mobile detection function
+	function checkIsMobile() {
+		return window.innerWidth < 768; // Tailwind's md breakpoint
+	}
 
 	function selectTab(tabId: string) {
 		if (!isValidTabId(tabId, validTabIds)) {
@@ -79,8 +85,33 @@
 			saveActiveTab('visual');
 		}
 
+		// Check if mobile and set initial state
+		isMobile = checkIsMobile();
+
+		// Add resize listener to track mobile state changes
+		const handleResize = () => {
+			const wasMobile = isMobile;
+			isMobile = checkIsMobile();
+
+			// If we switched from desktop to mobile and have results, go fullscreen
+			if (!wasMobile && isMobile && shouldShowTabs) {
+				isFullscreen = true;
+			}
+			// If we switched from mobile to desktop, exit fullscreen
+			else if (wasMobile && !isMobile) {
+				isFullscreen = false;
+			}
+		};
+
+		window.addEventListener('resize', handleResize);
+
 		// Add global keyboard listener for Escape key
 		document.addEventListener('keydown', handleFullscreenKeyDown);
+
+		// Cleanup function
+		return () => {
+			window.removeEventListener('resize', handleResize);
+		};
 	});
 
 	onDestroy(() => {
@@ -131,6 +162,13 @@
 			knittingCalculations.visualize ||
 			knittingCalculations.fullWritten
 	);
+
+	// Auto-fullscreen on mobile when results are available
+	$effect(() => {
+		if (isMobile && shouldShowTabs && !isFullscreen) {
+			isFullscreen = true;
+		}
+	});
 </script>
 
 {#if shouldShowTabs}
@@ -139,7 +177,7 @@
 		<div class="fixed inset-0 z-50 bg-white dark:bg-gray-900 flex flex-col">
 			<!-- Fullscreen Header -->
 			<div
-				class="flex items-center justify-between p-4 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950 dark:to-orange-950 border-b border-amber-200 dark:border-amber-700"
+				class="flex flex-col items-center justify-between p-4 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950 dark:to-orange-950 border-b border-amber-200 dark:border-amber-700"
 			>
 				<div class="flex items-center gap-3">
 					<button
@@ -159,7 +197,8 @@
 						</p>
 					</div>
 				</div>
-				<div class="flex items-center gap-2">
+
+				<div class="flex items-center gap-2 mt-4">
 					<!-- Tab switcher in fullscreen -->
 					<div class="flex gap-1">
 						{#each tabs as tab (tab.id)}
@@ -190,18 +229,20 @@
 			</div>
 		</div>
 	{:else}
-		<!-- Fullscreen Toggle Button -->
-		<div class="flex justify-center py-4 w-full">
-			<button
-				class="flex items-center w-full px-4 py-2 gap-2 justify-center bg-gradient-to-r from-amber-500 to-orange-500 dark:from-amber-600 dark:to-orange-600 text-white rounded-lg hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-amber-300 dark:focus:ring-amber-700 transition-all duration-200 touch-manipulation"
-				onclick={toggleFullscreen}
-				tabindex="0"
-				aria-label="Enter fullscreen mode"
-			>
-				<span class="material-symbols-outlined text-sm">fullscreen</span>
-				<p>Fullscreen</p>
-			</button>
-		</div>
+		<!-- Fullscreen Toggle Button (only show on desktop) -->
+		{#if !isMobile}
+			<div class="flex justify-center py-4 w-full">
+				<button
+					class="flex items-center w-full px-4 py-2 gap-2 justify-center bg-gradient-to-r from-amber-500 to-orange-500 dark:from-amber-600 dark:to-orange-600 text-white rounded-lg hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-amber-300 dark:focus:ring-amber-700 transition-all duration-200 touch-manipulation"
+					onclick={toggleFullscreen}
+					tabindex="0"
+					aria-label="Enter fullscreen mode"
+				>
+					<span class="material-symbols-outlined text-sm">fullscreen</span>
+					<p>Fullscreen</p>
+				</button>
+			</div>
+		{/if}
 
 		<!-- Normal Mode -->
 		<div
