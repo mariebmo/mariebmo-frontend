@@ -1,7 +1,6 @@
 <script lang="ts">
 	import KnittingActionVisual from './KnittingActionVisual.svelte';
 	import KnittingActionShorthand from './KnittingActionShorthand.svelte';
-	import KnittingActionFullyWritten from './KnittingActionFullyWritten.svelte';
 	import KnittingActionChecklist from './KnittingActionChecklist.svelte';
 	import KnittingActionInteractive from './KnittingActionInteractive.svelte';
 	import { knittingCalculations } from './knitting.svelte';
@@ -33,12 +32,6 @@
 			label: 'Shorthand',
 			icon: 'short_text',
 			component: KnittingActionShorthand
-		},
-		{
-			id: 'written',
-			label: 'Full Written',
-			icon: 'description',
-			component: KnittingActionFullyWritten
 		},
 		{
 			id: 'visual',
@@ -147,6 +140,7 @@
 
 	function exitFullscreen() {
 		isFullscreen = false;
+		knittingCalculations.reset();
 	}
 
 	function handleFullscreenKeyDown(event: KeyboardEvent) {
@@ -182,7 +176,10 @@
 				<div class="flex items-center gap-3">
 					<button
 						class="flex items-center justify-center w-10 h-10 bg-gradient-to-r from-amber-500 to-orange-500 dark:from-amber-600 dark:to-orange-600 text-white rounded-lg shadow-md hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-amber-300 dark:focus:ring-amber-700 transition-all duration-200 touch-manipulation"
-						onclick={exitFullscreen}
+						onclick={(e) => {
+							e.stopPropagation();
+							exitFullscreen();
+						}}
 						tabindex="0"
 						aria-label="Exit fullscreen mode"
 					>
@@ -207,7 +204,10 @@
 								tab.id
 									? 'bg-amber-500 text-white'
 									: 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-600'}"
-								onclick={() => selectTab(tab.id)}
+								onclick={(e) => {
+									e.stopPropagation();
+									selectTab(tab.id);
+								}}
 								tabindex="0"
 								aria-label="Switch to {tab.label} view"
 							>

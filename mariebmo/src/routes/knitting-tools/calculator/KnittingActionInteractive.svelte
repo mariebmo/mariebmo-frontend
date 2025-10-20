@@ -240,11 +240,17 @@
 				<!-- Clickable Content Area -->
 				<div
 					class="bg-white dark:bg-green-900 rounded-lg p-6 mb-4 border border-green-200 dark:border-green-700 cursor-pointer hover:bg-green-50 dark:hover:bg-green-800 transition-colors duration-200"
-					onclick={completeNextRepetition}
+					onclick={(e) => {
+						e.stopPropagation();
+						completeNextRepetition();
+					}}
 					tabindex="0"
 					role="button"
 					aria-label="Complete current repetition"
-					onkeydown={(e) => handleInteractiveKeyDown(e)}
+					onkeydown={(e) => {
+						e.stopPropagation();
+						handleInteractiveKeyDown(e);
+					}}
 				>
 					<div class="text-xl font-semibold text-gray-900 dark:text-green-100 mb-3">
 						{currentRepetition()?.action}
