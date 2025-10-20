@@ -1,5 +1,3 @@
-import tailwindcssThemer from 'tailwindcss-themer';
-
 const mariebmoColors = {
 	transparent: 'transparent',
 	current: 'currentColor',
@@ -121,86 +119,5 @@ export default {
 				...mariebmoColors
 			}
 		}
-	},
-	plugins: [
-		tailwindcssThemer({
-			defaultTheme: {
-				extend: {
-					colors: {
-						background: mariebmoColors['mariebmo-gray'][0],
-						'primary-text': mariebmoColors['mariebmo-gray'][950],
-						'secondary-text': mariebmoColors['mariebmo-gray'][700],
-
-						'primary-accent': mariebmoColors['mariebmo-orange'][600],
-						'primary-accent-hover': mariebmoColors['mariebmo-orange'][700],
-						'primary-accent-active': mariebmoColors['mariebmo-orange'][800],
-						'primary-accent-disabled': mariebmoColors['mariebmo-gray'][200],
-
-						'secondary-accent': mariebmoColors['mariebmo-blue'][600],
-						'secondary-accent-hover': mariebmoColors['mariebmo-blue'][700],
-						'secondary-accent-active': mariebmoColors['mariebmo-blue'][800],
-						'secondary-accent-disabled': mariebmoColors['mariebmo-gray'][200],
-
-						'tertinary-accent': mariebmoColors['mariebmo-green'][600],
-						'tertinary-accent-hover': mariebmoColors['mariebmo-green'][700],
-
-						'quaternary-accent': mariebmoColors['mariebmo-red'][600],
-						'quaternary-accent-hover': mariebmoColors['mariebmo-red'][700],
-
-						'quinary-accent': mariebmoColors['mariebmo-yellow'][600],
-						'quinary-accent-hover': mariebmoColors['mariebmo-yellow'][700],
-
-						'senary-accent': mariebmoColors['mariebmo-purple'][600],
-						'senary-accent-hover': mariebmoColors['mariebmo-purple'][700],
-
-						'septenary-accent': mariebmoColors['mariebmo-pink'][600],
-						'septenary-accent-hover': mariebmoColors['mariebmo-pink'][700]
-					}
-				}
-			},
-			themes: [
-				{
-					name: 'light-theme',
-					selectors: ['.light-mode', '[data-theme="light"]']
-				},
-				{
-					name: 'dark-theme',
-					selectors: ['.dark-mode', '[data-theme="dark"]'],
-
-					extend: {
-						colors: {
-							background: mariebmoColors['mariebmo-gray'][1000],
-							'primary-text': mariebmoColors['mariebmo-gray'][50],
-							'secondary-text': mariebmoColors['mariebmo-gray'][700],
-
-							'primary-accent': mariebmoColors['mariebmo-orange'][900],
-							'primary-accent-hover': mariebmoColors['mariebmo-orange'][800],
-							'primary-accent-active': mariebmoColors['mariebmo-orange'][700],
-							'primary-accent-disabled': mariebmoColors['mariebmo-gray'][800],
-
-							'secondary-accent': mariebmoColors['mariebmo-blue'][900],
-							'secondary-accent-hover': mariebmoColors['mariebmo-blue'][800],
-							'secondary-accent-active': mariebmoColors['mariebmo-blue'][700],
-							'secondary-accent-disabled': mariebmoColors['mariebmo-gray'][800],
-
-							'tertinary-accent': mariebmoColors['mariebmo-green'][900],
-							'tertinary-accent-hover': mariebmoColors['mariebmo-green'][800],
-
-							'quaternary-accent': mariebmoColors['mariebmo-red'][900],
-							'quaternary-accent-hover': mariebmoColors['mariebmo-red'][800],
-
-							'quinary-accent': mariebmoColors['mariebmo-yellow'][900],
-							'quinary-accent-hover': mariebmoColors['mariebmo-yellow'][800],
-
-							'senary-accent': mariebmoColors['mariebmo-purple'][900],
-							'senary-accent-hover': mariebmoColors['mariebmo-purple'][800],
-
-							'septenary-accent': mariebmoColors['mariebmo-pink'][900],
-							'septenary-accent-hover': mariebmoColors['mariebmo-pink'][800]
-						}
-					}
-				}
-			]
-		})
-	]
+	}
 };
