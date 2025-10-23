@@ -202,17 +202,17 @@
 										</div>
 
 										<!-- Action Buttons -->
-										<div class="flex gap-1">
+										<div class="flex flex-row gap-2 w-full sm:w-auto">
 											<button
 												onclick={toggleIncreaseDecrease}
-												class="px-2 py-1.5 text-xs font-medium rounded transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-1 dark:focus:ring-offset-amber-800 bg-amber-500 dark:bg-amber-600 text-white"
+												class="flex-1 sm:flex-none px-3 py-2 text-sm font-semibold rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-1 dark:focus:ring-offset-amber-800 bg-amber-500 dark:bg-amber-600 text-white hover:bg-amber-600 dark:hover:bg-amber-700 sm:min-w-[100px]"
 												aria-pressed={increaseSelected}
 											>
 												{increaseOrDecrease}
 											</button>
 											<button
 												onclick={toggleByOrTo}
-												class="px-2 py-1.5 text-xs font-medium rounded transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-1 dark:focus:ring-offset-amber-800 bg-amber-500 dark:bg-amber-600 text-white"
+												class="flex-1 sm:flex-none px-3 py-2 text-sm font-semibold rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-1 dark:focus:ring-offset-amber-800 bg-amber-500 dark:bg-amber-600 text-white hover:bg-amber-600 dark:hover:bg-amber-700 sm:min-w-[80px]"
 												aria-pressed={!totalAmountIncluded}
 											>
 												{byOrTo}
@@ -276,28 +276,23 @@
 								</div>
 
 								<!-- Action Buttons -->
-								<div class="flex justify-center">
-									<div
-										class="flex gap-2 p-1 bg-white dark:bg-amber-900 rounded-xl border border-gray-200 dark:border-amber-600 flex-col sm:flex-row"
+								<div class="flex flex-row gap-3 justify-center w-full">
+									<button
+										onclick={toggleIncreaseDecrease}
+										id="increase-decrease-btn"
+										class="flex-1 sm:flex-none px-5 py-2.5 text-sm font-semibold rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 dark:focus:ring-offset-amber-800 bg-amber-500 dark:bg-amber-600 text-white hover:bg-amber-600 dark:hover:bg-amber-700 shadow-sm hover:shadow-md sm:min-w-[110px]"
+										aria-pressed={increaseSelected}
 									>
-										<button
-											onclick={toggleIncreaseDecrease}
-											id="increase-decrease-btn"
-											class="flex items-center justify-center px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 dark:focus:ring-offset-amber-800
-											bg-amber-500 dark:bg-amber-600 text-white"
-											aria-pressed={increaseSelected}
-										>
-											{increaseOrDecrease}
-										</button>
-										<button
-											onclick={toggleByOrTo}
-											id="by-to-btn"
-											class="flex items-center justify-center px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 dark:focus:ring-offset-amber-800 bg-amber-500 dark:bg-amber-600 text-white"
-											aria-pressed={!totalAmountIncluded}
-										>
-											{byOrTo}
-										</button>
-									</div>
+										{increaseOrDecrease}
+									</button>
+									<button
+										onclick={toggleByOrTo}
+										id="by-to-btn"
+										class="flex-1 sm:flex-none px-5 py-2.5 text-sm font-semibold rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 dark:focus:ring-offset-amber-800 bg-amber-500 dark:bg-amber-600 text-white hover:bg-amber-600 dark:hover:bg-amber-700 shadow-sm hover:shadow-md sm:min-w-[90px]"
+										aria-pressed={!totalAmountIncluded}
+									>
+										{byOrTo}
+									</button>
 								</div>
 
 								<!-- Amount Input -->
