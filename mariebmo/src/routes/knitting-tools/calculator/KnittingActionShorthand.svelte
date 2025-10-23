@@ -4,6 +4,31 @@
 
 	let shorthandOutput = $derived(printShorthand(knittingCalculations.actions));
 
+	const colors = [
+		'bg-blue-100 dark:bg-blue-900 border-blue-300 dark:border-blue-700 text-blue-800 dark:text-blue-200',
+		'bg-emerald-100 dark:bg-emerald-900 border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-200',
+		'bg-amber-100 dark:bg-amber-900 border-amber-300 dark:border-amber-700 text-amber-800 dark:text-amber-200',
+		'bg-rose-100 dark:bg-rose-900 border-rose-300 dark:border-rose-700 text-rose-800 dark:text-rose-200',
+		'bg-violet-100 dark:bg-violet-900 border-violet-300 dark:border-violet-700 text-violet-800 dark:text-violet-200',
+		'bg-cyan-100 dark:bg-cyan-900 border-cyan-300 dark:border-cyan-700 text-cyan-800 dark:text-cyan-200'
+	];
+
+	// Pre-compute color assignments for all actions
+	let actionColorMap = $derived.by(() => {
+		const map = new Map<string, number>();
+		let nextColorIndex = 0;
+
+		for (const action of knittingCalculations.actions) {
+			const actionKey = `${action.actions.join(',')}-${action.count}`;
+			if (!map.has(actionKey)) {
+				map.set(actionKey, nextColorIndex);
+				nextColorIndex = (nextColorIndex + 1) % colors.length;
+			}
+		}
+
+		return map;
+	});
+
 	function printShorthand(actionArr: KnittingAction[]): string {
 		let output = '';
 
@@ -21,16 +46,10 @@
 		return output;
 	}
 
-	function getActionColor(action: KnittingAction, index: number): string {
-		const colors = [
-			'bg-blue-100 dark:bg-blue-900 border-blue-300 dark:border-blue-700 text-blue-800 dark:text-blue-200',
-			'bg-emerald-100 dark:bg-emerald-900 border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-200',
-			'bg-amber-100 dark:bg-amber-900 border-amber-300 dark:border-amber-700 text-amber-800 dark:text-amber-200',
-			'bg-rose-100 dark:bg-rose-900 border-rose-300 dark:border-rose-700 text-rose-800 dark:text-rose-200',
-			'bg-violet-100 dark:bg-violet-900 border-violet-300 dark:border-violet-700 text-violet-800 dark:text-violet-200',
-			'bg-cyan-100 dark:bg-cyan-900 border-cyan-300 dark:border-cyan-700 text-cyan-800 dark:text-cyan-200'
-		];
-		return colors[index % colors.length];
+	function getActionColor(action: KnittingAction): string {
+		const actionKey = `${action.actions.join(',')}-${action.count}`;
+		const colorIndex = actionColorMap.get(actionKey) ?? 0;
+		return colors[colorIndex];
 	}
 </script>
 
@@ -73,8 +92,7 @@
 					{#if action.count > 1}
 						<div
 							class="inline-flex items-center gap-2 px-3 py-2 rounded-lg border-2 {getActionColor(
-								action,
-								index
+								action
 							)} shadow-sm"
 						>
 							<span class="font-semibold">({action.actions.join(', ')})</span>
@@ -85,8 +103,7 @@
 					{:else}
 						<div
 							class="inline-flex items-center px-3 py-2 rounded-lg border-2 {getActionColor(
-								action,
-								index
+								action
 							)} shadow-sm"
 						>
 							<span class="font-semibold">{action.actions.join(', ')}</span>

@@ -260,11 +260,37 @@ export function combineActions(
 		}
 
 		if (!hasAMatch) {
-			result.push({
-				group: [groups[index]],
-				count: 1
-			});
-			index++;
+			// Before adding as single-element group, check if we should combine with next element
+			if (index + 1 < groups.length) {
+				// Try combining current and next into a 2-element pattern
+				const pattern = [groups[index], groups[index + 1]];
+				// Check if this 2-element pattern repeats
+				if (
+					index + 3 < groups.length &&
+					patternsEqual(pattern, [groups[index + 2], groups[index + 3]])
+				) {
+					const patternCount = countPatternRepetitions(groups, index, 2);
+					result.push({
+						group: pattern,
+						count: patternCount
+					});
+					index += 2 * patternCount;
+				} else {
+					// Even if it doesn't repeat, add as 2-element group with count 1
+					result.push({
+						group: pattern,
+						count: 1
+					});
+					index += 2;
+				}
+			} else {
+				// Only one element left
+				result.push({
+					group: [groups[index]],
+					count: 1
+				});
+				index++;
+			}
 		}
 	}
 
@@ -272,29 +298,26 @@ export function combineActions(
 }
 
 /**
- * Combines identical patterns to reduce redundancy, similar to the old makeSmaller function
+ * Combines consecutive identical patterns to reduce redundancy
  */
 function makeSmaller(
 	result: Array<{ group: ActionGroup[]; count: number }>
 ): Array<{ group: ActionGroup[]; count: number }> {
 	if (result.length === 0) return result;
 
-	// First, combine identical patterns
+	// First pass: Combine consecutive identical patterns
 	const combined: Array<{ group: ActionGroup[]; count: number }> = [];
 
 	for (let i = 0; i < result.length; i++) {
 		const current = result[i];
 
-		// Look for an existing entry with the same pattern
-		const existingIndex = combined.findIndex((existing) =>
-			patternsEqual(existing.group, current.group)
-		);
-
-		if (existingIndex !== -1) {
-			// If we found a matching pattern, add the counts together
-			combined[existingIndex].count += current.count;
+		// Check if the previous entry in combined has the same pattern
+		const lastCombined = combined[combined.length - 1];
+		if (lastCombined && patternsEqual(lastCombined.group, current.group)) {
+			// If consecutive patterns match, add the counts together
+			lastCombined.count += current.count;
 		} else {
-			// If no matching pattern exists, add this as a new entry
+			// If no match with previous, add as new entry
 			combined.push({
 				group: [...current.group], // Create a copy to avoid mutation
 				count: current.count
@@ -302,26 +325,33 @@ function makeSmaller(
 		}
 	}
 
-	// Second, try to combine consecutive single-element groups at the end
-	if (combined.length >= 2) {
-		let lastIndex = combined.length - 1;
-		let secondLastIndex = combined.length - 2;
+	// Second pass: Try to combine consecutive single-element groups throughout
+	// Keep iterating until no more combinations are possible
+	let changed = true;
+	while (changed) {
+		changed = false;
+		for (let i = 0; i < combined.length - 1; i++) {
+			const current = combined[i];
+			const next = combined[i + 1];
 
-		// Check if the last two entries are single-element groups with count 1
-		if (
-			combined[lastIndex].group.length === 1 &&
-			combined[lastIndex].count === 1 &&
-			combined[secondLastIndex].group.length === 1 &&
-			combined[secondLastIndex].count === 1
-		) {
-			// Combine them into a single 2-element group
-			const newGroup = {
-				group: [...combined[secondLastIndex].group, ...combined[lastIndex].group],
-				count: 1
-			};
+			// Check if both are single-element groups with count 1
+			if (
+				current.group.length === 1 &&
+				current.count === 1 &&
+				next.group.length === 1 &&
+				next.count === 1
+			) {
+				// Combine them into a single 2-element group
+				const newGroup = {
+					group: [...current.group, ...next.group],
+					count: 1
+				};
 
-			// Replace the last two entries with the combined one
-			return [...combined.slice(0, secondLastIndex), newGroup];
+				// Replace current and next with the combined group
+				combined.splice(i, 2, newGroup);
+				changed = true;
+				break; // Restart the loop after making a change
+			}
 		}
 	}
 

@@ -19,8 +19,8 @@
 		VALIDATION_MESSAGES
 	} from './knittingUtils';
 
-	let current = $state(0);
-	let amount = $state(0);
+	let current: number | null = $state(null);
+	let amount: number | null = $state(null);
 	let totalAmountIncluded = $state(false);
 	let increaseSelected = $state(true);
 	let warning: string | null = $state(null);
