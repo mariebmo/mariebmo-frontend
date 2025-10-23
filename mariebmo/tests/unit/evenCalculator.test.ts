@@ -9,7 +9,7 @@ import {
 	getFinalDistribution,
 	Operation,
 	ByOrTo
-} from '../src/routes/knitting-tools/calculator/evenCalculator';
+} from '../../src/routes/knitting-tools/calculator/evenCalculator';
 describe('getEvenDistribution', () => {
 	it('should create correct ADD distribution', () => {
 		const result = getEvenAddDistribution(12, 16);

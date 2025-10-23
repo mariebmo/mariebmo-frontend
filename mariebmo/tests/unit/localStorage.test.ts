@@ -6,7 +6,7 @@ import {
 	saveActiveTab,
 	clearUserPreferences,
 	isValidTabId
-} from '../src/lib/utils/localStorage';
+} from '../../src/lib/utils/localStorage';
 
 // Mock localStorage
 const localStorageMock = (() => {
