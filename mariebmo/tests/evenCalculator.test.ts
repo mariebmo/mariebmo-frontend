@@ -204,6 +204,112 @@ describe('Integration tests', () => {
 		expect(combined[1].count).toEqual(1);
 	});
 
+	it('should work end-to-end for ADD operation with uneven distribution and TO for large numbers	', () => {
+		const distribution = getEvenAddDistribution(123, 32);
+		const groups = groupActions(distribution);
+		const combined = combineActions(groups);
+
+		expect(distribution).toBeDefined();
+		expect(distribution).toHaveLength(155);
+		expect(distribution.filter((x) => x === 1)).toHaveLength(32);
+		expect(distribution.filter((x) => x === 0)).toHaveLength(123);
+
+		console.log(distribution);
+		console.log(groups);
+		console.log(combined);
+
+		expect(groups).toBeDefined();
+		expect(groups).toHaveLength(64);
+		expect(groups[0]).toEqual({ '0': 4 });
+		expect(groups[1]).toEqual({ '1': 1 });
+		expect(groups[2]).toEqual({ '0': 4 });
+		expect(groups[3]).toEqual({ '1': 1 });
+		expect(groups[4]).toEqual({ '0': 4 });
+		expect(groups[5]).toEqual({ '1': 1 });
+		expect(groups[6]).toEqual({ '0': 4 });
+		expect(groups[7]).toEqual({ '1': 1 });
+		expect(groups[8]).toEqual({ '0': 4 });
+		expect(groups[9]).toEqual({ '1': 1 });
+		expect(groups[10]).toEqual({ '0': 4 });
+		expect(groups[11]).toEqual({ '1': 1 }); //6
+		expect(groups[12]).toEqual({ '0': 3 });
+		expect(groups[13]).toEqual({ '1': 1 });
+		expect(groups[14]).toEqual({ '0': 4 });
+		expect(groups[15]).toEqual({ '1': 1 });
+		expect(groups[16]).toEqual({ '0': 4 });
+		expect(groups[17]).toEqual({ '1': 1 });
+		expect(groups[18]).toEqual({ '0': 4 });
+		expect(groups[19]).toEqual({ '1': 1 });
+		expect(groups[20]).toEqual({ '0': 4 });
+		expect(groups[21]).toEqual({ '1': 1 });
+		expect(groups[22]).toEqual({ '0': 4 });
+		expect(groups[23]).toEqual({ '1': 1 }); // 5
+		expect(groups[24]).toEqual({ '0': 3 });
+		expect(groups[25]).toEqual({ '1': 1 });
+		expect(groups[26]).toEqual({ '0': 4 });
+		expect(groups[27]).toEqual({ '1': 1 });
+		expect(groups[28]).toEqual({ '0': 4 });
+		expect(groups[29]).toEqual({ '1': 1 });
+		expect(groups[30]).toEqual({ '0': 4 });
+		expect(groups[31]).toEqual({ '1': 1 });
+		expect(groups[32]).toEqual({ '0': 4 });
+		expect(groups[33]).toEqual({ '1': 1 });
+		expect(groups[34]).toEqual({ '0': 4 });
+		expect(groups[35]).toEqual({ '1': 1 });
+		expect(groups[36]).toEqual({ '0': 4 });
+		expect(groups[37]).toEqual({ '1': 1 }); // 6
+		expect(groups[38]).toEqual({ '0': 3 });
+		expect(groups[39]).toEqual({ '1': 1 });
+		expect(groups[40]).toEqual({ '0': 4 });
+		expect(groups[41]).toEqual({ '1': 1 });
+		expect(groups[42]).toEqual({ '0': 4 });
+		expect(groups[43]).toEqual({ '1': 1 });
+		expect(groups[44]).toEqual({ '0': 4 });
+		expect(groups[45]).toEqual({ '1': 1 });
+		expect(groups[46]).toEqual({ '0': 4 });
+		expect(groups[47]).toEqual({ '1': 1 });
+		expect(groups[48]).toEqual({ '0': 4 });
+		expect(groups[49]).toEqual({ '1': 1 }); //5
+		expect(groups[50]).toEqual({ '0': 3 });
+		expect(groups[51]).toEqual({ '1': 1 });
+		expect(groups[52]).toEqual({ '0': 4 });
+		expect(groups[53]).toEqual({ '1': 1 });
+		expect(groups[54]).toEqual({ '0': 4 });
+		expect(groups[55]).toEqual({ '1': 1 });
+		expect(groups[56]).toEqual({ '0': 4 });
+		expect(groups[57]).toEqual({ '1': 1 });
+		expect(groups[58]).toEqual({ '0': 4 });
+		expect(groups[59]).toEqual({ '1': 1 });
+		expect(groups[60]).toEqual({ '0': 4 });
+		expect(groups[61]).toEqual({ '1': 1 }); //5
+		expect(groups[62]).toEqual({ '0': 3 });
+		expect(groups[63]).toEqual({ '1': 1 });
+		expect(groups[64]).toEqual(undefined);
+
+		expect(combined).toBeDefined();
+		expect(combined.length).toEqual(10);
+		expect(combined[0].group).toEqual([{ '0': 4 }, { '1': 1 }]);
+		expect(combined[0].count).toEqual(6);
+		expect(combined[1].group).toEqual([{ '0': 3 }, { '1': 1 }]);
+		expect(combined[1].count).toEqual(1);
+		expect(combined[2].group).toEqual([{ '0': 4 }, { '1': 1 }]);
+		expect(combined[2].count).toEqual(5);
+		expect(combined[3].group).toEqual([{ '0': 3 }, { '1': 1 }]);
+		expect(combined[3].count).toEqual(1);
+		expect(combined[4].group).toEqual([{ '0': 4 }, { '1': 1 }]);
+		expect(combined[4].count).toEqual(6);
+		expect(combined[5].group).toEqual([{ '0': 3 }, { '1': 1 }]);
+		expect(combined[5].count).toEqual(1);
+		expect(combined[6].group).toEqual([{ '0': 4 }, { '1': 1 }]);
+		expect(combined[6].count).toEqual(5);
+		expect(combined[7].group).toEqual([{ '0': 3 }, { '1': 1 }]);
+		expect(combined[7].count).toEqual(1);
+		expect(combined[8].group).toEqual([{ '0': 4 }, { '1': 1 }]);
+		expect(combined[8].count).toEqual(5);
+		expect(combined[9].group).toEqual([{ '0': 3 }, { '1': 1 }]);
+		expect(combined[9].count).toEqual(1);
+	});
+
 	it('should work end-to-end for REMOVE operation', () => {
 		const distribution = getEvenRemoveByDistribution(12, 4);
 		const groups = groupActions(distribution);
@@ -263,6 +369,35 @@ describe('Integration tests', () => {
 		expect(distribution.length).toBeGreaterThan(0);
 		expect(distribution[0].group).toEqual([{ '0': 3 }, { '1': 1 }]);
 		expect(distribution[0].count).toEqual(4);
+	});
+
+	it('should work end-to-end for FINAL distribution with TO and uneven distribution', () => {
+		const distribution = getFinalDistribution(123, 32, Operation.ADD, ByOrTo.TO);
+		//(k4, m) 6 times, k3, m, (k4, m) 5 times, k3, m, (k4, m) 6 times, k3, m, (k4, m) 5 times, k3, m, (k4, m) 5 times, k3, m
+
+		expect(distribution).toBeDefined();
+		expect(distribution.length).toBeGreaterThan(0);
+		expect(distribution.length).toEqual(10);
+		expect(distribution[0].group).toEqual([{ '0': 4 }, { '1': 1 }]);
+		expect(distribution[0].count).toEqual(6);
+		expect(distribution[1].group).toEqual([{ '0': 3 }, { '1': 1 }]);
+		expect(distribution[1].count).toEqual(1);
+		expect(distribution[2].group).toEqual([{ '0': 4 }, { '1': 1 }]);
+		expect(distribution[2].count).toEqual(5);
+		expect(distribution[3].group).toEqual([{ '0': 3 }, { '1': 1 }]);
+		expect(distribution[3].count).toEqual(1);
+		expect(distribution[4].group).toEqual([{ '0': 4 }, { '1': 1 }]);
+		expect(distribution[4].count).toEqual(6);
+		expect(distribution[5].group).toEqual([{ '0': 3 }, { '1': 1 }]);
+		expect(distribution[5].count).toEqual(1);
+		expect(distribution[6].group).toEqual([{ '0': 4 }, { '1': 1 }]);
+		expect(distribution[6].count).toEqual(5);
+		expect(distribution[7].group).toEqual([{ '0': 3 }, { '1': 1 }]);
+		expect(distribution[7].count).toEqual(1);
+		expect(distribution[8].group).toEqual([{ '0': 4 }, { '1': 1 }]);
+		expect(distribution[8].count).toEqual(6);
+		expect(distribution[9].group).toEqual([{ '0': 3 }, { '1': 1 }]);
+		expect(distribution[9].count).toEqual(1);
 	});
 
 	it('should work end-to-end for FINAL distribution with BY', () => {
