@@ -56,7 +56,6 @@
 <div
 	class="h-full bg-white dark:bg-gray-900 flex items-center justify-center p-4 cursor-pointer"
 	onclick={handleCounterClick}
-	onkeydown={handleGlobalKeyDown}
 	role="button"
 	tabindex="0"
 	aria-label="Click anywhere to increment counter"

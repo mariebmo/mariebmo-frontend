@@ -5,8 +5,6 @@
 	import type { KnittingActions } from './interfaces';
 	import KnittingViewTabs from './KnittingViewTabs.svelte';
 
-	$inspect(knittingCalculations);
-
 	// Import constants and utilities
 	import { KnitType, KnitSymbol } from './interfaces';
 	import {
@@ -29,6 +27,45 @@
 	let increaseOrDecrease = $derived(increaseSelected ? 'increase' : 'decrease');
 
 	let hasCalculatedData = $derived(knittingCalculations.actions.length > 0);
+
+	let validationWarning = $derived(
+		getValidationWarning(current, amount, increaseSelected, totalAmountIncluded)
+	);
+	let disableSubmitButton = $derived(validationWarning !== null);
+
+	$inspect(validationWarning);
+
+	function getValidationWarning(
+		current: number | null,
+		amount: number | null,
+		increaseSelected: boolean,
+		totalAmountIncluded: boolean
+	): string | null {
+		if (current === null || amount === null) {
+			return '';
+		}
+
+		if (current <= 0 || amount <= 0) {
+			return 'Please enter positive numbers for both fields.';
+		}
+		if (increaseSelected) {
+			let targetAmount = totalAmountIncluded ? amount : amount + current;
+			if (targetAmount <= current) {
+				return "You can't increase to fewer stitches than you have. Try a larger number.";
+			} else if (targetAmount > current * 2) {
+				return `You can only increase up to ${current * 2} stitches (double your current amount).`;
+			}
+		} else {
+			let targetAmount = totalAmountIncluded ? amount : current - amount;
+			if (targetAmount >= current) {
+				return "You can't decrease to more stitches than you started with. Try a smaller number.";
+			} else if (targetAmount < current / 2) {
+				return `You can only decrease down to ${Math.ceil(current / 2)} stitches (half your current amount).`;
+			}
+		}
+
+		return null;
+	}
 
 	function toggleByOrTo() {
 		totalAmountIncluded = !totalAmountIncluded;
@@ -149,12 +186,6 @@
 				<!--HEADER AREA -->
 				<div>
 					<div class="flex flex-row items-start">
-						<!-- Icon -->
-						<div
-							class=" h-10 w-10 fill-current text-amber-800 dark:text-orange-200 p-1 mr-4 bg-orange-300 dark:bg-amber-700 rounded-full"
-						>
-							<span class="material-symbols-outlined">favorite</span>
-						</div>
 						<!-- Card content -->
 						<div id="knitting-calculator-content" class="w-full">
 							<h1
@@ -239,7 +270,8 @@
 
 										<!-- Submit Button -->
 										<button
-											class="px-4 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 dark:from-amber-600 dark:to-orange-600 text-white font-semibold rounded shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-amber-300 dark:focus:ring-amber-700 transition-all duration-200 text-sm"
+											disabled={disableSubmitButton}
+											class="px-4 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 dark:from-amber-600 dark:to-orange-600 text-white font-semibold rounded shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-amber-300 dark:focus:ring-amber-700 transition-all duration-200 text-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:from-gray-400 disabled:to-gray-400 dark:disabled:from-gray-600 dark:disabled:to-gray-600 disabled:shadow-none disabled:hover:shadow-none"
 											onclick={submit}
 										>
 											Calculate
@@ -311,17 +343,28 @@
 									/>
 								</div>
 
-								<div
-									class="text-gray-600 dark:text-gray-100 font-semibold italic text-sm mb-4 justify-center flex"
-								>
-									{increaseOrDecrease} from {current}
-									{byOrTo}
-									{amount} = {calculateTargetAmount()} stitches.
-								</div>
+								{#if hasCalculatedData}
+									<div
+										class="text-gray-600 dark:text-gray-100 font-semibold italic text-sm mb-4 justify-center flex"
+									>
+										{increaseOrDecrease} from {current}
+										{byOrTo}
+										{amount} = {calculateTargetAmount()} stitches.
+									</div>
+								{/if}
+
+								{#if validationWarning}
+									<div
+										class="text-red-500 dark:text-red-400 font-semibold italic text-sm mb-4 justify-center flex"
+									>
+										{validationWarning}
+									</div>
+								{/if}
 
 								<!-- Submit Button -->
 								<button
-									class="w-full flex items-center justify-center px-3 py-2 sm:px-4 sm:py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 dark:from-amber-600 dark:to-orange-600 text-white font-semibold rounded-lg shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-amber-300 dark:focus:ring-amber-700 transition-all duration-200 hover:from-amber-600 hover:to-orange-600 dark:hover:from-amber-700 dark:hover:to-orange-700"
+									disabled={disableSubmitButton}
+									class="w-full flex items-center justify-center px-3 py-2 sm:px-4 sm:py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 dark:from-amber-600 dark:to-orange-600 text-white font-semibold rounded-lg shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-amber-300 dark:focus:ring-amber-700 transition-all duration-200 hover:from-amber-600 hover:to-orange-600 dark:hover:from-amber-700 dark:hover:to-orange-700 disabled:opacity-50 disabled:cursor-not-allowed disabled:from-gray-400 disabled:to-gray-400 dark:disabled:from-gray-600 dark:disabled:to-gray-600 disabled:shadow-none disabled:hover:shadow-none disabled:hover:from-gray-400 disabled:hover:to-gray-400 dark:disabled:hover:from-gray-600 dark:disabled:hover:to-gray-600"
 									onclick={submit}
 								>
 									Calculate Pattern

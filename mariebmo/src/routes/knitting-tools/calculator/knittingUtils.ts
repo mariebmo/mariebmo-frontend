@@ -5,12 +5,14 @@ import type { ActionGroup, KnittingAction } from './interfaces';
  * Validation error messages
  */
 export const VALIDATION_MESSAGES = {
-	INVALID_NUMBERS: 'Please enter valid positive numbers for current and amount.',
+	INVALID_NUMBERS: 'Please enter positive numbers for both fields.',
 	CANNOT_DECREASE_TO_HIGHER:
-		'Cannot decrease to a number greater than or equal to current stitches.',
-	CANNOT_INCREASE_TO_LOWER: 'Cannot increase to a number less than or equal to current stitches.',
-	CALCULATION_ERROR: 'Unable to calculate even distribution for the given inputs.',
-	GENERAL_ERROR: 'An error occurred during calculation.'
+		"You can't decrease to more stitches than you started with. Try a smaller number.",
+	CANNOT_INCREASE_TO_LOWER:
+		"You can't increase to fewer stitches than you have. Try a larger number.",
+	CALCULATION_ERROR:
+		"Couldn't find an even distribution for these numbers. Try adjusting your values slightly.",
+	GENERAL_ERROR: 'Something went wrong. Please try again.'
 } as const;
 
 /**
