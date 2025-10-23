@@ -8,6 +8,6 @@ export const smallLogo = '/logo_small.svg';
 export const largeLogo = '/logo_large.svg';
 
 export const socials = [
-	{ name: 'GitHub', url: 'https://github.com/mariebmo' },
-	{ name: 'LinkedIn', url: 'https://www.linkedin.com/in/mariebmo/' }
+	{ name: 'GitHub', url: 'https://github.com/mariebmo', icon: 'devicon-github-original' },
+	{ name: 'LinkedIn', url: 'https://www.linkedin.com/in/mariebmo/', icon: 'devicon-linkedin-plain' }
 ];

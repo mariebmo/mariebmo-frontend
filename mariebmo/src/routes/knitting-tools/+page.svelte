@@ -1,70 +1,84 @@
-<div class="h-full">
-	<div class="max-w-4xl mx-auto px-4 py-16">
-		<!-- Header -->
-		<div class="text-center mb-16">
-			<h1 class="text-3xl font-light text-gray-900 dark:text-white mb-4">Knitting Tools</h1>
-			<p class="text-gray-600 dark:text-gray-400 text-lg">Utilities for your knitting projects</p>
-		</div>
+<script lang="ts">
+	import { CardColor, getCardClasses } from '$lib';
 
-		<!-- Tools List -->
-		<div class="space-y-8">
-			<a href="/knitting-tools/calculator" class="block group">
+	interface Tool {
+		title: string;
+		description: string;
+		icon: string;
+		link: string;
+		color: CardColor;
+		iconColor: string;
+	}
+
+	const tools: Tool[] = [
+		{
+			title: 'Calculator',
+			description: 'Calculate even increases or decreases in knitting patterns.',
+			icon: 'calculate',
+			link: '/knitting-tools/calculator',
+			color: CardColor.ORANGE,
+			iconColor: 'text-orange-600 dark:text-orange-400'
+		},
+		{
+			title: 'Row Counter',
+			description: 'Count the number of rows in your knitting pattern.',
+			icon: 'add',
+			link: '/knitting-tools/counter',
+			color: CardColor.PINK,
+			iconColor: 'text-pink-600 dark:text-pink-400'
+		}
+	];
+</script>
+
+<div class="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+	<!-- Header -->
+	<div class="mb-12 text-center">
+		<div class="mb-4 flex justify-center">
+			<div class="h-1 w-20 rounded-full bg-gradient-to-r from-red-500 to-pink-500"></div>
+		</div>
+		<h1 class="mb-4 text-4xl font-bold text-gray-900 dark:text-white sm:text-5xl">
+			Knitting Tools
+		</h1>
+		<p class="text-lg text-gray-600 dark:text-gray-400">Utilities for your knitting projects</p>
+	</div>
+
+	<!-- Tools List -->
+	<div class="space-y-6">
+		{#each tools as tool}
+			<a href={tool.link} class="group block">
 				<div
-					class="flex bg-gradient-to-r from-amber-200 to-amber-100 dark:bg-amber-950 items-center gap-6 p-6 rounded-lg hover:from-amber-300 hover:to-amber-200 dark:hover:bg-gray-800 transition-colors duration-200"
+					class="flex items-center gap-6 p-6 {getCardClasses({
+						color: tool.color,
+						variant: 'outline',
+						rounded: 'lg'
+					})} hover:-translate-y-1"
 				>
 					<div class="flex-shrink-0">
 						<div
-							class="w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center"
+							class="flex h-14 w-14 items-center justify-center rounded-lg bg-white shadow-sm dark:bg-gray-800 sm:h-16 sm:w-16"
 						>
-							<span class="material-symbols-outlined text-gray-600 dark:text-gray-400 text-xl">
-								calculate
+							<span class="material-symbols-outlined text-3xl sm:text-4xl {tool.iconColor}">
+								{tool.icon}
 							</span>
 						</div>
 					</div>
-					<div class="flex-1 min-w-0">
-						<h2 class="text-xl font-medium text-gray-900 dark:text-white mb-1">Calculator</h2>
-						<p class="text-gray-600 dark:text-gray-400">
-							Calculate even increases or decreases in knitting patterns.
+					<div class="min-w-0 flex-1">
+						<h2 class="mb-1 text-xl font-semibold sm:text-2xl">
+							{tool.title}
+						</h2>
+						<p class="text-gray-700 dark:text-gray-300">
+							{tool.description}
 						</p>
 					</div>
 					<div class="flex-shrink-0">
 						<span
-							class="material-symbols-outlined text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors duration-200"
+							class="material-symbols-outlined text-gray-400 transition-all group-hover:translate-x-1 group-hover:text-gray-600 dark:group-hover:text-gray-300"
 						>
 							arrow_forward
 						</span>
 					</div>
 				</div>
 			</a>
-
-			<a href="/knitting-tools/counter" class="block group">
-				<div
-					class="flex bg-gradient-to-r from-pink-200 to-pink-100 dark:bg-pink-950 items-center gap-6 p-6 rounded-lg hover:from-pink-300 hover:to-pink-200 dark:hover:bg-gray-800 transition-colors duration-200"
-				>
-					<div class="flex-shrink-0">
-						<div
-							class="w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center"
-						>
-							<span class="material-symbols-outlined text-gray-600 dark:text-gray-400 text-xl">
-								add
-							</span>
-						</div>
-					</div>
-					<div class="flex-1 min-w-0">
-						<h2 class="text-xl font-medium text-gray-900 dark:text-white mb-1">Row Counter</h2>
-						<p class="text-gray-600 dark:text-gray-400">
-							Count the number of rows in your knitting pattern.
-						</p>
-					</div>
-					<div class="flex-shrink-0">
-						<span
-							class="material-symbols-outlined text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors duration-200"
-						>
-							arrow_forward
-						</span>
-					</div>
-				</div>
-			</a>
-		</div>
+		{/each}
 	</div>
 </div>
