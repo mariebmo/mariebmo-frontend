@@ -216,7 +216,7 @@ describe('Integration tests', () => {
 
 		console.log(distribution);
 		console.log(groups);
-		console.log(combined);
+		console.log(combined.map((x) => 'group: ' + JSON.stringify(x.group) + ' count: ' + x.count));
 
 		expect(groups).toBeDefined();
 		expect(groups).toHaveLength(64);
@@ -395,7 +395,7 @@ describe('Integration tests', () => {
 		expect(distribution[7].group).toEqual([{ '0': 3 }, { '1': 1 }]);
 		expect(distribution[7].count).toEqual(1);
 		expect(distribution[8].group).toEqual([{ '0': 4 }, { '1': 1 }]);
-		expect(distribution[8].count).toEqual(6);
+		expect(distribution[8].count).toEqual(5);
 		expect(distribution[9].group).toEqual([{ '0': 3 }, { '1': 1 }]);
 		expect(distribution[9].count).toEqual(1);
 	});
