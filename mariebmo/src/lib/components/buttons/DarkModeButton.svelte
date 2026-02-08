@@ -1,8 +1,7 @@
 <script lang="typescript">
 	import { browser } from '$app/environment';
 
-	var isDarkMode = false;
-	var icon = isDarkMode ? 'ic:round-light-mode' : 'ic:round-dark-mode';
+	var isDarkMode = $state(false);
 
 	if (browser) {
 		if (
@@ -42,14 +41,13 @@
 		}
 
 		isDarkMode = !isDarkMode;
-
-		//refresh icon
-		icon = !isDarkMode ? 'carbon:light' : 'carbon:moon';
 	}
 </script>
 
-<button id="theme-toggle-btn" on:click={toggle}>
-	<iconify-icon id="theme-toggle-icon" {icon} width="16" />
+<button id="theme-toggle-btn" onclick={toggle} aria-label="Toggle dark mode">
+	<span class="material-symbols-outlined">
+		{isDarkMode ? 'light_mode' : 'dark_mode'}
+	</span>
 </button>
 
 <style>
@@ -62,9 +60,5 @@
 		padding: 0;
 		margin: 0;
 		color: var(--text-1);
-	}
-
-	#theme-toggle-icon {
-		font-size: 2rem;
 	}
 </style>

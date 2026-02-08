@@ -5,18 +5,18 @@
 	import KnittingActionVisual from './KnittingActionVisual.svelte';
 	import KnittingActionChecklist from './KnittingActionChecklist.svelte';
 	import { flip } from 'svelte/animate';
-	import { SvelteComponent } from 'svelte';
+	import type { Component } from 'svelte';
 
 	const flipDurationMs = 200;
 
 	interface ComponentItem {
 		id: string;
-		component: typeof SvelteComponent<any, any, any>;
+		component: Component<any, any, any>;
 		visible: boolean;
 		name: string;
 	}
 
-	let components: ComponentItem[] = [
+	let components: ComponentItem[] = $state([
 		{ id: 'actionVisual', component: KnittingActionVisual, visible: true, name: 'Visual' },
 		{
 			id: 'actionToggleList',
@@ -31,9 +31,9 @@
 			name: 'Fully Written'
 		},
 		{ id: 'actionShorthand', component: KnittingActionShorthand, visible: true, name: 'Shorthand' }
-	];
+	]);
 
-	let dragDisabled = true;
+	let dragDisabled = $state(true);
 
 	const handleConsider = (e: CustomEvent) => {
 		components = e.detail.items;
@@ -55,8 +55,8 @@
 <div
 	class="w-full"
 	use:dndzone={{ items: components, dragDisabled, flipDurationMs }}
-	on:consider={handleConsider}
-	on:finalize={handleFinalize}
+	onconsider={handleConsider}
+	onfinalize={handleFinalize}
 >
 	{#each components as { id, component: Component, visible, name }, index (id)}
 		<div animate:flip={{ duration: flipDurationMs }} class="mt-2 mb-2 w-full">
@@ -71,18 +71,18 @@
 					<button
 						class:is-collapsed={!visible}
 						class="drag-handle handle h-full w-10 pt-5 pl-5 pb-5 pr-5 mr-5"
-						on:mousedown={startDrag}
-						on:touchstart={startDrag}
-						on:mouseup={stopDrag}
-						on:touchend={stopDrag}
+						onmousedown={startDrag}
+						ontouchstart={startDrag}
+						onmouseup={stopDrag}
+						ontouchend={stopDrag}
 					>
-						<iconify-icon icon="mdi:drag" />
+						<span class="material-symbols-outlined"> drag_indicator </span>
 					</button>
 
 					<!-- Component -->
 					<div class="flex-grow">
 						{#if visible}
-							<svelte:component this={Component} />
+							<Component />
 						{:else}
 							<p>{name} is hidden</p>
 						{/if}
@@ -92,19 +92,19 @@
 					<div class="ml-5 pr-5">
 						{#if visible}
 							<button
-								on:click={() =>
+								onclick={() =>
 									(components = components.map((c) =>
 										c.id === id ? { ...c, visible: false } : c
 									))}
 							>
-								<iconify-icon icon="mdi:eye" />
+								<span class="material-symbols-outlined"> visibility </span>
 							</button>
 						{:else}
 							<button
-								on:click={() =>
+								onclick={() =>
 									(components = components.map((c) => (c.id === id ? { ...c, visible: true } : c)))}
 							>
-								<iconify-icon icon="mdi:eye-off" />
+								<span class="material-symbols-outlined"> visibility_off </span>
 							</button>
 						{/if}
 					</div>
@@ -114,7 +114,7 @@
 	{/each}
 </div>
 
-<style lang="scss">
+<style lang="postcss">
 	.drag-handle {
 		cursor: grab;
 	}
