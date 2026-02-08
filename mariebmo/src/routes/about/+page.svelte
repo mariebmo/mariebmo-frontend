@@ -20,8 +20,7 @@
 			/>
 
 			<h1 class="mb-2 text-4xl font-bold text-gray-900 dark:text-white sm:text-5xl">About Me</h1>
-
-			<div class="mb-6 h-1 w-20 rounded-full bg-gradient-to-r from-pink-500 to-purple-500"></div>
+			<div class="mb-6 h-1 w-20 rounded-full bg-gray-200 dark:bg-gray-700 my-4"></div>
 		</div>
 
 		<!-- Content Section -->

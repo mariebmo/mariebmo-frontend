@@ -17,9 +17,6 @@
 <div class="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
 	<!-- Hero Section -->
 	<div class="mb-12 text-center">
-		<div class="mb-4 flex justify-center">
-			<div class="h-1 w-20 rounded-full bg-gradient-to-r from-pink-500 to-purple-500"></div>
-		</div>
 		<h1 class="mb-4 text-4xl font-bold text-gray-900 dark:text-white sm:text-5xl">Welcome</h1>
 		<p class="text-lg text-gray-600 dark:text-gray-400">Explore my projects and tools</p>
 	</div>
