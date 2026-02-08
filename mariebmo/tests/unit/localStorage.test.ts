@@ -8,7 +8,7 @@ import {
 	isValidTabId
 } from '../../src/lib/utils/localStorage';
 
-// Mock localStorage
+// Mock localStorage (Node/CI has no window – stub it so tests run in Vitest)
 const localStorageMock = (() => {
 	let store: Record<string, string> = {};
 
@@ -26,9 +26,9 @@ const localStorageMock = (() => {
 	};
 })();
 
-// Mock window.localStorage
-Object.defineProperty(window, 'localStorage', {
-	value: localStorageMock
+// Provide window and localStorage in Node/CI (Vitest runs without jsdom by default)
+vi.stubGlobal('window', {
+	localStorage: localStorageMock
 });
 
 describe('localStorage utilities', () => {
