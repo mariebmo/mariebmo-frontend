@@ -492,6 +492,7 @@
 						Personalia
 					</h2>
 					<div class="mt-3 space-y-1">
+						<img src="/mariebmo.png" class="rounded-lg" alt="Marie Blichfeldt Mo" />
 						{#each contact.addressLines as line}
 							<p>{line}</p>
 						{/each}
