@@ -86,7 +86,7 @@
 			const operation = increaseSelected ? Operation.ADD : Operation.REMOVE;
 			const targetAmount = calculateTargetAmount();
 
-			const distribution = getFinalDistribution(current, targetAmount, operation);
+			const distribution = getFinalDistribution(current ?? 0, targetAmount ?? 0, operation);
 			const result = processDistribution(distribution, increaseSelected);
 
 			if (distribution) {
@@ -104,7 +104,7 @@
 	}
 
 	function validateInputs(): string | null {
-		return validateKnittingInputs(current, amount, increaseSelected, totalAmountIncluded);
+		return validateKnittingInputs(current ?? 0, amount ?? 0, increaseSelected, totalAmountIncluded);
 	}
 
 	function setError(message: string) {
@@ -113,7 +113,12 @@
 	}
 
 	function calculateTargetAmount(): number {
-		return calculateKnittingTargetAmount(current, amount, increaseSelected, totalAmountIncluded);
+		return calculateKnittingTargetAmount(
+			current ?? 0,
+			amount ?? 0,
+			increaseSelected,
+			totalAmountIncluded
+		);
 	}
 
 	function processDistribution(
