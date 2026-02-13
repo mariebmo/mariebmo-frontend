@@ -18,13 +18,14 @@
 		bullets?: string[];
 		metaLabel?: string;
 		meta?: string;
+		thesisTitle?: string;
+		thesisDescription?: string;
 	};
 
 	const contact = {
 		name: 'Marie Blichfeldt Mo',
 		title: 'Senior tools software utvikler & 3D-grafiker',
-		addressLines: ['Oslo, Norway'],
-		phone: '+47 xx xx xxx x',
+		addressLines: ['Oslo, Norge'],
 		email: 'mariebmo@proton.me',
 		notes: ['Førerkort klasse B', 'Båtførerbevis']
 	};
@@ -37,10 +38,11 @@
 
 	const interests = [
 		'Brettspill & gaming',
+		'Bøker',
 		'Håndarbeid',
 		'Svømming',
 		'TTRPG (Dungeons & Dragons)',
-		'Matlaging',
+		'Mat',
 		'Programmering'
 	];
 
@@ -64,7 +66,7 @@
 			location: 'Oslo',
 			period: 'mai 2025 – d.d.',
 			description:
-				'Bygget en lettvekts webløsning som komplementerer den eksisterende WPF-klienten, med fokus på brukeropplevelse for kunder, koblet mot .NET-backend via WebSockets og REST-endepunkter. Levert en AI-først-løsning for autogenerering av opplæringsinnhold av høy kvalitet med bruk av Flowise, med veiledning fra brukeren. Sentral i kommunikasjon og implementasjon av API-er fra ulike teknologi-team i Attensi. Ledet pilotprosjekt for å onboarde designere til kodeprosjekter med Cursor og kodegenerering, med tett samarbeid med stakeholders og bruk av Scrum, og jobbet tett med designere i Figma.',
+				'Bygget en lettvekts webløsning fra bunnen i Svelte, som komplementerer den eksisterende WPF-klienten, med fokus på brukeropplevelse for kunder. Koblet løsningen mot en eksisterende .NET-backend via WebSockets og REST-endepunkter. Levert en AI-først-løsning for autogenerering av opplæringsinnhold av høy kvalitet med bruk av Flowise, med veiledning fra brukeren. Sentral i kommunikasjon og implementasjon av API-er fra ulike teknologi-team i Attensi. Ledet pilotprosjekt for å onboarde designere til kodeprosjekter med Cursor og kodegenerering, med tett samarbeid med stakeholders og bruk av Scrum, og jobbet tett med designere i Figma.',
 			metaLabel: 'Teknologi:',
 			meta: 'Svelte, TypeScript, Tailwind, .NET, C#, MongoDB, WebSockets, REST API, AWS, Sentry, Grafana, Figma, Scrum, Flowise'
 		},
@@ -111,7 +113,10 @@
 			location: 'Oslo',
 			period: 'aug 2020 – juni 2023',
 			description:
-				'Bachelor i programmering med hovedvekt på backend og robuste, skalerbare løsninger. Bacheloroppgave (A): «Alternatives to AssetBundles for runtime up-/download and rendering of 3D-assets in Unity».',
+				'Bachelor i programmering med hovedvekt på backend og robuste, skalerbare løsninger.',
+			thesisTitle: 'Bacheloroppgave (A):',
+			thesisDescription:
+				'«Alternatives to AssetBundles for runtime up-/download and rendering of 3D-assets in Unity».',
 			bullets: [
 				'Webutvikling & API-design (HTML, CSS, React, JavaScript)',
 				'Backend og enterprise (Kotlin, Spring Boot, REST, C#/.NET)',
@@ -126,7 +131,10 @@
 			location: 'Oslo',
 			period: 'aug 2015 – juni 2018',
 			description:
-				'Bachelor i 3D-grafikk med fokus på helhetlig produksjonspipeline for interaktivt og pre-rendered innhold. Bacheloroppgave (A): «Optimization of the design pipeline with the use of procedural textures».',
+				'Bachelor i 3D-grafikk med fokus på helhetlig produksjonspipeline for interaktivt og pre-rendered innhold.',
+			thesisTitle: 'Bacheloroppgave (A):',
+			thesisDescription:
+				'«Optimization of the design pipeline with the use of procedural textures».',
 			bullets: [
 				'Teksturering, modellering, topologi og komposisjon',
 				'Lyssetting, rendering og optimalisering for realtime 3D',
@@ -141,7 +149,10 @@
 			title: 'Bachelorpraksis',
 			company: 'Attensi',
 			location: 'Oslo',
-			period: 'jan 2018 – juni 2018'
+			period: 'jan 2018 – juni 2018',
+
+			description:
+				'Utviklet scener og prosedurale materialer for Unity-spill, med fokus på effektivitet og skalerbarhet.'
 		}
 	];
 
@@ -150,13 +161,26 @@
 			title: 'Nestleder',
 			company: 'Kvinner & IT (KIT)',
 			location: 'Oslo',
-			period: 'aug 2021 – jan 2023'
+			period: 'aug 2021 – jan 2023',
+			description:
+				'Var med på å gjennopstarte Kvinner & IT (KIT) studentforening under COVID. Satt i ledelsen med flere hundre medlemmer i et uavhengig studentfaglig samfunn ved Høyskolen Kristiania. Fokuset til KIT var å fremme kvinner i IT-bransjen. Jobbet tett med ulike personer, bedrifter og organisasjoner for å arrangere ulike arrangementer og kurs samt egne sosiale arrangementer for medlemmene.'
 		},
 		{
 			title: 'Nestleder',
 			company: 'BIOS studentforening',
 			location: 'Oslo',
-			period: 'juni 2021 – des 2021'
+			period: 'juni 2021 – des 2021',
+			description:
+				'Var med på å gjenoppstarte BIOS studentforening under COVID. BIOS ble tilsvarende en linjeforening for IT-studenter ved Høyskolen Kristiania. Jobbet aktivt med bransjekontakt, bedriftspresentasjoner, sosiale sammenkomster, samt å holde digitale forelesniger og veiledning for medlemmene.'
+		},
+		{
+			title: 'Velferdsansvarlig, Arbeidsutvalget',
+			company: 'Studentsamfunnet Westerdals Oslo ACT',
+			location: 'Oslo',
+			period: 'feb 2017 – aug 2018',
+
+			description:
+				'Satt i styret til Studentsamfunnet ved Westerdals Oslo ACT (SWOACT) med fokus på, og ansvar for, studentforeninger og trivsel ved skolen. Bidro med hjelp til søknader, dokumentasjon, gjennomføring av generalforsamling, promotering, fakturering, og generell driftshjelp i SWOACT-foreningene.'
 		},
 		{
 			title: 'Skiftleder',
@@ -164,12 +188,7 @@
 			location: 'Oslo',
 			period: 'mars 2018 – aug 2019'
 		},
-		{
-			title: 'Velferdsansvarlig, Arbeidsutvalget',
-			company: 'Studentsamfunnet Westerdals Oslo ACT',
-			location: 'Oslo',
-			period: 'feb 2017 – aug 2018'
-		},
+
 		{
 			title: 'Nestleder, Tillitsutvalget ved avd. Film, TV og spill',
 			company: 'Studentsamfunnet Westerdals Oslo ACT',
@@ -192,34 +211,69 @@
 		const maxWidth = pageWidth - marginX * 2;
 		const lineHeight = 16;
 
-		let y = 60;
+		// --- Header bar to match the web layout ---
+		doc.setFillColor(245, 158, 11); // amber-ish background
+		doc.rect(0, 0, pageWidth, 110, 'F');
+
+		doc.setTextColor(248, 250, 252); // near slate-50
+		doc.setFont('Helvetica', 'bold');
+		doc.setFontSize(20);
+
+		let y = 45;
+
+		doc.text(contact.name, marginX, y);
+		y += 24;
+
+		doc.setFontSize(12);
+		doc.setFont('Helvetica', 'normal');
+		doc.text(contact.title, marginX, y);
+		y += 18;
+
+		const intro =
+			'Basert i Oslo. Fokus på verktøyutvikling, AI-drevne workflows og brukersentrerte løsninger for innholdsproduksjon.';
+		const introLines = doc.splitTextToSize(intro, maxWidth);
+		doc.setFontSize(10);
+		doc.text(introLines, marginX, y);
+
+		// Reset for body content
+		y = 130;
+		doc.setFontSize(11);
+		doc.setFont('Helvetica', 'normal');
+		doc.setTextColor(30, 41, 59); // slate-800
 
 		const ensureSpace = (lines = 1) => {
 			const needed = lines * lineHeight + 30;
 			if (y + needed > pageHeight - 40) {
 				doc.addPage();
 				y = 60;
+				doc.setFontSize(11);
+				doc.setFont('Helvetica', 'normal');
+				doc.setTextColor(30, 41, 59);
 			}
 		};
 
 		const heading = (text: string) => {
 			doc.setFont('Helvetica', 'bold');
-			doc.setFontSize(16);
+			doc.setFontSize(14);
+			doc.setTextColor(180, 83, 9); // amber-700-ish
 			ensureSpace(2);
 			doc.text(text, marginX, y);
 			y += lineHeight * 1.8;
 			doc.setFontSize(11);
 			doc.setFont('Helvetica', 'normal');
+			doc.setTextColor(30, 41, 59);
 		};
 
 		const subheading = (text: string) => {
 			doc.setFont('Helvetica', 'bold');
 			doc.setFontSize(12);
+			doc.setTextColor(15, 23, 42); // slate-900
 			ensureSpace(1);
 			doc.text(text, marginX, y);
 			y += lineHeight * 1.3;
 			doc.setFontSize(11);
 			doc.setFont('Helvetica', 'normal');
+			doc.setTextColor(30, 41, 59);
 		};
 
 		const paragraph = (text?: string) => {
@@ -241,49 +295,40 @@
 			y += lineHeight * 0.25;
 		};
 
-		// Header
-		doc.setFont('Helvetica', 'bold');
-		doc.setFontSize(20);
-		doc.text(contact.name, marginX, y);
-		y += 24;
-
-		doc.setFontSize(12);
-		doc.setFont('Helvetica', 'normal');
-		doc.text(contact.title, marginX, y);
-		y += 18;
-
-		// Contact details
-		const contactLines = [...contact.addressLines, contact.phone, contact.email];
+		// --- Contact details & links (sidebar content) ---
+		const contactLines = [...contact.addressLines, contact.email];
 		for (const line of contactLines) {
+			ensureSpace();
 			doc.text(line, marginX, y);
 			y += 14;
 		}
 		y += 10;
 
-		// Links
 		if (links.length) {
 			doc.setFont('Helvetica', 'bold');
 			doc.setFontSize(11);
-			doc.text('Lenker:', marginX, y);
+			doc.text('Lenker', marginX, y);
 			y += 16;
 			doc.setFont('Helvetica', 'normal');
+			doc.setFontSize(10);
 
 			for (const link of links) {
 				const text = link.label;
 				const lines = doc.splitTextToSize(text, maxWidth);
 				ensureSpace(lines.length);
-				// Draw first line as clickable link
+				// First line clickable
 				doc.textWithLink(lines[0], marginX, y, { url: link.href });
-				// Any additional wrapped lines as normal text
+				// Additional wrapped lines as plain text
 				if (lines.length > 1) {
 					doc.text(lines.slice(1), marginX, y + lineHeight);
 				}
 				y += lines.length * lineHeight;
 			}
 			y += 10;
+			doc.setFontSize(11);
 		}
 
-		// Experience
+		// --- Experience (main column content) ---
 		heading('Yrkeserfaring');
 		for (const role of experience) {
 			subheading(role.title);
@@ -312,7 +357,7 @@
 			y += 6;
 		}
 
-		// Education
+		// --- Education ---
 		heading('Utdanning');
 		for (const edu of education) {
 			subheading(edu.title);
@@ -327,11 +372,24 @@
 			doc.setFontSize(11);
 
 			paragraph(edu.description);
+
+			if (edu.thesisTitle || edu.thesisDescription) {
+				const thesisText = `${edu.thesisTitle ?? ''} ${edu.thesisDescription ?? ''}`.trim();
+				if (thesisText) {
+					const lines = doc.splitTextToSize(thesisText, maxWidth);
+					ensureSpace(lines.length);
+					doc.setFont('Helvetica', 'bold');
+					doc.text(lines, marginX, y);
+					y += lines.length * lineHeight + 4;
+					doc.setFont('Helvetica', 'normal');
+				}
+			}
+
 			bulletList(edu.bullets);
 			y += 4;
 		}
 
-		// Other sections (brief)
+		// --- Internships (Praksisplasser) ---
 		if (internships.length) {
 			heading('Praksisplasser');
 			for (const p of internships) {
@@ -343,11 +401,15 @@
 					y += lineHeight;
 				}
 				doc.text(p.period, marginX, y);
-				y += lineHeight + 4;
+				y += lineHeight;
 				doc.setFontSize(11);
+
+				paragraph(p.description);
+				y += 4;
 			}
 		}
 
+		// --- Activities (Utenomfaglige aktiviteter) ---
 		if (activities.length) {
 			heading('Utenomfaglige aktiviteter');
 			for (const a of activities) {
@@ -359,10 +421,17 @@
 					y += lineHeight;
 				}
 				doc.text(a.period, marginX, y);
-				y += lineHeight + 4;
+				y += lineHeight;
 				doc.setFontSize(11);
+
+				paragraph(a.description);
+				y += 4;
 			}
 		}
+
+		// --- References ---
+		heading('Referanser');
+		paragraph('Referanser oppgis på forespørsel.');
 
 		doc.save('Marie-Blichfeldt-Mo-CV.pdf');
 	}
@@ -370,31 +439,31 @@
 
 <div class="print-cv-root mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
 	<section
-		class="relative overflow-hidden rounded-3xl bg-white/90 shadow-xl ring-1 ring-slate-200 backdrop-blur"
+		class="relative overflow-hidden rounded-3xl bg-white/90 shadow-xl ring-1 ring-slate-200 dark:ring-amber-900 backdrop-blur"
 	>
 		<div
-			class="pointer-events-none absolute inset-x-[-10%] -top-40 h-64 bg-gradient-to-br from-sky-100 via-fuchsia-50 to-transparent opacity-70"
+			class="pointer-events-none absolute inset-x-[-10%] -top-40 h-64 bg-gradient-to-br from-amber-50 via-orange-50 to-transparent opacity-80 dark:from-amber-900/40 dark:via-orange-900/40"
 			aria-hidden="true"
 		></div>
 
 		<!-- Header -->
 		<header
-			class="relative border-b border-slate-200 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 px-6 py-6 text-slate-50 sm:px-10 sm:py-8"
+			class="relative border-b border-amber-200/60 bg-amber-400 px-6 py-6 text-slate-900 shadow-sm sm:px-10 sm:py-8 dark:bg-amber-700 dark:border-amber-900 dark:text-white"
 		>
 			<div class="flex flex-col gap-4 sm:flex-row sm:justify-between">
 				<div>
-					<p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+					<p class="text-xs font-semibold uppercase tracking-[0.2em] text-amber-700">
 						Curriculum Vitae
 					</p>
 					<h1 class="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
 						{contact.name}
 					</h1>
-					<p class="mt-1 text-sm text-slate-200 sm:text-base">
+					<p class="mt-1 text-sm text-slate-800 dark:text-slate-100 sm:text-base">
 						{contact.title}
 					</p>
-					<p class="mt-3 text-xs text-slate-300 sm:text-sm">
-						Basert i Oslo. Fokus på verktøyutvikling, AI-drevne workflows og brukersentrerte
-						løsninger for innholdsproduksjon.
+					<p class="mt-3 text-xs text-slate-700 dark:text-slate-100 sm:text-sm">
+						Fullstackutvikler basert i Oslo. Fokus på verktøyutvikling, AI-drevne workflows og
+						brukersentrerte løsninger for innholdsproduksjon.
 					</p>
 				</div>
 
@@ -402,21 +471,9 @@
 					<button
 						type="button"
 						on:click={generatePdf}
-						class="print:hidden inline-flex items-center align-top justify-start gap-2 rounded-full bg-slate-50 px-4 py-2 text-xs font-medium text-slate-900 shadow-sm ring-1 ring-slate-300 transition hover:bg-white hover:shadow-md"
+						class="print:hidden truncate align-top justify-start rounded-full border border-amber-500 dark:border-amber-800 bg-slate-50 px-4 py-2 text-xs font-medium text-slate-900 shadow-sm ring-slate-300 transition hover:bg-white hover:shadow-md"
 					>
-						<svg
-							class="h-4 w-4 text-slate-700"
-							viewBox="0 0 20 20"
-							fill="currentColor"
-							aria-hidden="true"
-						>
-							<path
-								fill-rule="evenodd"
-								d="M5 3a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v4h1a2 2 0 0 1 2 2v3.5a2.5 2.5 0 0 1-2 2.45V18a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-3.05A2.5 2.5 0 0 1 3 12.5V9a2 2 0 0 1 2-2h1V3Zm2 4h6V3H7v4Zm3 3a.75.75 0 0 1 .75.75V14h1.69a.75.75 0 0 1 .53 1.28l-2.19 2.2a.75.75 0 0 1-1.06 0l-2.19-2.2A.75.75 0 0 1 7.06 14h1.69v-3.25A.75.75 0 0 1 10 10Z"
-								clip-rule="evenodd"
-							/>
-						</svg>
-						<span>Last ned som PDF</span>
+						Last ned som PDF
 					</button>
 				</div>
 			</div>
@@ -439,12 +496,10 @@
 							<p>{line}</p>
 						{/each}
 						<p>
-							<a href="tel:+4748139072" class="hover:text-slate-900">{contact.phone}</a>
-						</p>
-						<p>
 							<a href="mailto:{contact.email}" class="hover:text-slate-900">{contact.email}</a>
 						</p>
 						{#if contact.notes?.length}
+							<div class="w-full border-b py-1"></div>
 							<ul class="mt-2 list-inside list-disc space-y-0.5 text-xs text-slate-600">
 								{#each contact.notes as note}
 									<li>{note}</li>
@@ -574,6 +629,16 @@
 								{#if edu.description}
 									<p class="mt-3 text-slate-700">{edu.description}</p>
 								{/if}
+								{#if edu.thesisTitle || edu.thesisDescription}
+									<p class="mt-1 text-slate-700">
+										{#if edu.thesisTitle}
+											<span class="font-semibold">{edu.thesisTitle}</span>
+										{/if}
+										{#if edu.thesisDescription}
+											{' '}{edu.thesisDescription}
+										{/if}
+									</p>
+								{/if}
 								{#if edu.bullets}
 									<ul class="mt-3 list-inside list-disc space-y-1">
 										{#each edu.bullets as bullet}
@@ -631,6 +696,8 @@
 									{/if}
 									<p class="text-[0.8rem] text-slate-500">{activity.period}</p>
 								</header>
+
+								{activity.description}
 							</article>
 						{/each}
 					</div>
