@@ -40,8 +40,7 @@
 		'Brettspill & gaming',
 		'Bøker',
 		'Håndarbeid',
-		'Svømming',
-		'TTRPG (Dungeons & Dragons)',
+		'TTRPG (D&D)',
 		'Mat',
 		'Programmering'
 	];
@@ -493,15 +492,17 @@
 					</h2>
 					<div class="mt-3 space-y-1">
 						<img src="/mariebmo.png" class="rounded-lg" alt="Marie Blichfeldt Mo" />
-						{#each contact.addressLines as line}
-							<p>{line}</p>
-						{/each}
 						<p>
 							<a href="mailto:{contact.email}" class="hover:text-slate-900">{contact.email}</a>
 						</p>
+
+						{#each contact.addressLines as line}
+							<p>{line}</p>
+						{/each}
+
 						{#if contact.notes?.length}
-							<div class="w-full border-b py-1"></div>
-							<ul class="mt-2 list-inside list-disc space-y-0.5 text-xs text-slate-600">
+							<div class="w-full h-1 border-b"></div>
+							<ul class="list-inside list-disc space-y-0.5 text-xs text-slate-600">
 								{#each contact.notes as note}
 									<li>{note}</li>
 								{/each}
@@ -536,7 +537,7 @@
 					<ul class="mt-3 flex flex-wrap gap-2">
 						{#each interests as interest}
 							<li
-								class="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700 ring-1 ring-slate-200"
+								class="rounded-full bg-blue-50 border-blue-300 border px-3 py-1 text-xs font-medium text-slate-700 ring-1 ring-slate-200"
 							>
 								{interest}
 							</li>
