@@ -125,7 +125,7 @@
 				class="bg-gradient-to-br from-gray-50 to-slate-100 dark:from-gray-900 dark:to-slate-900 rounded-lg p-4 sm:p-6 border border-gray-200 dark:border-gray-700"
 			>
 				<div class="flex flex-wrap gap-2 justify-center items-center">
-					{#each symbols as symbol, index}
+					{#each symbols as symbol, index (index)}
 						<div
 							class="w-5 h-5 sm:w-5 sm:h-5 rounded-lg flex items-center justify-center font-bold text-lg sm:text-sm {getSymbolStyle(
 								symbol

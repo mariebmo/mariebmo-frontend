@@ -31,7 +31,7 @@
 			link="/about"
 		/>
 
-		{#each projects as project}
+		{#each projects as project (project.link)}
 			<ProjectCard
 				header={project.title}
 				description={project.description}

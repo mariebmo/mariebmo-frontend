@@ -19,7 +19,7 @@ const DEFAULT_PREFERENCES: UserPreferences = {
 function isLocalStorageAvailable(): boolean {
 	try {
 		if (typeof window === 'undefined') return false;
-		
+
 		const test = '__localStorage_test__';
 		window.localStorage.setItem(test, test);
 		window.localStorage.removeItem(test);

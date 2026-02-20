@@ -7,11 +7,13 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { isValidTabId, saveActiveTab, getSavedActiveTab } from '$lib/utils/localStorage';
 
+	import type { Component } from 'svelte';
+
 	interface Tab {
 		id: string;
 		label: string;
 		icon: string;
-		component: any;
+		component: Component;
 	}
 
 	const tabs: Tab[] = [

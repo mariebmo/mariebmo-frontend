@@ -33,8 +33,6 @@
 	);
 	let disableSubmitButton = $derived(validationWarning !== null);
 
-	$inspect(validationWarning);
-
 	function getValidationWarning(
 		current: number | null,
 		amount: number | null,

@@ -22,7 +22,7 @@
 		color = ProjectCardColor.PINK,
 		icon = undefined,
 		filled = false,
-		expanded = false
+		expanded: _expanded = false
 	}: Props = $props();
 
 	function mapProjectColorToCardColor(projectColor: ProjectCardColor): CardColor {

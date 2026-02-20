@@ -1,4 +1,7 @@
 <script lang="ts">
+	import CvTimelineSection from '$lib/components/cv/CvTimelineSection.svelte';
+	import { generateCvPdf } from '$lib/cv/generateCvPdf';
+
 	type Link = {
 		label: string;
 		href: string;
@@ -75,7 +78,7 @@
 			location: 'Oslo',
 			period: 'nov 2020 – mai 2025',
 			description:
-				'Gradvis overgang fra Art-teamet til Tools-teamet i Attensi frem til 2022. Ansvar for å lage verktøy for Attensis Creator-plattform. Utviklet og forbedret verktøy for innholdsproduksjon med stort fokus påeffektivitet og kvalitetssikring av brukerarbeid ved bruk av AI. Creator-plattformen er bygget på .NET med MongoDB-database og WPF-frontend, og implementerer Unity-previews ved bruk av C# for Unity.',
+				'Gradvis overgang fra Art-teamet til Tools-teamet i Attensi frem til 2022. Ansvar for å lage verktøy for Attensis Creator-plattform. Utviklet og forbedret verktøy for innholdsproduksjon med stort fokus på effektivitet og kvalitetssikring av brukerarbeid ved bruk av AI. Creator-plattformen er bygget på .NET med MongoDB-database og WPF-frontend, og implementerer Unity-previews ved bruk av C# for Unity.',
 			metaLabel: 'Teknologi:',
 			meta: '.NET, C#, MongoDB, WebSockets, REST API, AWS, Scrum, Unity'
 		},
@@ -149,7 +152,6 @@
 			company: 'Attensi',
 			location: 'Oslo',
 			period: 'jan 2018 – juni 2018',
-
 			description:
 				'Utviklet scener og prosedurale materialer for Unity-spill, med fokus på effektivitet og skalerbarhet.'
 		}
@@ -177,7 +179,6 @@
 			company: 'Studentsamfunnet Westerdals Oslo ACT',
 			location: 'Oslo',
 			period: 'feb 2017 – aug 2018',
-
 			description:
 				'Satt i styret til Studentsamfunnet ved Westerdals Oslo ACT (SWOACT) med fokus på, og ansvar for, studentforeninger og trivsel ved skolen. Bidro med hjelp til søknader, dokumentasjon, gjennomføring av generalforsamling, promotering, fakturering, og generell driftshjelp i SWOACT-foreningene.'
 		},
@@ -187,7 +188,6 @@
 			location: 'Oslo',
 			period: 'mars 2018 – aug 2019'
 		},
-
 		{
 			title: 'Nestleder, Tillitsutvalget ved avd. Film, TV og spill',
 			company: 'Studentsamfunnet Westerdals Oslo ACT',
@@ -196,243 +196,49 @@
 		}
 	];
 
+	async function imgToBase64(imgEl: HTMLImageElement): Promise<string | null> {
+		return new Promise((resolve) => {
+			try {
+				const canvas = document.createElement('canvas');
+				canvas.width = imgEl.naturalWidth || imgEl.width;
+				canvas.height = imgEl.naturalHeight || imgEl.height;
+				const ctx = canvas.getContext('2d');
+				if (!ctx) {
+					resolve(null);
+					return;
+				}
+				ctx.drawImage(imgEl, 0, 0);
+				resolve(canvas.toDataURL('image/jpeg', 0.92));
+			} catch {
+				resolve(null);
+			}
+		});
+	}
+
+	let pdfGenerating = false;
+
 	async function generatePdf() {
 		if (typeof window === 'undefined') return;
-
-		// @ts-ignore - jspdf is loaded dynamically at runtime
-		const jsPDFModule = await import('jspdf');
-		const jsPDF = (jsPDFModule as any).default;
-
-		const doc = new jsPDF({ unit: 'pt', format: 'a4' });
-		const pageWidth = doc.internal.pageSize.getWidth();
-		const pageHeight = doc.internal.pageSize.getHeight();
-		const marginX = 50;
-		const maxWidth = pageWidth - marginX * 2;
-		const lineHeight = 16;
-
-		// --- Header bar to match the web layout ---
-		doc.setFillColor(245, 158, 11); // amber-ish background
-		doc.rect(0, 0, pageWidth, 110, 'F');
-
-		doc.setTextColor(248, 250, 252); // near slate-50
-		doc.setFont('Helvetica', 'bold');
-		doc.setFontSize(20);
-
-		let y = 45;
-
-		doc.text(contact.name, marginX, y);
-		y += 24;
-
-		doc.setFontSize(12);
-		doc.setFont('Helvetica', 'normal');
-		doc.text(contact.title, marginX, y);
-		y += 18;
-
-		const intro =
-			'Basert i Oslo. Fokus på verktøyutvikling, AI-drevne workflows og brukersentrerte løsninger for innholdsproduksjon.';
-		const introLines = doc.splitTextToSize(intro, maxWidth);
-		doc.setFontSize(10);
-		doc.text(introLines, marginX, y);
-
-		// Reset for body content
-		y = 130;
-		doc.setFontSize(11);
-		doc.setFont('Helvetica', 'normal');
-		doc.setTextColor(30, 41, 59); // slate-800
-
-		const ensureSpace = (lines = 1) => {
-			const needed = lines * lineHeight + 30;
-			if (y + needed > pageHeight - 40) {
-				doc.addPage();
-				y = 60;
-				doc.setFontSize(11);
-				doc.setFont('Helvetica', 'normal');
-				doc.setTextColor(30, 41, 59);
-			}
-		};
-
-		const heading = (text: string) => {
-			doc.setFont('Helvetica', 'bold');
-			doc.setFontSize(14);
-			doc.setTextColor(180, 83, 9); // amber-700-ish
-			ensureSpace(2);
-			doc.text(text, marginX, y);
-			y += lineHeight * 1.8;
-			doc.setFontSize(11);
-			doc.setFont('Helvetica', 'normal');
-			doc.setTextColor(30, 41, 59);
-		};
-
-		const subheading = (text: string) => {
-			doc.setFont('Helvetica', 'bold');
-			doc.setFontSize(12);
-			doc.setTextColor(15, 23, 42); // slate-900
-			ensureSpace(1);
-			doc.text(text, marginX, y);
-			y += lineHeight * 1.3;
-			doc.setFontSize(11);
-			doc.setFont('Helvetica', 'normal');
-			doc.setTextColor(30, 41, 59);
-		};
-
-		const paragraph = (text?: string) => {
-			if (!text) return;
-			const lines = doc.splitTextToSize(text, maxWidth);
-			ensureSpace(lines.length);
-			doc.text(lines, marginX, y);
-			y += lines.length * lineHeight + lineHeight * 0.5;
-		};
-
-		const bulletList = (items?: string[]) => {
-			if (!items || !items.length) return;
-			for (const item of items) {
-				const lines = doc.splitTextToSize(`• ${item}`, maxWidth);
-				ensureSpace(lines.length);
-				doc.text(lines, marginX, y);
-				y += lines.length * lineHeight;
-			}
-			y += lineHeight * 0.25;
-		};
-
-		// --- Contact details & links (sidebar content) ---
-		const contactLines = [...contact.addressLines, contact.email];
-		for (const line of contactLines) {
-			ensureSpace();
-			doc.text(line, marginX, y);
-			y += 14;
+		if (pdfGenerating) return;
+		pdfGenerating = true;
+		try {
+			const photoEl = document.querySelector('.print-cv-root img') as HTMLImageElement | null;
+			const photoData = photoEl ? await imgToBase64(photoEl) : null;
+			await generateCvPdf({
+				contact,
+				links,
+				interests,
+				certificates,
+				courses,
+				experience,
+				education,
+				internships,
+				activities,
+				photoData
+			});
+		} finally {
+			pdfGenerating = false;
 		}
-		y += 10;
-
-		if (links.length) {
-			doc.setFont('Helvetica', 'bold');
-			doc.setFontSize(11);
-			doc.text('Lenker', marginX, y);
-			y += 16;
-			doc.setFont('Helvetica', 'normal');
-			doc.setFontSize(10);
-
-			for (const link of links) {
-				const text = link.label;
-				const lines = doc.splitTextToSize(text, maxWidth);
-				ensureSpace(lines.length);
-				// First line clickable
-				doc.textWithLink(lines[0], marginX, y, { url: link.href });
-				// Additional wrapped lines as plain text
-				if (lines.length > 1) {
-					doc.text(lines.slice(1), marginX, y + lineHeight);
-				}
-				y += lines.length * lineHeight;
-			}
-			y += 10;
-			doc.setFontSize(11);
-		}
-
-		// --- Experience (main column content) ---
-		heading('Yrkeserfaring');
-		for (const role of experience) {
-			subheading(role.title);
-			const line = [role.company, role.location].filter(Boolean).join(' · ');
-			doc.setFontSize(10);
-			if (line) {
-				doc.text(line, marginX, y);
-				y += lineHeight;
-			}
-			doc.text(role.period, marginX, y);
-			y += lineHeight;
-			doc.setFontSize(11);
-
-			paragraph(role.description);
-
-			if (role.meta && role.metaLabel) {
-				const metaText = `${role.metaLabel} ${role.meta}`;
-				const lines = doc.splitTextToSize(metaText, maxWidth);
-				ensureSpace(lines.length);
-				doc.setFontSize(9);
-				doc.text(lines, marginX, y);
-				y += lines.length * lineHeight + 4;
-				doc.setFontSize(11);
-			}
-
-			y += 6;
-		}
-
-		// --- Education ---
-		heading('Utdanning');
-		for (const edu of education) {
-			subheading(edu.title);
-			const line = [edu.company, edu.location].filter(Boolean).join(' · ');
-			doc.setFontSize(10);
-			if (line) {
-				doc.text(line, marginX, y);
-				y += lineHeight;
-			}
-			doc.text(edu.period, marginX, y);
-			y += lineHeight;
-			doc.setFontSize(11);
-
-			paragraph(edu.description);
-
-			if (edu.thesisTitle || edu.thesisDescription) {
-				const thesisText = `${edu.thesisTitle ?? ''} ${edu.thesisDescription ?? ''}`.trim();
-				if (thesisText) {
-					const lines = doc.splitTextToSize(thesisText, maxWidth);
-					ensureSpace(lines.length);
-					doc.setFont('Helvetica', 'bold');
-					doc.text(lines, marginX, y);
-					y += lines.length * lineHeight + 4;
-					doc.setFont('Helvetica', 'normal');
-				}
-			}
-
-			bulletList(edu.bullets);
-			y += 4;
-		}
-
-		// --- Internships (Praksisplasser) ---
-		if (internships.length) {
-			heading('Praksisplasser');
-			for (const p of internships) {
-				subheading(p.title);
-				const line = [p.company, p.location].filter(Boolean).join(' · ');
-				doc.setFontSize(10);
-				if (line) {
-					doc.text(line, marginX, y);
-					y += lineHeight;
-				}
-				doc.text(p.period, marginX, y);
-				y += lineHeight;
-				doc.setFontSize(11);
-
-				paragraph(p.description);
-				y += 4;
-			}
-		}
-
-		// --- Activities (Utenomfaglige aktiviteter) ---
-		if (activities.length) {
-			heading('Utenomfaglige aktiviteter');
-			for (const a of activities) {
-				subheading(a.title);
-				const line = [a.company, a.location].filter(Boolean).join(' · ');
-				doc.setFontSize(10);
-				if (line) {
-					doc.text(line, marginX, y);
-					y += lineHeight;
-				}
-				doc.text(a.period, marginX, y);
-				y += lineHeight;
-				doc.setFontSize(11);
-
-				paragraph(a.description);
-				y += 4;
-			}
-		}
-
-		// --- References ---
-		heading('Referanser');
-		paragraph('Referanser oppgis på forespørsel.');
-
-		doc.save('Marie-Blichfeldt-Mo-CV.pdf');
 	}
 </script>
 
@@ -470,9 +276,11 @@
 					<button
 						type="button"
 						on:click={generatePdf}
-						class="print:hidden truncate align-top justify-start rounded-full border border-amber-500 dark:border-amber-800 bg-slate-50 px-4 py-2 text-xs font-medium text-slate-900 shadow-sm ring-slate-300 transition hover:bg-white hover:shadow-md"
+						disabled={pdfGenerating}
+						aria-label={pdfGenerating ? 'Laster ned PDF…' : 'Last ned CV som PDF'}
+						class="print:hidden truncate align-top justify-start rounded-full border border-amber-500 dark:border-amber-800 bg-slate-50 px-4 py-2 text-xs font-medium text-slate-900 shadow-sm ring-slate-300 transition hover:bg-white hover:shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
 					>
-						Last ned som PDF
+						{pdfGenerating ? 'Laster ned…' : 'Last ned som PDF'}
 					</button>
 				</div>
 			</div>
@@ -491,19 +299,29 @@
 						Personalia
 					</h2>
 					<div class="mt-3 space-y-1">
-						<img src="/mariebmo.png" class="rounded-lg" alt="Marie Blichfeldt Mo" />
+						<img
+							src="/mariebmo.png"
+							width="148"
+							height="148"
+							class="rounded-lg object-cover"
+							alt="Marie Blichfeldt Mo"
+							fetchpriority="high"
+						/>
 						<p>
-							<a href="mailto:{contact.email}" class="hover:text-slate-900">{contact.email}</a>
+							<a
+								href="/cdn-cgi/l/email-protection#97ecf4f8f9e3f6f4e3b9f2faf6fefbea"
+								class="hover:text-slate-900">{contact.email}</a
+							>
 						</p>
 
-						{#each contact.addressLines as line}
+						{#each contact.addressLines as line (line)}
 							<p>{line}</p>
 						{/each}
 
 						{#if contact.notes?.length}
 							<div class="w-full h-1 border-b"></div>
 							<ul class="list-inside list-disc space-y-0.5 text-xs text-slate-600">
-								{#each contact.notes as note}
+								{#each contact.notes as note (note)}
 									<li>{note}</li>
 								{/each}
 							</ul>
@@ -514,7 +332,7 @@
 				<section>
 					<h2 class="text-xs font-semibold uppercase tracking-[0.15em] text-slate-500">Lenker</h2>
 					<ul class="mt-3 space-y-1">
-						{#each links as link}
+						{#each links as link (link.href)}
 							<li>
 								<a
 									href={link.href}
@@ -535,7 +353,7 @@
 						Interesser
 					</h2>
 					<ul class="mt-3 flex flex-wrap gap-2">
-						{#each interests as interest}
+						{#each interests as interest (interest)}
 							<li
 								class="rounded-full bg-blue-50 border-blue-300 border px-3 py-1 text-xs font-medium text-slate-700 ring-1 ring-slate-200"
 							>
@@ -550,7 +368,7 @@
 						Sertifikater
 					</h2>
 					<ul class="mt-3 space-y-2">
-						{#each certificates as cert}
+						{#each certificates as cert (cert.name)}
 							<li>
 								<p class="font-medium text-slate-800">{cert.name}</p>
 								<p class="text-xs text-slate-500">{cert.date}</p>
@@ -562,7 +380,7 @@
 				<section>
 					<h2 class="text-xs font-semibold uppercase tracking-[0.15em] text-slate-500">Kurs</h2>
 					<ul class="mt-3 space-y-2">
-						{#each courses as course}
+						{#each courses as course (course.name)}
 							<li>
 								<p class="font-medium text-slate-800">{course.name}</p>
 								<p class="text-xs text-slate-500">{course.date}</p>
@@ -574,136 +392,28 @@
 
 			<!-- Main column -->
 			<main class="space-y-10 text-sm text-slate-800">
-				<section>
-					<h2 class="text-xs font-semibold uppercase tracking-[0.15em] text-slate-500">
-						Yrkeserfaring
-					</h2>
-					<div class="mt-4 space-y-6 border-l border-slate-200 pl-5">
-						{#each experience as role}
-							<article class="relative pl-4">
-								<div
-									class="absolute left-[-0.6rem] top-2 h-2 w-2 rounded-full bg-sky-500 ring-2 ring-sky-100"
-								></div>
-								<header>
-									<h3 class="font-semibold text-slate-900">{role.title}</h3>
-									{#if role.company}
-										<p class="text-slate-600">
-											{role.company}
-											{#if role.location}&middot; {role.location}{/if}
-										</p>
-									{/if}
-									<p class="text-[0.8rem] text-slate-500">{role.period}</p>
-								</header>
-								{#if role.description}
-									<p class="mt-3 text-slate-700">{role.description}</p>
-								{/if}
-								{#if role.meta}
-									<p class="mt-2 text-xs text-slate-500">
-										<span class="font-semibold text-slate-600">{role.metaLabel}</span>
-										{' '}{role.meta}
-									</p>
-								{/if}
-							</article>
-						{/each}
-					</div>
-				</section>
-
-				<section>
-					<h2 class="text-xs font-semibold uppercase tracking-[0.15em] text-slate-500">
-						Utdanning
-					</h2>
-					<div class="mt-4 space-y-6 border-l border-slate-200 pl-5">
-						{#each education as edu}
-							<article class="relative pl-4">
-								<div
-									class="absolute left-[-0.6rem] top-2 h-2 w-2 rounded-full bg-violet-500 ring-2 ring-violet-100"
-								></div>
-								<header>
-									<h3 class="font-semibold text-slate-900">{edu.title}</h3>
-									{#if edu.company}
-										<p class="text-slate-600">
-											{edu.company}
-											{#if edu.location}&middot; {edu.location}{/if}
-										</p>
-									{/if}
-									<p class="text-[0.8rem] text-slate-500">{edu.period}</p>
-								</header>
-								{#if edu.description}
-									<p class="mt-3 text-slate-700">{edu.description}</p>
-								{/if}
-								{#if edu.thesisTitle || edu.thesisDescription}
-									<p class="mt-1 text-slate-700">
-										{#if edu.thesisTitle}
-											<span class="font-semibold">{edu.thesisTitle}</span>
-										{/if}
-										{#if edu.thesisDescription}
-											{' '}{edu.thesisDescription}
-										{/if}
-									</p>
-								{/if}
-								{#if edu.bullets}
-									<ul class="mt-3 list-inside list-disc space-y-1">
-										{#each edu.bullets as bullet}
-											<li>{bullet}</li>
-										{/each}
-									</ul>
-								{/if}
-							</article>
-						{/each}
-					</div>
-				</section>
-
-				<section>
-					<h2 class="text-xs font-semibold uppercase tracking-[0.15em] text-slate-500">
-						Praksisplasser
-					</h2>
-					<div class="mt-4 space-y-3 border-l border-slate-200 pl-5">
-						{#each internships as internship}
-							<article class="relative pl-4">
-								<div
-									class="absolute left-[-0.6rem] top-2 h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-emerald-100"
-								></div>
-								<header>
-									<h3 class="font-semibold text-slate-900">{internship.title}</h3>
-									{#if internship.company}
-										<p class="text-slate-600">
-											{internship.company}
-											{#if internship.location}&middot; {internship.location}{/if}
-										</p>
-									{/if}
-									<p class="text-[0.8rem] text-slate-500">{internship.period}</p>
-								</header>
-							</article>
-						{/each}
-					</div>
-				</section>
-
-				<section>
-					<h2 class="text-xs font-semibold uppercase tracking-[0.15em] text-slate-500">
-						Utenomfaglige aktiviteter
-					</h2>
-					<div class="mt-4 space-y-3 border-l border-slate-200 pl-5">
-						{#each activities as activity}
-							<article class="relative pl-4">
-								<div
-									class="absolute left-[-0.6rem] top-2 h-2 w-2 rounded-full bg-amber-500 ring-2 ring-amber-100"
-								></div>
-								<header>
-									<h3 class="font-semibold text-slate-900">{activity.title}</h3>
-									{#if activity.company}
-										<p class="text-slate-600">
-											{activity.company}
-											{#if activity.location}&middot; {activity.location}{/if}
-										</p>
-									{/if}
-									<p class="text-[0.8rem] text-slate-500">{activity.period}</p>
-								</header>
-
-								{activity.description}
-							</article>
-						{/each}
-					</div>
-				</section>
+				<CvTimelineSection
+					title="Yrkeserfaring"
+					entries={experience}
+					dotClass="bg-sky-500 ring-2 ring-sky-100"
+				/>
+				<CvTimelineSection
+					title="Utdanning"
+					entries={education}
+					dotClass="bg-violet-500 ring-2 ring-violet-100"
+				/>
+				<CvTimelineSection
+					title="Praksisplasser"
+					entries={internships}
+					dotClass="bg-emerald-500 ring-2 ring-emerald-100"
+					compact
+				/>
+				<CvTimelineSection
+					title="Utenomfaglige aktiviteter"
+					entries={activities}
+					dotClass="bg-amber-500 ring-2 ring-amber-100"
+					compact
+				/>
 
 				<section>
 					<h2 class="text-xs font-semibold uppercase tracking-[0.15em] text-slate-500">

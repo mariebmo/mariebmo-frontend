@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { KnittingAction } from './interfaces';
 	import { knittingCalculations } from './knitting.svelte';
+	import { SvelteMap } from 'svelte/reactivity';
 
 	let shorthandOutput = $derived(printShorthand(knittingCalculations.actions));
 
@@ -15,7 +16,7 @@
 
 	// Pre-compute color assignments for all actions
 	let actionColorMap = $derived.by(() => {
-		const map = new Map<string, number>();
+		const map = new SvelteMap<string, number>();
 		let nextColorIndex = 0;
 
 		for (const action of knittingCalculations.actions) {
@@ -88,7 +89,7 @@
 
 			<!-- Badge-style view -->
 			<div class="flex flex-wrap gap-2">
-				{#each knittingCalculations.actions as action, index}
+				{#each knittingCalculations.actions as action, index (index)}
 					{#if action.count > 1}
 						<div
 							class="inline-flex items-center gap-2 px-3 py-2 rounded-lg border-2 {getActionColor(

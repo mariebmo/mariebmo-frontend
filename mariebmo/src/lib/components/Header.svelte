@@ -14,7 +14,7 @@
 		{/if}
 	</div>
 
-	<a href="/" aria-label="Go to homepage">
+	<a href="/" aria-label="Go to homepage" data-sveltekit-preload-data="hover">
 		<Logo />
 	</a>
 
