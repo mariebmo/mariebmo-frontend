@@ -6,8 +6,8 @@
 	let currentRepetitionIndex = $state(0);
 	let isInFullscreen = $state(false);
 
-	// Flatten all repetitions from all actions for global progression
-	let allRepetitions = $derived(() => {
+	// Flatten all repetitions from all actions for global progression (reserved for future use)
+	let _allRepetitions = $derived(() => {
 		const repetitions: Array<{
 			actionIndex: number;
 			repetitionIndex: number;

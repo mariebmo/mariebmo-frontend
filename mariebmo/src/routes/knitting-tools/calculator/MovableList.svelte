@@ -11,7 +11,7 @@
 
 	interface ComponentItem {
 		id: string;
-		component: Component<any, any, any>;
+		component: Component;
 		visible: boolean;
 		name: string;
 	}

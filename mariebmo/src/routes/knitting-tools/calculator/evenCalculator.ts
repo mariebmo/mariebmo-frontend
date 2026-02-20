@@ -216,12 +216,12 @@ export function combineActions(
 	let outerMaxIterations = MAX_ITERATIONS;
 
 	while (index < groups.length && outerMaxIterations-- > 0) {
-		let lookAheadIndex = 1;
+		const lookAheadIndex = 1;
 		let possibleMatches: Array<{ group: ActionGroup[]; count: number }> = [];
 		let hasAMatch = false;
 
 		// Check if the last result can be extended (similar to old lastAction logic)
-		let lastResult = result[result.length - 1];
+		const lastResult = result[result.length - 1];
 		if (lastResult?.group != null) {
 			const patternLength = lastResult.group.length;
 			if (index + patternLength <= groups.length) {
@@ -490,9 +490,9 @@ function processMatchedPattern(
 }
 
 /**
- * Helper function to combine multiple groups into one
+ * Helper function to combine multiple groups into one (reserved for future use)
  */
-function combineGroups(groups: ActionGroup[]): ActionGroup {
+function _combineGroups(groups: ActionGroup[]): ActionGroup {
 	const result: ActionGroup = {};
 
 	for (const group of groups) {

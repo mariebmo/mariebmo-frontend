@@ -1,8 +1,6 @@
 <script lang="ts">
 	import KnittingActionChecklistElement from './KnittingActionChecklistElement.svelte';
 	import { knittingCalculations } from './knitting.svelte';
-
-	$inspect(knittingCalculations.actions);
 </script>
 
 <div>

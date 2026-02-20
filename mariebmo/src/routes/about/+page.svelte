@@ -50,7 +50,7 @@
 			</h2>
 
 			<div class="flex flex-wrap justify-center gap-4">
-				{#each socials as social}
+				{#each socials as social (social.name)}
 					<a
 						href={social.url}
 						target="_blank"

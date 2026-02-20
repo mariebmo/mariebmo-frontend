@@ -7,7 +7,7 @@
 	import { inject } from '@vercel/analytics';
 
 	interface Props {
-		children?: Snippet<[any]>;
+		children?: Snippet<[Record<string, unknown>]>;
 	}
 
 	let { children }: Props = $props();

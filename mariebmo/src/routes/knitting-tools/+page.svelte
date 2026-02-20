@@ -41,7 +41,7 @@
 
 	<!-- Tools List -->
 	<div class="space-y-6">
-		{#each tools as tool}
+		{#each tools as tool (tool.link)}
 			<a href={tool.link} class="group block">
 				<div
 					class="flex items-center gap-6 p-6 {getCardClasses({
