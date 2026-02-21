@@ -1,12 +1,14 @@
 /**
  * Educational / experience projects from https://github.com/mariebmo-edu
  * Used on the About → Experience page.
+ *
+ * Tags can be: languages, themes (frontend/backend/fullstack/etc.), frameworks and packages.
  */
 
 export interface ExperienceProject {
 	/** Display headline, e.g. "2020: PGR103, Kreativt Webprosjekt, EKSAMEN (A)" */
 	headline: string;
-	/** Tech stack tags shown as badges */
+	/** Tech stack tags: languages, themes, frameworks/packages */
 	tags: string[];
 	/** GitHub repo URL */
 	repoUrl: string;
@@ -16,12 +18,38 @@ export interface ExperienceProject {
 	howItIsBuilt: string;
 }
 
+/**
+ * Map tag label → Devicon font class (devicon.dev).
+ * Use with: <i class="{TAG_DEVICON_MAP[tag]} colored"></i>
+ * Tags not in the map render as text-only.
+ */
+export const TAG_DEVICON_MAP: Record<string, string> = {
+	HTML: 'devicon-html5-plain',
+	CSS: 'devicon-css3-plain',
+	Java: 'devicon-java-plain',
+	'C#': 'devicon-csharp-plain',
+	C: 'devicon-c-plain',
+	Kotlin: 'devicon-kotlin-plain',
+	JavaScript: 'devicon-javascript-plain',
+	TypeScript: 'devicon-typescript-plain',
+	Spring: 'devicon-spring-plain',
+	'Spring Boot': 'devicon-spring-plain',
+	Docker: 'devicon-docker-plain',
+	AWS: 'devicon-amazonwebservices-plain-wordmark',
+	Terraform: 'devicon-terraform-plain',
+	Android: 'devicon-android-plain',
+	Linux: 'devicon-linux-plain',
+	'GitHub Actions': 'devicon-githubactions-plain',
+	MongoDB: 'devicon-mongodb-plain',
+	Node: 'devicon-nodejs-plain'
+};
+
 const GITHUB_ORG = 'https://github.com/mariebmo-edu';
 
 export const experienceProjects: ExperienceProject[] = [
 	{
 		headline: '2020: PGR103, Kreativt Webprosjekt, EKSAMEN (A)',
-		tags: ['HTML', 'CSS'],
+		tags: ['HTML', 'CSS', 'frontend'],
 		repoUrl: `${GITHUB_ORG}/pro105-kreativt-webprosjekt-Eksamen`,
 		description:
 			'Fishavdisor — kreativt webprosjekt. Eksamensprosjekt i faget Kreativt Webprosjekt, første semester.',
@@ -30,7 +58,7 @@ export const experienceProjects: ExperienceProject[] = [
 	},
 	{
 		headline: '2020: PGR102, Intro til Programmering, EKSAMEN (Godkjent)',
-		tags: ['HTML'],
+		tags: ['HTML', 'frontend'],
 		repoUrl: `${GITHUB_ORG}/pgr102-intro-til-programmering-eksamen-h2022`,
 		description:
 			'Løsningsforslag og oppgaver fra introduksjon til programmering. Grunnleggende programmeringskonsepter og problemløsning.',
@@ -39,7 +67,7 @@ export const experienceProjects: ExperienceProject[] = [
 	},
 	{
 		headline: '2021: PRO104, Webprosjekt, EKSAMEN (Godkjent)',
-		tags: ['HTML', 'CSS'],
+		tags: ['HTML', 'CSS', 'frontend'],
 		repoUrl: `${GITHUB_ORG}/pro104-webprosjekt-eksamen`,
 		description: 'Eksamensprosjekt våren 2021 i Webprosjekt. Fullført webprosjekt med planlegging og implementasjon.',
 		howItIsBuilt:
@@ -47,7 +75,7 @@ export const experienceProjects: ExperienceProject[] = [
 	},
 	{
 		headline: '2021: PGR103, Objektorientert Programmering, EKSAMEN (Godkjent)',
-		tags: ['Java'],
+		tags: ['Java', 'backend', 'OOP'],
 		repoUrl: `${GITHUB_ORG}/PGR112-objektorientert-programmering-eksamen-v2023`,
 		description:
 			'Eksamen i objektorientert programmering. Klasser, arv, polymorfisme, innkapsling og design av Java-applikasjoner.',
@@ -56,7 +84,7 @@ export const experienceProjects: ExperienceProject[] = [
 	},
 	{
 		headline: '2022: PG3302, Software Design, EKSAMEN (A)',
-		tags: ['C#'],
+		tags: ['C#', 'backend', 'design patterns'],
 		repoUrl: `${GITHUB_ORG}/pg3302-software-design-eksamen`,
 		description:
 			'Eksamen i software design. Designmønstre, arkitektur og skalerbare løsninger i C#.',
@@ -65,7 +93,7 @@ export const experienceProjects: ExperienceProject[] = [
 	},
 	{
 		headline: '2022: PG4200, Algoritmer og Datastrukturer, EKSAMEN (A)',
-		tags: ['Java', 'Algoritmer'],
+		tags: ['Java', 'backend', 'algorithms', 'data structures'],
 		repoUrl: GITHUB_ORG,
 		description:
 			'Eksamen i algoritmer og datastrukturer. Analyse av kjøretid, grafer, sortering, søk og datastrukturer.',
@@ -74,7 +102,7 @@ export const experienceProjects: ExperienceProject[] = [
 	},
 	{
 		headline: '2022: PGR203, Avansert Java, EKSAMEN (B)',
-		tags: ['Java', 'Spring'],
+		tags: ['Java', 'Spring Boot', 'backend', 'REST API', 'JPA'],
 		repoUrl: GITHUB_ORG,
 		description:
 			'Eksamen i avansert Java. Backend-utvikling, Spring, REST API og persistering.',
@@ -83,7 +111,7 @@ export const experienceProjects: ExperienceProject[] = [
 	},
 	{
 		headline: '2023: PG5100, Enterprise 1, EKSAMEN (A)',
-		tags: ['Java', 'Enterprise'],
+		tags: ['Java', 'Spring', 'backend', 'Jakarta EE', 'REST API'],
 		repoUrl: GITHUB_ORG,
 		description:
 			'Eksamen i Enterprise 1. Bygge enterprise-løsninger med Java EE / Jakarta EE og moderne arkitektur.',
@@ -92,7 +120,7 @@ export const experienceProjects: ExperienceProject[] = [
 	},
 	{
 		headline: '2023: PGR208, Android Programmering, EKSAMEN (A)',
-		tags: ['Kotlin', 'Android'],
+		tags: ['Kotlin', 'Android', 'mobile', 'Android SDK', 'Room', 'ViewModel'],
 		repoUrl: GITHUB_ORG,
 		description:
 			'Eksamen i Android-programmering. Native mobilapp med Kotlin og Android SDK.',
@@ -101,7 +129,7 @@ export const experienceProjects: ExperienceProject[] = [
 	},
 	{
 		headline: '2023: PGR6301, Webutvikling & API-design, EKSAMEN (A)',
-		tags: ['JavaScript', 'API', 'Web'],
+		tags: ['JavaScript', 'fullstack', 'REST API', 'frontend', 'backend', 'Node'],
 		repoUrl: GITHUB_ORG,
 		description:
 			'Eksamen i webutvikling og API-design. Fullstack web med moderne rammeverk og RESTful API.',
@@ -110,7 +138,16 @@ export const experienceProjects: ExperienceProject[] = [
 	},
 	{
 		headline: '2023: PGR301, DevOps i Skyen, EKSAMEN (A)',
-		tags: ['AWS', 'Terraform', 'Docker', 'CI/CD'],
+		tags: [
+			'AWS',
+			'Terraform',
+			'Docker',
+			'GitHub Actions',
+			'infrastructure as code',
+			'CI/CD',
+			'Lambda',
+			'CloudWatch'
+		],
 		repoUrl: `${GITHUB_ORG}/pg301-devops-i-skyen-eksamen`,
 		description:
 			'Eksamen i DevOps i skyen. GitHub Actions, Lambda, SAM, Docker, Terraform og CloudWatch.',
@@ -119,7 +156,7 @@ export const experienceProjects: ExperienceProject[] = [
 	},
 	{
 		headline: '2023: PG3401, Programmering i C for Linux, EKSAMEN (B)',
-		tags: ['C', 'Linux'],
+		tags: ['C', 'Linux', 'backend', 'systems programming', 'gcc', 'Make'],
 		repoUrl: `${GITHUB_ORG}/pg3401-c-for-linux-eksamen`,
 		description: 'Eksamen i C for Linux. Systemnær programmering, minnehåndtering og Linux-miljø.',
 		howItIsBuilt:
