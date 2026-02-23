@@ -27,7 +27,9 @@ import type {
 	BookInfoResponse
 } from './types';
 
-const API_BASE = dev ? 'http://localhost:5001' : 'https://api.mariebmo.io';
+const API_BASE =
+	(typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_URL) ||
+	(dev ? 'http://localhost:5001' : 'https://api.mariebmo.io');
 const BASE = '/api/book-clubs';
 
 async function getToken(): Promise<string | null> {

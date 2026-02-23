@@ -349,13 +349,16 @@
 				{#if showAddBook}
 					<section class="mt-6 rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-800">
 						<h2 class="mb-3 text-lg font-semibold text-slate-800 dark:text-slate-100">Add book</h2>
+						<p class="mb-2 text-sm text-slate-600 dark:text-slate-400">
+							Paste the book page URL or ISBN. If you paste a whole line (e.g. title + URL), the URL is picked out automatically.
+						</p>
 						<div class="mb-3 flex gap-2">
 							<input
-								type="url"
+								type="text"
 								bind:value={addBookFetchUrl}
-								placeholder="Paste Goodreads / Open Library / Google Books URL or ISBN"
+								placeholder="e.g. https://www.goodreads.com/book/show/12345 or 9780141439518"
 								class="min-w-0 flex-1 rounded-lg border border-slate-300 px-3 py-2 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-								aria-label="URL or ISBN to fetch book info"
+								aria-label="Book page URL or ISBN to fetch book info"
 							/>
 							<button
 								type="button"
