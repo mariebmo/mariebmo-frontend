@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { auth } from '$lib/auth';
 
@@ -8,6 +9,7 @@
 	let isSubmitting = $state(false);
 
 	const canSubmit = $derived(email.length > 0 && password.length >= 8 && !isSubmitting);
+	const redirectTo = $derived($page.url.searchParams.get('redirect'));
 
 	async function handleSubmit(event: SubmitEvent) {
 		event.preventDefault();
@@ -25,7 +27,8 @@
 		isSubmitting = false;
 
 		if (success) {
-			goto('/');
+			const target = redirectTo && redirectTo.startsWith('/') ? redirectTo : '/';
+			goto(target);
 		}
 	}
 

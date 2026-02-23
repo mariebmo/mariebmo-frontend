@@ -10,6 +10,14 @@
 			color: ProjectCardColor.RED,
 			link: '/knitting-tools',
 			showWhenExpanded: null
+		},
+		{
+			title: 'Bookclub',
+			description: 'Book club app — reading lists and discussions.',
+			icon: 'menu_book',
+			color: ProjectCardColor.PINK,
+			link: '/bookclub',
+			showWhenExpanded: null
 		}
 	];
 </script>
