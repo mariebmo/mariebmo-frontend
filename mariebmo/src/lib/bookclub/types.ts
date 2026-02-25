@@ -109,15 +109,36 @@ export interface NoteDto {
 	updatedAt: string;
 }
 
+/** Book the user is currently reading (joined) in a club, with due date and progress for display. */
+export interface CurrentBookEntry {
+	clubId: string;
+	clubName: string;
+	book: BookDto;
+	dueDate: string | null;
+	progressPercent: number | null;
+}
+
 export interface BookClubListResponse {
 	clubs: BookClubDto[];
+}
+
+export interface PastBookWithMyRatingDto {
+	book: BookDto;
+	myRating: number | null;
 }
 
 export interface BookClubDetailResponse {
 	club: BookClubDto;
 	members: BookClubMemberDto[];
 	currentBook: BookDto | null;
-	pastBooks: BookDto[];
+	pastBooks: PastBookWithMyRatingDto[];
+}
+
+export interface DiscussionPointDto {
+	id: string;
+	text: string;
+	sortOrder: number;
+	createdAt: string;
 }
 
 export interface BookDetailResponse {
@@ -126,6 +147,7 @@ export interface BookDetailResponse {
 	ratings: BookRatingDto[];
 	myProgress: MemberBookProgressDto | null;
 	dnfVoteCount: number;
+	discussionPoints?: DiscussionPointDto[];
 }
 
 export interface CreateBookClubRequest {
@@ -239,5 +261,6 @@ export const ReadingFormat = {
 export const JoinStatus = {
 	NotSet: 'notset',
 	Joined: 'joined',
-	Skipping: 'skipping'
+	Skipping: 'skipping',
+	Finished: 'finished'
 } as const;

@@ -5,7 +5,21 @@
 	import { auth } from '$lib/auth';
 	import { BOOKCLUB_BASE_PATH } from '$lib/bookclub/config';
 	import { bookclubApi } from '$lib/bookclub/api';
-	import type { BookClubDetailResponse, BookDto } from '$lib/bookclub/types';
+	import type { BookClubDetailResponse } from '$lib/bookclub/types';
+	import { JoinStatus } from '$lib/bookclub/types';
+	import { viewAsRole } from '$lib/bookclub/viewAsRole';
+	import {
+		AddBookForm,
+		BookclubBreadcrumb,
+		ClubHeroCard,
+		ClubSettingsForm,
+		CurrentlyReadingSection,
+		HelpFloatingButton,
+		MeetingScheduleCard,
+		MembersList,
+		PastBooksGrid,
+		PastBooksSidebar
+	} from '$lib/bookclub/components';
 
 	const clubId = $derived($page.params.clubId as string);
 	const base = $derived(BOOKCLUB_BASE_PATH || '/');
@@ -14,7 +28,6 @@
 	let loading = $state(true);
 	let error = $state<string | null>(null);
 
-	// Add book (admin)
 	let showAddBook = $state(false);
 	let addTitle = $state('');
 	let addAuthor = $state('');
@@ -26,7 +39,6 @@
 	let addBookSubmitting = $state(false);
 	let addBookError = $state<string | null>(null);
 
-	// Club settings (admin)
 	let showSettings = $state(false);
 	let settingsName = $state('');
 	let settingsDescription = $state('');
@@ -43,6 +55,50 @@
 	let settingsError = $state<string | null>(null);
 
 	let inviteCopyDone = $state(false);
+	let currentBookProgressSubmitting = $state(false);
+
+	const club = $derived(data?.club ?? null);
+	const me = $derived(data?.members?.find((m) => m.userId === auth.user?.id) ?? null);
+	const myJoinStatus = $derived(
+		me?.currentBookProgress?.joinStatus?.toLowerCase() ?? JoinStatus.NotSet
+	);
+
+	const nextMeetingDate = $derived(
+		data?.currentBook?.meetup?.scheduledAt
+			? new Date(data.currentBook.meetup.scheduledAt).toLocaleDateString(undefined, {
+					month: 'long',
+					day: 'numeric',
+					year: 'numeric'
+				})
+			: null
+	);
+	const scheduleLabel = $derived(
+		data?.currentBook?.meetup?.notes ?? club?.theme ?? 'See book page for details'
+	);
+	const themeTags = $derived(
+		club?.theme
+			? club.theme
+					.split(/[,&]|\s+and\s+/i)
+					.map((t) => t.trim())
+					.filter(Boolean)
+			: []
+	);
+
+	const isAdmin = $derived(!!club && auth.user?.id === club.adminId);
+	let viewAsRoleValue = $state<'admin' | 'member'>('admin');
+	$effect(() => {
+		const unsub = viewAsRole.subscribe((v) => {
+			viewAsRoleValue = v;
+		});
+		return unsub;
+	});
+	const effectiveIsAdmin = $derived(isAdmin && viewAsRoleValue !== 'member');
+
+	const inviteUrl = $derived(
+		typeof window !== 'undefined' && club?.inviteSlug
+			? `${window.location.origin}${base}/join/${encodeURIComponent(club.inviteSlug)}`
+			: ''
+	);
 
 	async function loadData() {
 		const res = await bookclubApi.getClubDetail(clubId);
@@ -74,15 +130,6 @@
 			loading = false;
 		}
 	});
-
-	const club = $derived(data?.club ?? null);
-	const isAdmin = $derived(!!club && auth.user?.id === club.adminId);
-
-	const inviteUrl = $derived(
-		typeof window !== 'undefined' && club?.inviteSlug
-			? `${window.location.origin}${base}/join/${encodeURIComponent(club.inviteSlug)}`
-			: ''
-	);
 
 	function copyInviteLink() {
 		if (!inviteUrl) return;
@@ -164,6 +211,17 @@
 		}
 	}
 
+	async function setMyParticipation(joinStatus: string) {
+		if (!data?.currentBook) return;
+		currentBookProgressSubmitting = true;
+		try {
+			await bookclubApi.setMyProgress(clubId, data.currentBook.id, { joinStatus });
+			await loadData();
+		} finally {
+			currentBookProgressSubmitting = false;
+		}
+	}
+
 	async function removeMember(memberId: string) {
 		if (!confirm('Remove this member from the club?')) return;
 		try {
@@ -179,350 +237,128 @@
 	<title>{club?.name ?? 'Club'} | Bookclub</title>
 </svelte:head>
 
-<div class="mx-auto max-w-4xl px-4 py-8 sm:px-6">
+<div class="min-h-full bg-amber-50/60 dark:bg-slate-900">
 	{#if loading}
-		<p class="text-slate-600 dark:text-slate-400">Loading...</p>
-	{:else if error || !data}
-		<div
-			class="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700 dark:border-red-800 dark:bg-red-900/30 dark:text-red-400"
-			role="alert"
-		>
-			{error ?? 'Club not found'}
+		<div class="mx-auto max-w-5xl px-4 py-12 sm:px-6">
+			<p class="text-slate-600 dark:text-slate-400">Loading...</p>
 		</div>
-		<p class="mt-4">
-			<a href={base} class="text-slate-600 underline dark:text-slate-400">Back to bookclub</a>
-		</p>
-	{:else}
-		<header class="mb-8">
-			<a href={base} class="mb-4 inline-block text-sm text-slate-600 dark:text-slate-400 hover:underline">
-				← My clubs
-			</a>
-			<h1 class="text-2xl font-bold text-slate-900 dark:text-white">{club!.name}</h1>
-			{#if club!.theme}
-				<p class="mt-1 text-slate-500 dark:text-slate-400">{club!.theme}</p>
-			{/if}
-			{#if club!.description}
-				<p class="mt-2 text-slate-600 dark:text-slate-300">{club!.description}</p>
-			{/if}
-			<p class="mt-2 text-sm text-slate-500 dark:text-slate-400">
-				{data.members.length} member{data.members.length === 1 ? '' : 's'}
-			</p>
-
-			<!-- Invite link -->
-			{#if club!.inviteSlug}
-				<div class="mt-4 flex flex-wrap items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 p-3 dark:border-slate-600 dark:bg-slate-800/50">
-					<span class="text-sm text-slate-600 dark:text-slate-400">Invite link:</span>
-					<code class="flex-1 truncate rounded bg-white px-2 py-1 text-sm dark:bg-slate-800">{inviteUrl}</code>
-					<button
-						type="button"
-						onclick={copyInviteLink}
-						class="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600"
-						aria-label="Copy invite link"
-					>
-						{inviteCopyDone ? 'Copied!' : 'Copy'}
-					</button>
-				</div>
-			{/if}
-
-			<!-- Admin: Settings & Add book -->
-			{#if isAdmin}
-				<div class="mt-4 flex flex-wrap gap-2">
-					<button
-						type="button"
-						onclick={() => (showSettings = !showSettings)}
-						class="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
-					>
-						{showSettings ? 'Hide settings' : 'Club settings'}
-					</button>
-					<button
-						type="button"
-						onclick={() => (showAddBook = !showAddBook)}
-						class="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
-					>
-						{showAddBook ? 'Cancel' : 'Add book'}
-					</button>
-				</div>
-
-				{#if showSettings}
-					<section class="mt-6 rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-800">
-						<h2 class="mb-3 text-lg font-semibold text-slate-800 dark:text-slate-100">Club settings</h2>
-						{#if settingsError}
-							<p class="mb-3 text-sm text-red-600 dark:text-red-400" role="alert">{settingsError}</p>
-						{/if}
-						<form onsubmit={submitSettings} class="space-y-3">
-							<div>
-								<label for="settings-name" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Name</label>
-								<input
-									id="settings-name"
-									type="text"
-									bind:value={settingsName}
-									maxlength={100}
-									class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-								/>
-							</div>
-							<div>
-								<label for="settings-desc" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Description</label>
-								<textarea
-									id="settings-desc"
-									bind:value={settingsDescription}
-									rows={2}
-									maxlength={500}
-									class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-								></textarea>
-							</div>
-							<div>
-								<label for="settings-theme" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Theme (e.g. Black history month)</label>
-								<input
-									id="settings-theme"
-									type="text"
-									bind:value={settingsTheme}
-									maxlength={200}
-									class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-								/>
-							</div>
-							<div class="flex items-center gap-2">
-								<input
-									id="settings-public"
-									type="checkbox"
-									bind:checked={settingsIsPublic}
-									class="h-4 w-4 rounded border-slate-300 text-slate-600 dark:border-slate-600 dark:bg-slate-700"
-								/>
-								<label for="settings-public" class="text-sm text-slate-700 dark:text-slate-300">Public club</label>
-							</div>
-							<div>
-								<label for="settings-invite-slug" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Invite slug (for join link)</label>
-								<input
-									id="settings-invite-slug"
-									type="text"
-									bind:value={settingsInviteSlug}
-									placeholder="e.g. my-club"
-									maxlength={100}
-									class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-								/>
-							</div>
-							<div>
-								<label for="settings-invite-pw" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Invite password (optional)</label>
-								<input
-									id="settings-invite-pw"
-									type="password"
-									bind:value={settingsInvitePassword}
-									placeholder="Leave blank to remove"
-									class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-								/>
-							</div>
-							<div class="space-y-2 border-t border-slate-200 pt-3 dark:border-slate-600">
-								<p class="text-sm font-medium text-slate-700 dark:text-slate-300">Features</p>
-								<div class="flex flex-wrap gap-4">
-									<label class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
-										<input type="checkbox" bind:checked={settingsAllowComments} class="rounded border-slate-300" />
-										Comments
-									</label>
-									<label class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
-										<input type="checkbox" bind:checked={settingsAllowRatings} class="rounded border-slate-300" />
-										Ratings
-									</label>
-									<label class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
-										<input type="checkbox" bind:checked={settingsAllowDnfVote} class="rounded border-slate-300" />
-										DNF vote
-									</label>
-									<label class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
-										<input type="checkbox" bind:checked={settingsAllowMeetupVote} class="rounded border-slate-300" />
-										Meetup vote
-									</label>
-									<label class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
-										<input type="checkbox" bind:checked={settingsAllowMeetupDetails} class="rounded border-slate-300" />
-										Meetup details
-									</label>
-								</div>
-							</div>
-							<button
-								type="submit"
-								disabled={settingsSubmitting}
-								class="rounded-lg bg-slate-700 px-4 py-2 text-sm font-medium text-white hover:bg-slate-600 disabled:opacity-50 dark:bg-slate-600 dark:hover:bg-slate-500"
-							>
-								{settingsSubmitting ? 'Saving...' : 'Save settings'}
-							</button>
-						</form>
-					</section>
-				{/if}
-
-				{#if showAddBook}
-					<section class="mt-6 rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-800">
-						<h2 class="mb-3 text-lg font-semibold text-slate-800 dark:text-slate-100">Add book</h2>
-						<p class="mb-2 text-sm text-slate-600 dark:text-slate-400">
-							Paste the book page URL or ISBN. If you paste a whole line (e.g. title + URL), the URL is picked out automatically.
-						</p>
-						<div class="mb-3 flex gap-2">
-							<input
-								type="text"
-								bind:value={addBookFetchUrl}
-								placeholder="e.g. https://www.goodreads.com/book/show/12345 or 9780141439518"
-								class="min-w-0 flex-1 rounded-lg border border-slate-300 px-3 py-2 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-								aria-label="Book page URL or ISBN to fetch book info"
-							/>
-							<button
-								type="button"
-								onclick={fetchBookInfo}
-								disabled={addBookFetching || !addBookFetchUrl.trim()}
-								class="rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
-							>
-								{addBookFetching ? 'Fetching...' : 'Fetch'}
-							</button>
-						</div>
-						{#if addBookError}
-							<p class="mb-3 text-sm text-red-600 dark:text-red-400" role="alert">{addBookError}</p>
-						{/if}
-						<form onsubmit={submitAddBook} class="space-y-3">
-							<div class="grid gap-3 sm:grid-cols-2">
-								<div>
-									<label for="add-title" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Title *</label>
-									<input
-										id="add-title"
-										type="text"
-										bind:value={addTitle}
-										required
-										maxlength={200}
-										class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-									/>
-								</div>
-								<div>
-									<label for="add-author" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Author *</label>
-									<input
-										id="add-author"
-										type="text"
-										bind:value={addAuthor}
-										required
-										maxlength={200}
-										class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-									/>
-								</div>
-							</div>
-							<div class="flex flex-wrap gap-4">
-								<div>
-									<label for="add-cover" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Cover URL</label>
-									<input
-										id="add-cover"
-										type="url"
-										bind:value={addCoverUrl}
-										class="mt-1 w-64 rounded-lg border border-slate-300 px-3 py-2 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-									/>
-								</div>
-								<div>
-									<label for="add-pages" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Page count</label>
-									<input
-										id="add-pages"
-										type="number"
-										min="0"
-										bind:value={addPageCount}
-										class="mt-1 w-24 rounded-lg border border-slate-300 px-3 py-2 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-									/>
-								</div>
-								<div class="flex items-center gap-2 pt-6">
-									<input
-										id="add-current"
-										type="checkbox"
-										bind:checked={addIsCurrent}
-										class="h-4 w-4 rounded border-slate-300 text-slate-600 dark:border-slate-600 dark:bg-slate-700"
-									/>
-									<label for="add-current" class="text-sm text-slate-700 dark:text-slate-300">Set as current book</label>
-								</div>
-							</div>
-							<button
-								type="submit"
-								disabled={addBookSubmitting || !addTitle.trim() || !addAuthor.trim()}
-								class="rounded-lg bg-slate-700 px-4 py-2 text-sm font-medium text-white hover:bg-slate-600 disabled:opacity-50 dark:bg-slate-600 dark:hover:bg-slate-500"
-							>
-								{addBookSubmitting ? 'Adding...' : 'Add book'}
-							</button>
-						</form>
-					</section>
-				{/if}
-			{/if}
-		</header>
-
-		{#if data.currentBook}
-			<section class="mb-8">
-				<h2 class="mb-4 text-lg font-semibold text-slate-800 dark:text-slate-100">Current book</h2>
+	{:else if error || !data}
+		<div class="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+			<div
+				class="rounded-xl border border-red-200 bg-red-50 p-4 text-red-700 dark:border-red-800 dark:bg-red-900/30 dark:text-red-400"
+				role="alert"
+			>
+				{error ?? 'Club not found'}
+			</div>
+			<p class="mt-4">
 				<a
-					href="{base}/{clubId}/books/{data.currentBook.id}"
-					class="block rounded-xl border border-slate-200 bg-white p-4 transition-shadow hover:shadow-md dark:border-slate-700 dark:bg-slate-800"
+					href={base}
+					class="inline-flex items-center gap-1 text-sm font-medium text-slate-600 underline hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
+					aria-label="Back to bookclub hub"
 				>
-					<div class="flex gap-4">
-						{#if data.currentBook.coverImage}
-							<img
-								src={data.currentBook.coverImage}
-								alt=""
-								class="h-24 w-16 shrink-0 rounded object-cover"
-							/>
-						{/if}
-						<div class="min-w-0 flex-1">
-							<h3 class="font-semibold text-slate-900 dark:text-white">{data.currentBook.title}</h3>
-							<p class="text-sm text-slate-600 dark:text-slate-400">{data.currentBook.author}</p>
-							{#if data.currentBook.averageRating != null}
-								<p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
-									★ {data.currentBook.averageRating.toFixed(1)} ({data.currentBook.ratingCount} ratings)
-								</p>
-							{/if}
-						</div>
-						<span class="text-slate-400 dark:text-slate-500" aria-hidden="true">→</span>
-					</div>
+					← Back to Hub
 				</a>
-			</section>
-		{/if}
+			</p>
+		</div>
+	{:else if club}
+		<BookclubBreadcrumb basePath={base} />
 
-		<section class="mb-8">
-			<h2 class="mb-4 text-lg font-semibold text-slate-800 dark:text-slate-100">Members</h2>
-			<ul class="space-y-2" role="list">
-				{#each data.members as member (member.id)}
-					<li
-						class="flex items-center justify-between gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 dark:border-slate-700 dark:bg-slate-800"
-					>
-						<div class="min-w-0 flex-1">
-							<span class="font-medium text-slate-700 dark:text-slate-300">{member.displayName || member.email}</span>
-							<span class="ml-2 text-xs text-slate-500 dark:text-slate-400">
-								{member.role}
-								{#if member.currentBookProgress}
-									· {member.currentBookProgress.joinStatus}
-								{/if}
-							</span>
-						</div>
-						{#if isAdmin && member.userId !== club!.adminId}
-							<button
-								type="button"
-								onclick={() => removeMember(member.id)}
-								class="shrink-0 rounded px-2 py-1 text-xs text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
-								aria-label="Remove member"
-							>
-								Remove
-							</button>
-						{/if}
-					</li>
-				{/each}
-			</ul>
-		</section>
+		<div class="mx-auto max-w-5xl px-4 py-6 sm:px-6">
+			<ClubHeroCard
+				{club}
+				memberCount={data.members.length}
+				nextMeetingLabel={nextMeetingDate ?? scheduleLabel}
+				{scheduleLabel}
+				{effectiveIsAdmin}
+				{showSettings}
+				{showAddBook}
+				{inviteCopyDone}
+				{inviteUrl}
+				onToggleSettings={() => (showSettings = !showSettings)}
+				onToggleAddBook={() => (showAddBook = !showAddBook)}
+				onCopyInvite={copyInviteLink}
+			/>
 
-		{#if data.pastBooks.length > 0}
-			<section>
-				<h2 class="mb-4 text-lg font-semibold text-slate-800 dark:text-slate-100">Past books</h2>
-				<ul class="space-y-2" role="list">
-					{#each data.pastBooks as book (book.id)}
-						<li>
-							<a
-								href="{base}/{clubId}/books/{book.id}"
-								class="block rounded-lg border border-slate-200 bg-white px-4 py-2 dark:border-slate-700 dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700/50"
-							>
-								<span class="font-medium text-slate-700 dark:text-slate-300">{book.title}</span>
-								<span class="text-slate-500 dark:text-slate-400"> — {book.author}</span>
-								{#if book.averageRating != null}
-									<span class="text-sm text-slate-500 dark:text-slate-400">
-										· ★ {book.averageRating.toFixed(1)}
-									</span>
-								{/if}
-							</a>
-						</li>
-					{/each}
-				</ul>
-			</section>
-		{/if}
+			{#if effectiveIsAdmin && showSettings}
+				<ClubSettingsForm
+					name={settingsName}
+					description={settingsDescription}
+					theme={settingsTheme}
+					isPublic={settingsIsPublic}
+					inviteSlug={settingsInviteSlug}
+					invitePassword={settingsInvitePassword}
+					allowComments={settingsAllowComments}
+					allowRatings={settingsAllowRatings}
+					allowDnfVote={settingsAllowDnfVote}
+					allowMeetupVote={settingsAllowMeetupVote}
+					allowMeetupDetails={settingsAllowMeetupDetails}
+					submitting={settingsSubmitting}
+					error={settingsError}
+					onNameChange={(v) => (settingsName = v)}
+					onDescriptionChange={(v) => (settingsDescription = v)}
+					onThemeChange={(v) => (settingsTheme = v)}
+					onIsPublicChange={(v) => (settingsIsPublic = v)}
+					onInviteSlugChange={(v) => (settingsInviteSlug = v)}
+					onInvitePasswordChange={(v) => (settingsInvitePassword = v)}
+					onAllowCommentsChange={(v) => (settingsAllowComments = v)}
+					onAllowRatingsChange={(v) => (settingsAllowRatings = v)}
+					onAllowDnfVoteChange={(v) => (settingsAllowDnfVote = v)}
+					onAllowMeetupVoteChange={(v) => (settingsAllowMeetupVote = v)}
+					onAllowMeetupDetailsChange={(v) => (settingsAllowMeetupDetails = v)}
+					onSubmit={submitSettings}
+				/>
+			{/if}
+
+			{#if effectiveIsAdmin && showAddBook}
+				<AddBookForm
+					fetchUrl={addBookFetchUrl}
+					title={addTitle}
+					author={addAuthor}
+					coverUrl={addCoverUrl}
+					pageCount={addPageCount}
+					isCurrent={addIsCurrent}
+					fetching={addBookFetching}
+					submitting={addBookSubmitting}
+					error={addBookError}
+					onFetchUrlChange={(v) => (addBookFetchUrl = v)}
+					onTitleChange={(v) => (addTitle = v)}
+					onAuthorChange={(v) => (addAuthor = v)}
+					onCoverUrlChange={(v) => (addCoverUrl = v)}
+					onPageCountChange={(v) => (addPageCount = v)}
+					onIsCurrentChange={(v) => (addIsCurrent = v)}
+					onFetch={fetchBookInfo}
+					onSubmit={submitAddBook}
+				/>
+			{/if}
+
+			<div class="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
+				<div class="lg:col-span-2">
+					<CurrentlyReadingSection
+						currentBook={data.currentBook}
+						{club}
+						{themeTags}
+						basePath={base}
+						{clubId}
+						{myJoinStatus}
+						submitting={currentBookProgressSubmitting}
+						{effectiveIsAdmin}
+						onSetParticipation={setMyParticipation}
+						onShowAddBook={() => (showAddBook = true)}
+					/>
+				</div>
+				<aside class="flex flex-col gap-6" aria-label="Club sidebar">
+					<MeetingScheduleCard {nextMeetingDate} {scheduleLabel} />
+					<PastBooksSidebar pastBooks={data.pastBooks} basePath={base} {clubId} />
+				</aside>
+			</div>
+
+			<MembersList members={data.members} {club} {effectiveIsAdmin} onRemoveMember={removeMember} />
+
+			{#if data.pastBooks.length > 0}
+				<PastBooksGrid pastBooks={data.pastBooks} basePath={base} {clubId} />
+			{/if}
+		</div>
+
+		<HelpFloatingButton helpHref={base + '#help'} />
 	{/if}
 </div>
