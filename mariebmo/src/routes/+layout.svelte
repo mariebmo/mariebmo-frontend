@@ -16,9 +16,6 @@
 
 	let { children }: Props = $props();
 
-	/** When true, bookclub is served as a standalone app (no main site header/footer). */
-	const isBookclub = $derived($page.url.pathname.startsWith('/bookclub'));
-
 	inject();
 
 	// Initialize auth store on mount (client-side only)
@@ -30,15 +27,9 @@
 </script>
 
 <div class="flex flex-col h-screen">
-	{#if isBookclub}
-		<main class="flex-grow">
-			{@render children?.({ class: 'h-full' })}
-		</main>
-	{:else}
-		<Header />
-		<main class="flex-grow">
-			{@render children?.({ class: 'h-full' })}
-		</main>
-		<Footer />
-	{/if}
+	<Header />
+	<main class="flex-grow">
+		{@render children?.({ class: 'h-full' })}
+	</main>
+	<Footer />
 </div>
