@@ -4,6 +4,15 @@
 
 	let projects = [
 		{
+			title: 'Feast of the Rings',
+			description:
+				'Watch Lord of the Rings while eating what they eat — plan dishes, shop, and sync with the film.',
+			icon: 'restaurant',
+			color: ProjectCardColor.YELLOW,
+			link: '/feast-of-the-rings',
+			showWhenExpanded: null
+		},
+		{
 			title: 'Knitting Utilities',
 			description: 'Utilities used for knitting, such as calculators and row counters.',
 			icon: 'favorite',
