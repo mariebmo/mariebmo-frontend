@@ -7,6 +7,7 @@ export const TWO_TOWERS_DISHES: Dish[] = [
 		filmId: 'two-towers',
 		name: 'Lembas bread',
 		scene: 'What have we got to eat',
+		kinds: ['food'],
 		sceneRole: 'interaction',
 		tier: 'suggested',
 		timestamps: timestamps('two-towers', 1, '0:08'),
@@ -19,6 +20,7 @@ export const TWO_TOWERS_DISHES: Dish[] = [
 		filmId: 'two-towers',
 		name: 'Orc draught',
 		scene: 'Give him some Medicine',
+		kinds: ['drink'],
 		sceneRole: 'consumed',
 		tier: 'extra',
 		timestamps: timestamps('two-towers', 1, '0:17'),
@@ -31,6 +33,7 @@ export const TWO_TOWERS_DISHES: Dish[] = [
 		filmId: 'two-towers',
 		name: 'Lembas bread',
 		scene: 'Is it Tasty?',
+		kinds: ['food'],
 		sceneRole: 'consumed',
 		tier: 'extra',
 		timestamps: timestamps('two-towers', 1, '0:43'),
@@ -43,6 +46,7 @@ export const TWO_TOWERS_DISHES: Dish[] = [
 		filmId: 'two-towers',
 		name: 'Ent draught',
 		scene: 'I\'ve always been taller than you',
+		kinds: ['drink'],
 		sceneRole: 'consumed',
 		tier: 'suggested',
 		timestamps: timestamps('two-towers', 1, '1:09'),
@@ -55,6 +59,7 @@ export const TWO_TOWERS_DISHES: Dish[] = [
 		filmId: 'two-towers',
 		name: 'Meduseld feast',
 		scene: 'Théoden\'s Halls',
+		kinds: ['food', 'drink'],
 		sceneRole: 'background',
 		tier: 'iconic',
 		timestamps: timestamps('two-towers', 1, '1:29'),
@@ -66,6 +71,26 @@ export const TWO_TOWERS_DISHES: Dish[] = [
 			{ name: 'Sourdough bread', amount: 1, unit: 'loaf' },
 			{ name: 'Roasted chicken', amount: 1, unit: 'piece' },
 			{ name: 'Apple cider', amount: 1, unit: 'bottle' }
+		],
+		suggestions: [
+			{
+				id: 'ttt-theodins-halls-nibble',
+				name: 'Nibble',
+				description: 'One item from the scene — keep it light.',
+				ingredients: [{ name: 'Tomato soup', amount: 1, unit: 'pot' }]
+			},
+			{
+				id: 'ttt-theodins-halls-vegetarian',
+				name: 'Vegetarian spread',
+				description: 'Soup, cheese, bread, and cider — no meat.',
+				dietary: ['vegetarian'],
+				ingredients: [
+					{ name: 'Tomato soup', amount: 1, unit: 'pot' },
+					{ name: 'Swiss cheese', amount: 200, unit: 'g' },
+					{ name: 'Sourdough bread', amount: 1, unit: 'loaf' },
+					{ name: 'Apple cider', amount: 1, unit: 'bottle' }
+				]
+			}
 		]
 	},
 	{
@@ -73,6 +98,7 @@ export const TWO_TOWERS_DISHES: Dish[] = [
 		filmId: 'two-towers',
 		name: 'Rabbit & potato stew',
 		scene: 'Po-ta-toes',
+		kinds: ['food'],
 		sceneRole: 'interaction',
 		tier: 'iconic',
 		timestamps: timestamps('two-towers', 1, '1:41'),
@@ -84,13 +110,15 @@ export const TWO_TOWERS_DISHES: Dish[] = [
 			{ name: 'Carrots', amount: 3, unit: 'piece' },
 			{ name: 'Onion', amount: 2, unit: 'piece' }
 		],
-		recipe: 'Brown rabbit pieces, simmer with chopped potatoes and vegetables until tender — start well before the scene.'
+		recipe:
+			'Brown rabbit pieces, simmer with chopped potatoes and vegetables until tender — start well before the scene.'
 	},
 	{
 		id: 'ttt-helms-deep-soup',
 		filmId: 'two-towers',
 		name: 'Chicken & dumplings',
 		scene: 'Road to Helm\'s Deep',
+		kinds: ['food'],
 		sceneRole: 'interaction',
 		tier: 'suggested',
 		timestamps: timestamps('two-towers', 2, '0:01'),
@@ -107,6 +135,7 @@ export const TWO_TOWERS_DISHES: Dish[] = [
 		filmId: 'two-towers',
 		name: 'Ale',
 		scene: 'For Gondor!',
+		kinds: ['drink'],
 		sceneRole: 'consumed',
 		tier: 'suggested',
 		timestamps: timestamps('two-towers', 2, '0:33'),
@@ -119,6 +148,7 @@ export const TWO_TOWERS_DISHES: Dish[] = [
 		filmId: 'two-towers',
 		name: 'Isengard store room',
 		scene: 'Isengard Store Room',
+		kinds: ['food', 'drink'],
 		sceneRole: 'background',
 		tier: 'suggested',
 		timestamps: timestamps('two-towers', 2, '1:39'),

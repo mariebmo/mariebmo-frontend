@@ -1,16 +1,13 @@
 import type { Dish } from '../types';
 import { timestamps } from '../schedule-utils';
 
-/**
- * Fellowship feast schedule — disc-relative times from the marathon overview,
- * converted to seconds from opening narration (extended/theatrical).
- */
 export const FELLOWSHIP_DISHES: Dish[] = [
 	{
 		id: 'fotr-concerning-hobbits-cupcake',
 		filmId: 'fellowship',
 		name: 'Strawberry cupcake',
 		scene: 'Concerning Hobbits',
+		kinds: ['food'],
 		sceneRole: 'consumed',
 		tier: 'iconic',
 		timestamps: timestamps('fellowship', 1, '0:10', true),
@@ -27,6 +24,7 @@ export const FELLOWSHIP_DISHES: Dish[] = [
 		filmId: 'fellowship',
 		name: 'Gandalf\'s tea spread',
 		scene: 'Very Old Friends',
+		kinds: ['food', 'drink'],
 		sceneRole: 'interaction',
 		tier: 'iconic',
 		timestamps: timestamps('fellowship', 1, '0:15'),
@@ -46,6 +44,7 @@ export const FELLOWSHIP_DISHES: Dish[] = [
 		filmId: 'fellowship',
 		name: 'Birthday party spread',
 		scene: 'Bilbo\'s Birthday',
+		kinds: ['food', 'drink'],
 		sceneRole: 'background',
 		tier: 'iconic',
 		timestamps: timestamps('fellowship', 1, '0:20'),
@@ -62,6 +61,7 @@ export const FELLOWSHIP_DISHES: Dish[] = [
 		filmId: 'fellowship',
 		name: 'Ale',
 		scene: 'To the bottle I go',
+		kinds: ['drink'],
 		sceneRole: 'consumed',
 		tier: 'suggested',
 		timestamps: timestamps('fellowship', 1, '0:35'),
@@ -74,6 +74,7 @@ export const FELLOWSHIP_DISHES: Dish[] = [
 		filmId: 'fellowship',
 		name: 'Apple slices & tea',
 		scene: 'The Ring',
+		kinds: ['food', 'drink'],
 		sceneRole: 'consumed',
 		tier: 'suggested',
 		timestamps: timestamps('fellowship', 1, '0:37'),
@@ -89,6 +90,7 @@ export const FELLOWSHIP_DISHES: Dish[] = [
 		filmId: 'fellowship',
 		name: 'Campfire sausage & pork',
 		scene: 'Camping',
+		kinds: ['food'],
 		sceneRole: 'interaction',
 		tier: 'suggested',
 		timestamps: timestamps('fellowship', 1, '0:45'),
@@ -104,6 +106,7 @@ export const FELLOWSHIP_DISHES: Dish[] = [
 		filmId: 'fellowship',
 		name: 'Carrots',
 		scene: 'Farmer Maggot',
+		kinds: ['food'],
 		sceneRole: 'consumed',
 		tier: 'extra',
 		timestamps: timestamps('fellowship', 1, '0:52'),
@@ -116,6 +119,7 @@ export const FELLOWSHIP_DISHES: Dish[] = [
 		filmId: 'fellowship',
 		name: 'Ale & bread',
 		scene: 'The Prancing Pony',
+		kinds: ['food', 'drink'],
 		sceneRole: 'consumed',
 		tier: 'iconic',
 		timestamps: timestamps('fellowship', 1, '1:00'),
@@ -131,6 +135,7 @@ export const FELLOWSHIP_DISHES: Dish[] = [
 		filmId: 'fellowship',
 		name: 'Second breakfast',
 		scene: '2nd Breakfast',
+		kinds: ['food'],
 		sceneRole: 'consumed',
 		tier: 'iconic',
 		timestamps: timestamps('fellowship', 1, '1:07'),
@@ -146,6 +151,7 @@ export const FELLOWSHIP_DISHES: Dish[] = [
 		filmId: 'fellowship',
 		name: 'Weathertop breakfast',
 		scene: 'Weathertop',
+		kinds: ['food'],
 		sceneRole: 'interaction',
 		tier: 'iconic',
 		timestamps: timestamps('fellowship', 1, '1:11'),
@@ -162,6 +168,7 @@ export const FELLOWSHIP_DISHES: Dish[] = [
 		filmId: 'fellowship',
 		name: 'Brautwurst & French loaf',
 		scene: 'The Ring Goes South',
+		kinds: ['food'],
 		sceneRole: 'consumed',
 		tier: 'suggested',
 		timestamps: timestamps('fellowship', 2, '0:05'),
@@ -177,14 +184,13 @@ export const FELLOWSHIP_DISHES: Dish[] = [
 		filmId: 'fellowship',
 		name: 'Lembas bread',
 		scene: 'Farewell to Lothlórien',
+		kinds: ['food'],
 		sceneRole: 'interaction',
 		tier: 'iconic',
 		timestamps: timestamps('fellowship', 2, '1:02'),
 		prepLeadTimeSeconds: 0,
 		baseServings: 8,
-		ingredients: [
-			{ name: 'Shortbread cookies', amount: 16, unit: 'piece' }
-		],
+		ingredients: [{ name: 'Shortbread cookies', amount: 16, unit: 'piece' }],
 		recipe: 'Use shortbread cookies as lembas — one bite is enough for a long journey.'
 	}
 ];

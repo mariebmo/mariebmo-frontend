@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { feastTheme } from '$lib/feast-of-the-rings/theme';
+	import Tooltip from '$lib/components/Tooltip.svelte';
 	import { getDishTimestamp } from '$lib/feast-of-the-rings/dishes';
 	import { getFilmRuntime } from '$lib/feast-of-the-rings/films';
 	import {
@@ -14,13 +16,14 @@
 		edition: Edition;
 		filmId: FilmId;
 		selectedDishIds: string[];
-		pickerDishes?: Dish[];
 		showCheckboxes?: boolean;
+		highlightSelected?: boolean;
 		currentElapsedSeconds?: number | null;
 		onToggleDish?: (dishId: string) => void;
 		onScrubStart?: () => void;
 		onScrub?: (seconds: number) => void;
 		onScrubEnd?: () => void;
+		onDishClick?: (dishId: string) => void;
 	}
 
 	let {
@@ -28,13 +31,14 @@
 		edition,
 		filmId,
 		selectedDishIds,
-		pickerDishes = [],
 		showCheckboxes = true,
+		highlightSelected = false,
 		currentElapsedSeconds = null,
 		onToggleDish,
 		onScrubStart,
 		onScrub,
-		onScrubEnd
+		onScrubEnd,
+		onDishClick
 	}: Props = $props();
 
 	let isExpanded = $state(false);
@@ -74,6 +78,17 @@
 
 		return labels;
 	});
+
+	function scrollToDishOnPage(dishId: string) {
+		isExpanded = true;
+		onDishClick?.(dishId);
+
+		queueMicrotask(() => {
+			const browseEl = document.getElementById(`feast-dish-${dishId}`);
+			const rowEl = document.getElementById(`feast-dish-row-${dishId}`);
+			(browseEl ?? rowEl)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+		});
+	}
 
 	function scrollToDish(dishId: string) {
 		if (!trackRef) return;
@@ -141,9 +156,6 @@
 		class="rounded-lg border border-dashed border-gray-300 p-8 text-center dark:border-gray-600"
 	>
 		<p class="text-gray-600 dark:text-gray-400">No dishes on the timeline.</p>
-		{#if pickerDishes.length > 0 && showCheckboxes}
-			<p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Add dishes below to build your feast.</p>
-		{/if}
 	</div>
 {:else}
 	<div
@@ -201,7 +213,7 @@
 					{/each}
 
 					<div
-						class="pointer-events-none absolute inset-x-0 top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-amber-200 dark:bg-amber-900/50"
+						class="pointer-events-none absolute inset-x-0 top-1/2 h-1.5 -translate-y-1/2 rounded-full {feastTheme.timeline.track}"
 					></div>
 
 					{#if playheadPercent !== null}
@@ -224,17 +236,30 @@
 							{@const isNext = dish.id === nextDishId}
 							{@const isPast =
 								currentElapsedSeconds !== null && eatAt <= currentElapsedSeconds}
+							{@const isSelected = selectedDishIds.includes(dish.id)}
+							{@const isGhost = highlightSelected && !isSelected}
 
 							<div
-								class="pointer-events-none absolute top-1/2 z-10 -translate-x-1/2 -translate-y-1/2"
+								class="absolute top-1/2 z-10 -translate-x-1/2 -translate-y-1/2"
 								style="left: {percent}%;"
 							>
-								<div
-									class="h-3.5 w-3.5 rounded-full bg-amber-500 ring-2 ring-white dark:ring-gray-800
-										{isNext ? 'scale-125 ring-4 ring-amber-400' : ''}
-										{isPast ? 'opacity-40' : ''}"
-									title="{dish.name} · {formatTimestamp(eatAt)}"
-								></div>
+								<Tooltip
+									label={dish.name}
+									description="Eat {formatTimestamp(eatAt)}"
+									placement="top"
+									class="cursor-pointer"
+									onclick={() => scrollToDishOnPage(dish.id)}
+								>
+									<span
+										class="block rounded-full ring-2 ring-white dark:ring-gray-800
+											{isGhost
+											? `h-2 w-2 opacity-50 ${feastTheme.timeline.markerGhost}`
+											: `h-3.5 w-3.5 ${feastTheme.timeline.marker}`}
+											{isNext ? `scale-125 ring-4 ${feastTheme.timeline.markerRing}` : ''}
+											{highlightSelected && isSelected ? `scale-110 ${feastTheme.timeline.markerRing}` : ''}
+											{isPast && !isGhost ? 'opacity-40' : ''}"
+									></span>
+								</Tooltip>
 							</div>
 						{/if}
 					{/each}
@@ -266,14 +291,16 @@
 					{#each dishes as dish (dish.id)}
 						{@const eatAt = getDishTimestamp(dish, edition)}
 						{#if eatAt !== null}
+							{@const isSelected = selectedDishIds.includes(dish.id)}
 							<TimelineDishRow
 								{dish}
 								{edition}
 								{runtimeSeconds}
 								isNext={dish.id === nextDishId}
 								isPast={currentElapsedSeconds !== null && eatAt <= currentElapsedSeconds}
+								isDimmed={highlightSelected && !isSelected}
 								showCheckbox={showCheckboxes}
-								selected={selectedDishIds.includes(dish.id)}
+								selected={isSelected}
 								onToggle={onToggleDish ? () => onToggleDish(dish.id) : undefined}
 							/>
 						{/if}
@@ -281,25 +308,5 @@
 				</div>
 			{/if}
 		</div>
-	</div>
-{/if}
-
-{#if pickerDishes.length > 0 && showCheckboxes}
-	<div class="mt-4 rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-900/40">
-		<h3 class="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">Add to plan</h3>
-		<ul class="space-y-2">
-			{#each pickerDishes as dish (dish.id)}
-				<li class="flex items-center gap-2">
-					<input
-						type="checkbox"
-						checked={false}
-						onchange={() => onToggleDish?.(dish.id)}
-						class="h-4 w-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
-						aria-label="Add {dish.name} to plan"
-					/>
-					<span class="text-sm text-gray-700 dark:text-gray-300">{dish.name}</span>
-				</li>
-			{/each}
-		</ul>
 	</div>
 {/if}

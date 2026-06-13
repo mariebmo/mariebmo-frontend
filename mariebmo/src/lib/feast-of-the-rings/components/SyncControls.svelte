@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { feastTheme } from '$lib/feast-of-the-rings/theme';
 	import {
 		clampTimestamp,
 		formatCountdown,
@@ -104,7 +105,7 @@
 				inputmode="numeric"
 				autocomplete="off"
 				spellcheck="false"
-				class="w-full max-w-xs rounded-lg border border-amber-300 bg-white px-3 py-2 font-mono text-3xl font-bold text-gray-900 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/30 focus:outline-none dark:border-amber-700 dark:bg-gray-900 dark:text-white"
+				class="w-full max-w-xs rounded-lg border border-rose-300 bg-white px-3 py-2 font-mono text-3xl font-bold text-gray-900 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/30 focus:outline-none dark:border-rose-800 dark:bg-gray-900 dark:text-white"
 				aria-invalid={timeInputError !== null}
 				aria-describedby={timeInputError ? 'elapsed-time-error' : 'elapsed-time-hint'}
 				onkeydown={handleTimeInputKeyDown}
@@ -113,7 +114,7 @@
 		{:else}
 			<button
 				type="button"
-				class="rounded-lg font-mono text-3xl font-bold text-gray-900 transition-colors hover:text-amber-700 focus:ring-2 focus:ring-amber-500/30 focus:outline-none dark:text-white dark:hover:text-amber-400"
+				class="rounded-lg font-mono text-3xl font-bold text-gray-900 transition-colors {feastTheme.watch.textHover} focus:ring-2 focus:ring-rose-500/30 focus:outline-none dark:text-white"
 				aria-label="Set elapsed time, currently {formatTimestamp(elapsedSeconds)}"
 				onclick={startEditingTime}
 			>
@@ -150,7 +151,7 @@
 
 	{#if prepDishName}
 		<div
-			class="mb-4 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-900 dark:bg-amber-900/30 dark:text-amber-100"
+			class="mb-4 rounded-lg px-3 py-2 text-sm {feastTheme.watch.surface} {feastTheme.watch.surfaceText}"
 			role="status"
 		>
 			Start preparing <span class="font-semibold">{prepDishName}</span>
@@ -161,7 +162,7 @@
 		{#if isPlaying}
 			<button
 				type="button"
-				class="rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-white"
+				class="rounded-lg {feastTheme.plan.solid} px-4 py-2 text-sm font-medium hover:opacity-90"
 				onclick={onPause}
 			>
 				Pause
@@ -169,7 +170,7 @@
 		{:else}
 			<button
 				type="button"
-				class="rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white hover:bg-amber-700"
+				class="rounded-lg {feastTheme.watch.solid} px-4 py-2 text-sm font-medium"
 				onclick={onPlay}
 			>
 				Play

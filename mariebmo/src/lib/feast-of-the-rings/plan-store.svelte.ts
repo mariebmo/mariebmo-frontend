@@ -6,6 +6,7 @@ import {
 	getIconicDishIdsForFilms,
 	sortDishesByTimestamp
 } from './dishes';
+import { getDefaultSuggestionId } from './suggestions';
 import type { Dish, Edition, FeastPlan, FilmId, TierFilter } from './types';
 
 const STORAGE_KEY = 'feast-of-the-rings-plan';
@@ -13,13 +14,30 @@ const STORAGE_KEY = 'feast-of-the-rings-plan';
 const DEFAULT_PLAN: FeastPlan = {
 	selectedFilmIds: ['fellowship'],
 	selectedDishIds: [],
+	selectedSuggestions: {},
 	headcount: 4,
 	edition: 'extended',
 	tierFilter: 'all'
 };
 
+function normalizePlan(raw: Partial<FeastPlan>): FeastPlan {
+	return {
+		selectedFilmIds: raw.selectedFilmIds ?? DEFAULT_PLAN.selectedFilmIds,
+		selectedDishIds: raw.selectedDishIds ?? DEFAULT_PLAN.selectedDishIds,
+		selectedSuggestions: raw.selectedSuggestions ?? {},
+		headcount: raw.headcount ?? DEFAULT_PLAN.headcount,
+		edition: raw.edition ?? DEFAULT_PLAN.edition,
+		tierFilter: raw.tierFilter ?? DEFAULT_PLAN.tierFilter
+	};
+}
+
 function loadPlan(): FeastPlan {
-	if (!browser) return { ...DEFAULT_PLAN, selectedDishIds: getIconicDishIdsForFilms(['fellowship'], 'extended') };
+	if (!browser) {
+		return {
+			...DEFAULT_PLAN,
+			selectedDishIds: getIconicDishIdsForFilms(['fellowship'], 'extended')
+		};
+	}
 
 	try {
 		const stored = localStorage.getItem(STORAGE_KEY);
@@ -29,7 +47,7 @@ function loadPlan(): FeastPlan {
 				selectedDishIds: getIconicDishIdsForFilms(['fellowship'], DEFAULT_PLAN.edition)
 			};
 		}
-		return JSON.parse(stored) as FeastPlan;
+		return normalizePlan(JSON.parse(stored) as Partial<FeastPlan>);
 	} catch {
 		return {
 			...DEFAULT_PLAN,
@@ -48,8 +66,22 @@ function savePlan(plan: FeastPlan): void {
 	}
 }
 
+function pruneSuggestions(plan: FeastPlan): void {
+	const next: Record<string, string> = {};
+
+	for (const dishId of plan.selectedDishIds) {
+		const dish = ALL_DISHES.find((entry) => entry.id === dishId);
+		if (!dish) continue;
+
+		next[dishId] = plan.selectedSuggestions[dishId] ?? getDefaultSuggestionId(dish);
+	}
+
+	plan.selectedSuggestions = next;
+}
+
 function createFeastPlanStore() {
 	let plan = $state<FeastPlan>(loadPlan());
+	pruneSuggestions(plan);
 
 	function persist() {
 		savePlan(plan);
@@ -62,6 +94,7 @@ function createFeastPlanStore() {
 			if (!dish) return false;
 			return dish.timestamps[edition] !== null;
 		});
+		pruneSuggestions(plan);
 		persist();
 	}
 
@@ -90,6 +123,7 @@ function createFeastPlanStore() {
 			plan.selectedDishIds = [...new Set([...plan.selectedDishIds, ...iconicIds])];
 		}
 
+		pruneSuggestions(plan);
 		persist();
 	}
 
@@ -98,6 +132,7 @@ function createFeastPlanStore() {
 		plan.selectedFilmIds = allFilmIds;
 		const iconicIds = getIconicDishIdsForFilms(allFilmIds, plan.edition);
 		plan.selectedDishIds = [...new Set([...plan.selectedDishIds, ...iconicIds])];
+		pruneSuggestions(plan);
 		persist();
 	}
 
@@ -106,7 +141,20 @@ function createFeastPlanStore() {
 			plan.selectedDishIds = plan.selectedDishIds.filter((id) => id !== dishId);
 		} else {
 			plan.selectedDishIds = [...plan.selectedDishIds, dishId];
+			const dish = ALL_DISHES.find((entry) => entry.id === dishId);
+			if (dish) {
+				plan.selectedSuggestions[dishId] = getDefaultSuggestionId(dish);
+			}
 		}
+
+		pruneSuggestions(plan);
+		persist();
+	}
+
+	function setSuggestion(dishId: string, suggestionId: string) {
+		if (!plan.selectedDishIds.includes(dishId)) return;
+
+		plan.selectedSuggestions[dishId] = suggestionId;
 		persist();
 	}
 
@@ -136,7 +184,7 @@ function createFeastPlanStore() {
 				plan.selectedFilmIds.includes(dish.filmId) &&
 				dish.timestamps[plan.edition] !== null
 		);
-		return sortDishesByTimestamp(filterDishesByTier(dishes, plan.edition), plan.edition);
+		return sortDishesByTimestamp(filterDishesByTier(dishes, plan.tierFilter), plan.edition);
 	}
 
 	return {
@@ -149,6 +197,7 @@ function createFeastPlanStore() {
 		toggleFilm,
 		selectTrilogy,
 		toggleDish,
+		setSuggestion,
 		isDishSelected,
 		getPlannedDishesForFilm,
 		hasPlannedDishesForFilm,

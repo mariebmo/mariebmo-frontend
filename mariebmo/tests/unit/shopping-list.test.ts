@@ -15,6 +15,14 @@ describe('buildShoppingList', () => {
 
 		expect(ale).toEqual({ name: 'Ale', amount: 8, unit: 'pint' });
 	});
+
+	it('uses selected suggestion ingredients instead of the default dish list', () => {
+		const items = buildShoppingList(['ttt-theodins-halls'], 6, {
+			'ttt-theodins-halls': 'ttt-theodins-halls-nibble'
+		});
+
+		expect(items).toEqual([{ name: 'Tomato soup', amount: 1, unit: 'pot' }]);
+	});
 });
 
 describe('formatShoppingListForClipboard', () => {

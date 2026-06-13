@@ -13,7 +13,7 @@ One of the three Lord of the Rings movies — *The Fellowship of the Ring*, *The
 _Avoid_: Movie, part, installment
 
 **Edition**:
-Either the theatrical cut or the extended edition of a film. Each dish stores separate timestamps per edition where they differ. Extended-only dishes appear only when extended edition is selected.
+Either the theatrical cut or the extended edition of a film. Each dish stores separate timestamps per edition where they differ. Extended-only dishes appear only when extended edition is selected. The companion currently targets extended edition only; theatrical data is retained for a future release.
 _Avoid_: Version, cut, director's cut
 
 **Dish**:
@@ -45,27 +45,42 @@ When a dish appears on screen, measured from the opening narration ("The world i
 _Avoid_: Timecode, marker, cue point
 
 **Watch mode**:
-Viewing one film's timeline during playback, with play sync and a countdown to the next planned dish. Toggled on the same route as Browse; sync controls appear only in Watch.
+Viewing one film's timeline during playback, with play sync and a countdown to the next planned dish. Toggled on the same route as Plan mode; sync controls appear only in Watch.
 
-When the plan includes dishes for this film, Watch shows only those. When it doesn't, the user chooses **All** (full curated timeline with sync) or **None** (empty timeline, sync only).
+When the plan includes dishes for this film, Watch shows only those. When it doesn't, Watch defaults to the full curated timeline — no extra prompt.
 _Avoid_: Play mode, sync mode
 
-**Browse**:
-The full curated timeline for a film — all dishes, grouped by scene role, labelled by tier. No plan filtering applied. Same route as Watch mode, toggled off.
-_Avoid_: Explore, gallery
+**Plan mode**:
+On a film route, choosing which dishes to include and previewing when they happen on the timeline. Same route as Watch mode; dish selection happens here via cards or list.
+
+The timeline shows all curated dishes for the film as faint markers; dishes in the plan are highlighted. Dish browse filters (tier, kind, view) are grouped in a single filter control.
+_Avoid_: Browse, explore, gallery
+
+**Menu**:
+The middle step between planning and watching — what and how you'll serve each selected dish. Covers serving options now; recipes, shopping list, and variations later. Reached from the film page stepper (Plan → Menu → Watch), not a separate planning concept from the persisted **Plan**.
+
+On a film route, Menu shows serving options for that film's selected food dishes only. A cross-film Menu (all films at once) is planned for a later release.
+_Avoid_: Meal plan (confused with Plan)
+
+**Film stepper**:
+The primary navigation on a film route: **Plan → Menu → Watch**, shown as a linked sequence below the film title. All three steps live on the same film route; the user can jump to any step freely. Watch is never blocked if Menu was skipped — serving options default to Standard.
+
+Desktop: three-segment bar. Mobile: text labels with arrows between them.
 
 **Plan**:
-The user's chosen set of dishes across one or more films. Filters each film's watch timeline to planned dishes only, and generates a single shopping list across all selected films. Pre-selects **Iconic** tier dishes; supports tier filtering. Persisted in the browser between visits. Dishes can be added or removed from any timeline view, not only here.
-
-Film scope is chosen explicitly (per film or trilogy shortcut); only selected films' dishes are shown.
+The user's chosen set of dishes across one or more films, plus serving options where defined. Pre-selects **Iconic** tier dishes; supports tier filtering. Persisted in the browser between visits.
 _Avoid_: Menu, selection, playlist
 
 **Sync**:
 Keeping the timeline timer aligned with the film the user is watching elsewhere. The user starts playback manually and can nudge the timer if their copy differs from the curated timestamps. The primary countdown targets the on-screen moment; dishes with prep lead time show a persistent banner when their prep window opens.
 _Avoid_: Play mode, auto-sync
 
+**Serving options**:
+Alternative ways to hit the same on-screen food beat — e.g. a nibble vs a full spread, or a vegetarian take. Part of **Menu** today; chosen per dish after planning.
+_Avoid_: Variant, substitution
+
 **Shopping list**:
-Ingredients aggregated from all dishes in the plan, scaled to a headcount the user specifies. Identical ingredients merge with normalised units (e.g. 500g + 200g → 700g). Copyable to clipboard as plain text.
+Ingredients aggregated from all dishes in the plan, scaled to a headcount. Part of **Menu** in a future release.
 _Avoid_: Grocery list, ingredients list
 
 **Headcount**:

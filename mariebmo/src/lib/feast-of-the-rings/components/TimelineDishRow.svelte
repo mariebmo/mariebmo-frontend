@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { feastTheme } from '$lib/feast-of-the-rings/theme';
 	import { getDishTimestamp } from '$lib/feast-of-the-rings/dishes';
 	import { getPrepStartSeconds, getPositionPercent } from '$lib/feast-of-the-rings/timeline-utils';
 	import { formatTimestamp } from '$lib/feast-of-the-rings/time';
@@ -10,6 +11,7 @@
 		runtimeSeconds: number;
 		isNext?: boolean;
 		isPast?: boolean;
+		isDimmed?: boolean;
 		showCheckbox?: boolean;
 		selected?: boolean;
 		onToggle?: () => void;
@@ -21,6 +23,7 @@
 		runtimeSeconds,
 		isNext = false,
 		isPast = false,
+		isDimmed = false,
 		showCheckbox = false,
 		selected = false,
 		onToggle
@@ -44,9 +47,11 @@
 </script>
 
 <div
-	class="grid grid-cols-[minmax(7rem,9rem)_1fr] items-center gap-3 py-1.5
+	id="feast-dish-row-{dish.id}"
+	class="scroll-mt-24 grid grid-cols-[minmax(7rem,9rem)_1fr] items-center gap-3 py-1.5
 		{isPast ? 'opacity-50' : ''}
-		{isNext ? 'rounded-lg bg-amber-50/80 px-2 dark:bg-amber-900/20' : ''}"
+		{isDimmed ? 'opacity-40' : ''}
+		{isNext ? `rounded-lg px-2 ${feastTheme.timeline.nextRow}` : ''}"
 >
 	<div class="flex min-w-0 items-center gap-2">
 		{#if showCheckbox && onToggle}
@@ -54,13 +59,13 @@
 				type="checkbox"
 				checked={selected}
 				onchange={onToggle}
-				class="h-3.5 w-3.5 shrink-0 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+				class="h-3.5 w-3.5 shrink-0 rounded border-gray-300 {feastTheme.watch.checkbox}"
 				aria-label="Include {dish.name} in plan"
 			/>
 		{/if}
 		<span
 			class="truncate text-sm font-medium text-gray-800 dark:text-gray-200
-				{isNext ? 'text-amber-700 dark:text-amber-300' : ''}"
+				{isNext ? feastTheme.timeline.nextText : ''}"
 			title={dish.name}
 		>
 			{dish.name}
@@ -71,18 +76,18 @@
 		<div class="relative h-3 rounded-full bg-gray-100 dark:bg-gray-900/60">
 			{#if hasPrepWindow}
 				<div
-					class="absolute inset-y-0 rounded-full bg-emerald-400/90 dark:bg-emerald-600/90"
+					class="absolute inset-y-0 rounded-full {feastTheme.timeline.prepBar}"
 					style="left: {prepLeftPercent}%; width: {prepWidthPercent}%;"
 				></div>
 				<div
-					class="absolute top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-600 ring-1 ring-white dark:ring-gray-800"
+					class="absolute top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full {feastTheme.timeline.prepDot} ring-1 ring-white dark:ring-gray-800"
 					style="left: {prepLeftPercent}%;"
 					title="Prep {formatTimestamp(prepStart!)}"
 				></div>
 			{/if}
 
 			<div
-				class="absolute top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-amber-500 ring-1 ring-white dark:ring-gray-800"
+				class="absolute top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full {feastTheme.timeline.marker} ring-1 ring-white dark:ring-gray-800"
 				style="left: {eatPercent}%;"
 				title="Eat {formatTimestamp(eatAt)}"
 			></div>

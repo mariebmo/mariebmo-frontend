@@ -1,5 +1,6 @@
 import { getDishById } from './dishes';
-import type { Dish, Ingredient, ShoppingListItem } from './types';
+import { getSelectedSuggestion, getSuggestionBaseServings } from './suggestions';
+import type { Ingredient, ShoppingListItem } from './types';
 
 function scaleAmount(amount: number, headcount: number, baseServings: number): number {
 	if (baseServings <= 0) return amount;
@@ -14,16 +15,23 @@ function ingredientKey(ingredient: Ingredient): string {
 	return `${ingredient.name.toLowerCase()}::${ingredient.unit.toLowerCase()}`;
 }
 
-export function buildShoppingList(dishIds: string[], headcount: number): ShoppingListItem[] {
+export function buildShoppingList(
+	dishIds: string[],
+	headcount: number,
+	selectedSuggestions: Record<string, string> = {}
+): ShoppingListItem[] {
 	const merged = new Map<string, ShoppingListItem>();
 
 	for (const dishId of dishIds) {
 		const dish = getDishById(dishId);
 		if (!dish) continue;
 
-		for (const ingredient of dish.ingredients) {
+		const suggestion = getSelectedSuggestion(dish, selectedSuggestions[dishId]);
+		const baseServings = getSuggestionBaseServings(dish, suggestion);
+
+		for (const ingredient of suggestion.ingredients) {
 			const key = ingredientKey(ingredient);
-			const scaledAmount = roundAmount(scaleAmount(ingredient.amount, headcount, dish.baseServings));
+			const scaledAmount = roundAmount(scaleAmount(ingredient.amount, headcount, baseServings));
 			const existing = merged.get(key);
 
 			if (existing) {
@@ -51,11 +59,4 @@ export function formatShoppingListForClipboard(items: ShoppingListItem[]): strin
 			return `${amount} ${item.unit} ${item.name}`;
 		})
 		.join('\n');
-}
-
-export function getScaledIngredients(dish: Dish, headcount: number): Ingredient[] {
-	return dish.ingredients.map((ingredient) => ({
-		...ingredient,
-		amount: roundAmount(scaleAmount(ingredient.amount, headcount, dish.baseServings))
-	}));
 }

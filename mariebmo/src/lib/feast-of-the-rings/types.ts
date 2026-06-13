@@ -8,12 +8,32 @@ export type Tier = 'iconic' | 'suggested' | 'extra';
 
 export type TierFilter = Tier | 'all';
 
-export type WatchEmptyScope = 'all' | 'none';
+export type FeastKind = 'food' | 'drink';
+
+export type FilmStep = 'plan' | 'menu' | 'watch';
+
+export type KindFilter = FeastKind | 'all';
+
+export type DishViewMode = 'cards' | 'list';
+
+export type FeastKinds = FeastKind[];
 
 export interface Ingredient {
 	name: string;
 	amount: number;
 	unit: string;
+}
+
+export type DietaryTag = 'vegetarian' | 'vegan';
+
+export interface DishSuggestion {
+	id: string;
+	name: string;
+	description?: string;
+	dietary?: DietaryTag[];
+	ingredients: Ingredient[];
+	recipe?: string;
+	baseServings?: number;
 }
 
 export interface DishTimestamps {
@@ -26,6 +46,7 @@ export interface Dish {
 	filmId: FilmId;
 	name: string;
 	scene: string;
+	kinds: FeastKinds;
 	sceneRole: SceneRole;
 	tier: Tier;
 	timestamps: DishTimestamps;
@@ -34,6 +55,10 @@ export interface Dish {
 	ingredients: Ingredient[];
 	recipe?: string;
 	extendedOnly?: boolean;
+	/** Path to a screenshot of the food in the scene, e.g. `/feast-of-the-rings/scenes/fotr-weathertop.jpg` */
+	sceneImage?: string;
+	/** Alternative ways to serve this beat — nibble, vegetarian, full feast, etc. Standard is always derived from `ingredients`. */
+	suggestions?: DishSuggestion[];
 }
 
 export interface FilmRuntimes {
@@ -53,6 +78,8 @@ export interface Film {
 export interface FeastPlan {
 	selectedFilmIds: FilmId[];
 	selectedDishIds: string[];
+	/** dishId → chosen suggestion id */
+	selectedSuggestions: Record<string, string>;
 	headcount: number;
 	edition: Edition;
 	tierFilter: TierFilter;

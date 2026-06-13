@@ -1,23 +1,38 @@
 <script lang="ts">
+	import { browser } from '$app/environment';
+	import { feastTheme } from '$lib/feast-of-the-rings/theme';
 	import { onDestroy } from 'svelte';
-	import EditionToggle from '$lib/feast-of-the-rings/components/EditionToggle.svelte';
+	import DishBrowse from '$lib/feast-of-the-rings/components/DishBrowse.svelte';
+	import DishFilterMenu from '$lib/feast-of-the-rings/components/DishFilterMenu.svelte';
+	import FeastDetailCard from '$lib/feast-of-the-rings/components/FeastDetailCard.svelte';
+	import FilmStepper from '$lib/feast-of-the-rings/components/FilmStepper.svelte';
 	import SyncControls from '$lib/feast-of-the-rings/components/SyncControls.svelte';
 	import Timeline from '$lib/feast-of-the-rings/components/Timeline.svelte';
 	import { feastPlan } from '$lib/feast-of-the-rings/plan-store.svelte';
 	import { getFilmRuntime } from '$lib/feast-of-the-rings/films';
+	import { getAllSuggestions } from '$lib/feast-of-the-rings/suggestions';
 	import { clampTimestamp } from '$lib/feast-of-the-rings/time';
 	import { getSyncStatus } from '$lib/feast-of-the-rings/sync-utils';
-	import type { WatchEmptyScope } from '$lib/feast-of-the-rings/types';
+	import type { DishViewMode, FilmStep, KindFilter } from '$lib/feast-of-the-rings/types';
 	import type { PageData } from './$types';
+
+	const VIEW_STORAGE_KEY = 'feast-browse-view';
+
+	const STEP_SUBTITLES: Record<FilmStep, string> = {
+		plan: 'Pick dishes — the timeline shows everything, your choices are highlighted.',
+		menu: 'Choose how to serve each food beat before you watch.',
+		watch: 'Press Play when you hear "The world is changed…"'
+	};
 
 	let { data }: { data: PageData } = $props();
 
-	let isWatchMode = $state(false);
-	let watchEmptyScope = $state<WatchEmptyScope>('all');
+	let step = $state<FilmStep>('plan');
 	let isPlaying = $state(false);
 	let elapsedSeconds = $state(0);
 	let offsetSeconds = $state(0);
 	let startedAt = $state<number | null>(null);
+	let kindFilter = $state<KindFilter>('all');
+	let viewMode = $state<DishViewMode>(loadViewMode());
 
 	let intervalId: ReturnType<typeof setInterval> | null = null;
 	let wasPlayingBeforeScrub = false;
@@ -28,21 +43,45 @@
 
 	const allDishes = $derived(feastPlan.getVisibleDishesForFilm(filmId));
 	const plannedDishes = $derived(feastPlan.getPlannedDishesForFilm(filmId));
+	const menuFoodDishes = $derived(
+		plannedDishes.filter((dish) => dish.kinds.includes('food'))
+	);
+	const menuDishesWithOptions = $derived(
+		menuFoodDishes.filter((dish) => getAllSuggestions(dish).length > 1)
+	);
 
-	const timelineDishes = $derived.by(() => {
-		if (plannedDishes.length > 0) return plannedDishes;
-
-		if (watchEmptyScope === 'none') return [];
-		return allDishes;
+	const browseDishes = $derived.by(() => {
+		if (kindFilter === 'all') return allDishes;
+		const kind = kindFilter;
+		return allDishes.filter((dish) => dish.kinds.includes(kind));
 	});
 
-	const pickerDishes = $derived(
-		allDishes.filter((dish) => !feastPlan.plan.selectedDishIds.includes(dish.id))
+	const timelineDishes = $derived(
+		plannedDishes.length > 0 ? plannedDishes : allDishes
 	);
 
 	const syncStatus = $derived(
-		isWatchMode ? getSyncStatus(timelineDishes, edition, elapsedSeconds) : null
+		step === 'watch' ? getSyncStatus(timelineDishes, edition, elapsedSeconds) : null
 	);
+
+	function loadViewMode(): DishViewMode {
+		if (!browser) return 'cards';
+		return localStorage.getItem(VIEW_STORAGE_KEY) === 'list' ? 'list' : 'cards';
+	}
+
+	function setViewMode(mode: DishViewMode) {
+		viewMode = mode;
+		if (browser) {
+			localStorage.setItem(VIEW_STORAGE_KEY, mode);
+		}
+	}
+
+	function handleStepChange(nextStep: FilmStep) {
+		if (step === 'watch' && nextStep !== 'watch') {
+			handleReset();
+		}
+		step = nextStep;
+	}
 
 	function tickElapsed() {
 		if (startedAt === null) return;
@@ -119,13 +158,6 @@
 		}
 	}
 
-	function handleWatchModeToggle() {
-		isWatchMode = !isWatchMode;
-		if (!isWatchMode) {
-			handleReset();
-		}
-	}
-
 	onDestroy(() => {
 		stopInterval();
 	});
@@ -136,91 +168,82 @@
 </svelte:head>
 
 <div class="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
-	<div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-		<div>
-			<h1 class="text-3xl font-bold text-gray-900 dark:text-white">{data.film.title}</h1>
-			<p class="text-sm text-gray-600 dark:text-gray-400">
-				Timestamps from opening narration — press Play when you hear "The world is changed…"
-			</p>
-		</div>
-		<div class="flex flex-wrap items-center gap-3">
-			<EditionToggle
-				edition={feastPlan.plan.edition}
-				onchange={(value) => feastPlan.setEdition(value)}
+	<header class="mb-6">
+		<h1 class="mb-4 text-3xl font-bold text-gray-900 dark:text-white">{data.film.title}</h1>
+
+		<FilmStepper step={step} onchange={handleStepChange} />
+
+		<p class="mt-3 text-sm text-gray-600 dark:text-gray-400">{STEP_SUBTITLES[step]}</p>
+	</header>
+
+	{#if step === 'plan'}
+		<section class="mb-6" aria-label="Feast timeline">
+			<Timeline
+				dishes={allDishes}
+				{edition}
+				{filmId}
+				selectedDishIds={feastPlan.plan.selectedDishIds}
+				highlightSelected={true}
+				showCheckboxes={false}
 			/>
-			<a
-				href="/feast-of-the-rings/plan"
-				class="text-sm font-medium text-amber-700 hover:text-amber-800 dark:text-amber-400"
+		</section>
+
+		<section class="space-y-4" aria-label="Dish selection">
+			<DishFilterMenu
+				tierFilter={feastPlan.plan.tierFilter}
+				{kindFilter}
+				{viewMode}
+				dishCount={browseDishes.length}
+				onTierChange={(filter) => feastPlan.setTierFilter(filter)}
+				onKindChange={(value) => (kindFilter = value)}
+				onViewChange={setViewMode}
+			/>
+
+			<DishBrowse
+				dishes={allDishes}
+				{edition}
+				selectedDishIds={feastPlan.plan.selectedDishIds}
+				{kindFilter}
+				{viewMode}
+				onToggleDish={(id) => feastPlan.toggleDish(id)}
+			/>
+		</section>
+	{:else if step === 'menu'}
+		{#if menuFoodDishes.length === 0}
+			<div
+				class="rounded-lg border border-dashed border-gray-300 p-8 text-center dark:border-gray-600"
 			>
-				Edit plan
-			</a>
-		</div>
-	</div>
-
-	<div class="mb-6 flex items-center gap-2">
-		<button
-			type="button"
-			class="rounded-lg px-4 py-2 text-sm font-medium transition-colors
-				{!isWatchMode
-				? 'bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-900'
-				: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200'}"
-			aria-pressed={!isWatchMode}
-			onclick={() => {
-				if (isWatchMode) handleWatchModeToggle();
-			}}
-		>
-			Browse
-		</button>
-		<button
-			type="button"
-			class="rounded-lg px-4 py-2 text-sm font-medium transition-colors
-				{isWatchMode
-				? 'bg-amber-600 text-white'
-				: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200'}"
-			aria-pressed={isWatchMode}
-			onclick={() => {
-				if (!isWatchMode) handleWatchModeToggle();
-			}}
-		>
-			Watch
-		</button>
-	</div>
-
-	{#if !plannedDishes.length}
-		<div
-			class="mb-6 rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-900/20"
-		>
-			<p class="mb-3 text-sm text-amber-900 dark:text-amber-100">
-				No dishes selected for this film. Show the full timeline or keep it empty?
-			</p>
-			<div class="flex gap-2">
-				<button
-					type="button"
-					class="rounded-lg px-3 py-1.5 text-sm font-medium
-						{watchEmptyScope === 'all'
-						? 'bg-amber-600 text-white'
-						: 'bg-white text-amber-800 dark:bg-gray-800 dark:text-amber-200'}"
-					aria-pressed={watchEmptyScope === 'all'}
-					onclick={() => (watchEmptyScope = 'all')}
-				>
-					All dishes
-				</button>
-				<button
-					type="button"
-					class="rounded-lg px-3 py-1.5 text-sm font-medium
-						{watchEmptyScope === 'none'
-						? 'bg-amber-600 text-white'
-						: 'bg-white text-amber-800 dark:bg-gray-800 dark:text-amber-200'}"
-					aria-pressed={watchEmptyScope === 'none'}
-					onclick={() => (watchEmptyScope = 'none')}
-				>
-					None
-				</button>
+				<p class="text-gray-600 dark:text-gray-400">
+					No food dishes selected yet.
+					<button
+						type="button"
+						class={feastTheme.link}
+						onclick={() => handleStepChange('plan')}
+					>
+						Go to Plan
+					</button>
+				</p>
 			</div>
-		</div>
-	{/if}
-
-	{#if isWatchMode}
+		{:else if menuDishesWithOptions.length === 0}
+			<p class="text-sm text-gray-600 dark:text-gray-400">
+				{menuFoodDishes.length} food dish{menuFoodDishes.length === 1 ? '' : 'es'} selected —
+				serving options will appear here as we add them.
+			</p>
+		{:else}
+			<ul class="space-y-4" role="list">
+				{#each menuDishesWithOptions as dish (dish.id)}
+					<li>
+						<FeastDetailCard
+							{dish}
+							selectedSuggestionId={feastPlan.plan.selectedSuggestions[dish.id]}
+							onSelectSuggestion={(suggestionId) =>
+								feastPlan.setSuggestion(dish.id, suggestionId)}
+						/>
+					</li>
+				{/each}
+			</ul>
+		{/if}
+	{:else}
 		<div class="mb-6">
 			<SyncControls
 				{isPlaying}
@@ -236,19 +259,18 @@
 				onSeek={handleSeek}
 			/>
 		</div>
-	{/if}
 
-	<Timeline
-		dishes={timelineDishes}
-		{edition}
-		{filmId}
-		{pickerDishes}
-		selectedDishIds={feastPlan.plan.selectedDishIds}
-		showCheckboxes={true}
-		currentElapsedSeconds={isWatchMode ? elapsedSeconds : null}
-		onToggleDish={(id) => feastPlan.toggleDish(id)}
-		onScrubStart={isWatchMode ? handleScrubStart : undefined}
-		onScrub={isWatchMode ? handleScrub : undefined}
-		onScrubEnd={isWatchMode ? handleScrubEnd : undefined}
-	/>
+		<Timeline
+			dishes={timelineDishes}
+			{edition}
+			{filmId}
+			selectedDishIds={feastPlan.plan.selectedDishIds}
+			showCheckboxes={true}
+			currentElapsedSeconds={elapsedSeconds}
+			onToggleDish={(id) => feastPlan.toggleDish(id)}
+			onScrubStart={handleScrubStart}
+			onScrub={handleScrub}
+			onScrubEnd={handleScrubEnd}
+		/>
+	{/if}
 </div>

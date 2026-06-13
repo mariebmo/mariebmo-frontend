@@ -1,17 +1,19 @@
 <script lang="ts">
+	import { feastTheme } from '$lib/feast-of-the-rings/theme';
 	import { buildShoppingList, formatShoppingListForClipboard } from '$lib/feast-of-the-rings/shopping-list';
 	import type { ShoppingListItem } from '$lib/feast-of-the-rings/types';
 
 	interface Props {
 		dishIds: string[];
 		headcount: number;
+		selectedSuggestions?: Record<string, string>;
 	}
 
-	let { dishIds, headcount }: Props = $props();
+	let { dishIds, headcount, selectedSuggestions = {} }: Props = $props();
 
 	let copied = $state(false);
 
-	const items = $derived(buildShoppingList(dishIds, headcount));
+	const items = $derived(buildShoppingList(dishIds, headcount, selectedSuggestions));
 
 	async function copyToClipboard(listItems: ShoppingListItem[]) {
 		const text = formatShoppingListForClipboard(listItems);
@@ -32,7 +34,7 @@
 		<h2 class="text-lg font-semibold text-gray-900 dark:text-white">Shopping list</h2>
 		<button
 			type="button"
-			class="rounded-lg bg-amber-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-amber-700 disabled:opacity-50"
+			class="rounded-lg {feastTheme.watch.solid} px-3 py-1.5 text-sm font-medium disabled:opacity-50"
 			disabled={items.length === 0}
 			onclick={() => copyToClipboard(items)}
 		>

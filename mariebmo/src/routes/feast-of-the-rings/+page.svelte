@@ -14,18 +14,9 @@
 			Feast of the Rings
 		</h1>
 		<p class="mx-auto max-w-2xl text-lg text-gray-600 dark:text-gray-400">
-			Eat what they eat, when they eat it. Plan your dishes, build a shopping list, and sync with
-			the film from the opening narration.
+			Eat what they eat, when they eat it. Plan your dishes, set your menu, and sync with the
+			opening narration.
 		</p>
-	</div>
-
-	<div class="mb-8 flex flex-wrap justify-center gap-4">
-		<a
-			href="/feast-of-the-rings/plan"
-			class="rounded-lg bg-amber-600 px-6 py-3 text-sm font-semibold text-white hover:bg-amber-700"
-		>
-			Plan your feast
-		</a>
 	</div>
 
 	<div class="space-y-4">
@@ -34,7 +25,7 @@
 				<a href="/feast-of-the-rings/watch/{film.slug}" class="group block">
 					<div
 						class="flex items-center gap-4 p-6 {getCardClasses({
-							color: CardColor.YELLOW,
+							color: CardColor.RED,
 							variant: 'outline',
 							rounded: 'lg'
 						})} hover:-translate-y-1"

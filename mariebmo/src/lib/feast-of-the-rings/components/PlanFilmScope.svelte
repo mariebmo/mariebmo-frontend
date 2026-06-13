@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { feastTheme } from '$lib/feast-of-the-rings/theme';
 	import { FILMS } from '$lib/feast-of-the-rings/films';
 	import type { FilmId } from '$lib/feast-of-the-rings/types';
 
@@ -21,7 +22,7 @@
 			type="button"
 			class="rounded-full px-3 py-1 text-sm transition-colors
 				{selectedFilmIds.includes(film.id)
-				? 'bg-amber-600 text-white'
+				? feastTheme.watch.solid
 				: 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'}"
 			aria-pressed={selectedFilmIds.includes(film.id)}
 			disabled={!film.curated && !selectedFilmIds.includes(film.id)}
@@ -37,7 +38,7 @@
 
 	<button
 		type="button"
-		class="rounded-full border border-amber-600 px-3 py-1 text-sm text-amber-700 transition-colors hover:bg-amber-50 dark:border-amber-400 dark:text-amber-300 dark:hover:bg-amber-900/20"
+		class="rounded-full border border-rose-700 px-3 py-1 text-sm {feastTheme.watch.text} transition-colors hover:bg-rose-50 dark:border-rose-500 dark:hover:bg-rose-950/30"
 		aria-pressed={allSelected}
 		onclick={onSelectTrilogy}
 	>

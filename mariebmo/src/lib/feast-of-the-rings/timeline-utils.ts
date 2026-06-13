@@ -1,4 +1,5 @@
 import { getDishTimestamp } from './dishes';
+import { feastTheme } from './theme';
 import type { Dish, Edition, SceneRole } from './types';
 
 export function getPositionPercent(timestamp: number, runtimeSeconds: number): number {
@@ -48,10 +49,10 @@ export function getMarkerColorClasses(sceneRole: SceneRole, isSelected: boolean)
 
 	switch (sceneRole) {
 		case 'consumed':
-			return 'bg-amber-500 ring-amber-600';
+			return `${feastTheme.timeline.marker} ${feastTheme.timeline.markerRing}`;
 		case 'interaction':
-			return 'bg-emerald-500 ring-emerald-600';
+			return `${feastTheme.timeline.prepDot} ring-teal-600`;
 		case 'background':
-			return 'bg-gray-400 ring-gray-500 dark:bg-gray-500 dark:ring-gray-400';
+			return 'bg-stone-400 ring-stone-500 dark:bg-stone-500 dark:ring-stone-400';
 	}
 }
