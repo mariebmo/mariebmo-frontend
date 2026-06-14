@@ -152,9 +152,7 @@
 </script>
 
 {#if dishes.length === 0}
-	<div
-		class="rounded-lg border border-dashed border-gray-300 p-8 text-center dark:border-gray-600"
-	>
+	<div class="rounded-lg border border-dashed border-gray-300 p-8 text-center dark:border-gray-600">
 		<p class="text-gray-600 dark:text-gray-400">No dishes on the timeline.</p>
 	</div>
 {:else}
@@ -213,7 +211,8 @@
 					{/each}
 
 					<div
-						class="pointer-events-none absolute inset-x-0 top-1/2 h-1.5 -translate-y-1/2 rounded-full {feastTheme.timeline.track}"
+						class="pointer-events-none absolute inset-x-0 top-1/2 h-1.5 -translate-y-1/2 rounded-full {feastTheme
+							.timeline.track}"
 					></div>
 
 					{#if playheadPercent !== null}
@@ -234,8 +233,7 @@
 						{#if eatAt !== null}
 							{@const percent = getPositionPercent(eatAt, runtimeSeconds)}
 							{@const isNext = dish.id === nextDishId}
-							{@const isPast =
-								currentElapsedSeconds !== null && eatAt <= currentElapsedSeconds}
+							{@const isPast = currentElapsedSeconds !== null && eatAt <= currentElapsedSeconds}
 							{@const isSelected = selectedDishIds.includes(dish.id)}
 							{@const isGhost = highlightSelected && !isSelected}
 

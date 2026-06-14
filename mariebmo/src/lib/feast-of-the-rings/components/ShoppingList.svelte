@@ -29,12 +29,21 @@
 	}
 </script>
 
-<section class="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
+<section aria-labelledby="shopping-list-heading">
 	<div class="mb-4 flex items-center justify-between gap-4">
-		<h2 class="text-lg font-semibold text-gray-900 dark:text-white">Shopping list</h2>
+		<div>
+			<h2 id="shopping-list-heading" class="text-lg font-semibold text-gray-900 dark:text-white">
+				Shopping list
+			</h2>
+			{#if items.length > 0}
+				<p class="text-sm text-gray-600 dark:text-gray-400">
+					{items.length} ingredient{items.length === 1 ? '' : 's'}, merged across your plan
+				</p>
+			{/if}
+		</div>
 		<button
 			type="button"
-			class="rounded-lg {feastTheme.watch.solid} px-3 py-1.5 text-sm font-medium disabled:opacity-50"
+			class="shrink-0 rounded-lg {feastTheme.watch.solid} px-3 py-1.5 text-sm font-medium disabled:opacity-50"
 			disabled={items.length === 0}
 			onclick={() => copyToClipboard(items)}
 		>
@@ -43,13 +52,13 @@
 	</div>
 
 	{#if items.length === 0}
-		<p class="text-sm text-gray-500 dark:text-gray-400">Select dishes to build your list.</p>
+		<p class="text-sm text-gray-500 dark:text-gray-400">Select dishes in Plan to build your list.</p>
 	{:else}
-		<ul class="space-y-2" role="list">
+		<ul class="divide-y divide-gray-200 dark:divide-gray-700" role="list">
 			{#each items as item (item.name + item.unit)}
-				<li class="flex justify-between gap-4 text-sm text-gray-700 dark:text-gray-300">
+				<li class="flex justify-between gap-4 py-2.5 text-sm text-gray-700 dark:text-gray-300">
 					<span>{item.name}</span>
-					<span class="font-mono whitespace-nowrap">
+					<span class="font-mono whitespace-nowrap text-gray-900 dark:text-white">
 						{item.amount % 1 === 0 ? item.amount : item.amount.toFixed(2)}
 						{item.unit}
 					</span>

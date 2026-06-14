@@ -114,7 +114,8 @@
 		{:else}
 			<button
 				type="button"
-				class="rounded-lg font-mono text-3xl font-bold text-gray-900 transition-colors {feastTheme.watch.textHover} focus:ring-2 focus:ring-rose-500/30 focus:outline-none dark:text-white"
+				class="rounded-lg font-mono text-3xl font-bold text-gray-900 transition-colors {feastTheme
+					.watch.textHover} focus:ring-2 focus:ring-rose-500/30 focus:outline-none dark:text-white"
 				aria-label="Set elapsed time, currently {formatTimestamp(elapsedSeconds)}"
 				onclick={startEditingTime}
 			>
@@ -123,10 +124,7 @@
 		{/if}
 	</div>
 
-	<p
-		id="elapsed-time-hint"
-		class="mb-4 text-xs text-gray-500 dark:text-gray-400"
-	>
+	<p id="elapsed-time-hint" class="mb-4 text-xs text-gray-500 dark:text-gray-400">
 		{#if isEditingTime}
 			Enter mm:ss, h:mm:ss, or seconds · Enter to apply · Esc to cancel
 		{:else}
@@ -151,7 +149,8 @@
 
 	{#if prepDishName}
 		<div
-			class="mb-4 rounded-lg px-3 py-2 text-sm {feastTheme.watch.surface} {feastTheme.watch.surfaceText}"
+			class="mb-4 rounded-lg px-3 py-2 text-sm {feastTheme.watch.surface} {feastTheme.watch
+				.surfaceText}"
 			role="status"
 		>
 			Start preparing <span class="font-semibold">{prepDishName}</span>

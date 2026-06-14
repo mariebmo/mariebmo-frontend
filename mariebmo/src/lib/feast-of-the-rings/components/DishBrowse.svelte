@@ -21,9 +21,7 @@
 </script>
 
 {#if filteredDishes.length === 0}
-	<div
-		class="rounded-lg border border-dashed border-gray-300 p-8 text-center dark:border-gray-600"
-	>
+	<div class="rounded-lg border border-dashed border-gray-300 p-8 text-center dark:border-gray-600">
 		<p class="text-gray-600 dark:text-gray-400">No dishes to show.</p>
 	</div>
 {:else if viewMode === 'cards'}

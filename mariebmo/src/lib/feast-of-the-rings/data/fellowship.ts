@@ -190,7 +190,6 @@ export const FELLOWSHIP_DISHES: Dish[] = [
 		timestamps: timestamps('fellowship', 2, '1:02'),
 		prepLeadTimeSeconds: 0,
 		baseServings: 8,
-		ingredients: [{ name: 'Shortbread cookies', amount: 16, unit: 'piece' }],
-		recipe: 'Use shortbread cookies as lembas — one bite is enough for a long journey.'
+		ingredients: [{ name: 'Shortbread cookies', amount: 16, unit: 'piece' }]
 	}
 ];

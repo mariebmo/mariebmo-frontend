@@ -47,9 +47,7 @@
 			<span class="material-symbols-outlined text-base" aria-hidden="true">filter_list</span>
 			Filters
 			{#if activeFilterCount > 0}
-				<span
-					class="rounded-full px-1.5 py-0.5 text-xs font-semibold {feastTheme.filter.badge}"
-				>
+				<span class="rounded-full px-1.5 py-0.5 text-xs font-semibold {feastTheme.filter.badge}">
 					{activeFilterCount}
 				</span>
 			{/if}
@@ -79,7 +77,9 @@
 				</div>
 
 				<fieldset>
-					<legend class="mb-1.5 block text-xs font-medium text-gray-500 uppercase dark:text-gray-400">
+					<legend
+						class="mb-1.5 block text-xs font-medium text-gray-500 uppercase dark:text-gray-400"
+					>
 						Kind
 					</legend>
 					<div class="flex flex-wrap gap-1.5">
@@ -100,7 +100,9 @@
 				</fieldset>
 
 				<fieldset>
-					<legend class="mb-1.5 block text-xs font-medium text-gray-500 uppercase dark:text-gray-400">
+					<legend
+						class="mb-1.5 block text-xs font-medium text-gray-500 uppercase dark:text-gray-400"
+					>
 						View
 					</legend>
 					<div class="flex gap-1.5">

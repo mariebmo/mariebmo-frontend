@@ -35,15 +35,20 @@ export const RETURN_OF_THE_KING_DISHES: Dish[] = [
 	{
 		id: 'rotk-edoras-drinking',
 		filmId: 'return-of-the-king',
-		name: 'Edoras drinking contest',
+		name: 'Edoras celebration',
 		scene: 'Edoras Drinking Contest',
-		kinds: ['drink'],
+		kinds: ['food', 'drink'],
 		sceneRole: 'consumed',
 		tier: 'iconic',
 		timestamps: timestamps('return-of-the-king', 1, '0:19'),
 		prepLeadTimeSeconds: 0,
-		baseServings: 4,
-		ingredients: [{ name: 'Ale', amount: 8, unit: 'pint' }]
+		baseServings: 6,
+		ingredients: [
+			{ name: 'Ale', amount: 8, unit: 'pint' },
+			{ name: 'Cheese', amount: 200, unit: 'g' },
+			{ name: 'Cured meats', amount: 300, unit: 'g' },
+			{ name: 'Bread', amount: 1, unit: 'loaf' }
+		]
 	},
 	{
 		id: 'rotk-faramir-feast',

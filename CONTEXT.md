@@ -57,9 +57,9 @@ The timeline shows all curated dishes for the film as faint markers; dishes in t
 _Avoid_: Browse, explore, gallery
 
 **Menu**:
-The middle step between planning and watching — what and how you'll serve each selected dish. Covers serving options now; recipes, shopping list, and variations later. Reached from the film page stepper (Plan → Menu → Watch), not a separate planning concept from the persisted **Plan**.
+The middle step between planning and watching — headcount and per-dish serving options with scaled ingredients for each beat in timeline order. Reached from the film page stepper (Plan → Menu → Watch), not a separate planning concept from the persisted **Plan**.
 
-On a film route, Menu shows serving options for that film's selected food dishes only. A cross-film Menu (all films at once) is planned for a later release.
+On a film route, Menu lists every selected dish with its chosen (or default Standard) suggestion and ingredient amounts. Dishes with alternatives show a serving picker. A cross-film Menu and aggregated shopping list are planned for a later release.
 _Avoid_: Meal plan (confused with Plan)
 
 **Film stepper**:
@@ -80,9 +80,15 @@ Alternative ways to hit the same on-screen food beat — e.g. a nibble vs a full
 _Avoid_: Variant, substitution
 
 **Shopping list**:
-Ingredients aggregated from all dishes in the plan, scaled to a headcount. Part of **Menu** in a future release.
+Ingredients aggregated across all dishes in a plan, scaled to headcount. Built by `shopping-list.ts` for a future cross-film view; Menu shows per-dish ingredients instead.
 _Avoid_: Grocery list, ingredients list
 
 **Headcount**:
 The number of people eating. Scales each dish's ingredient quantities from its base serving size: `quantity × (headcount / baseServings)`.
 _Avoid_: Servings, guests, party size
+
+## Data sources
+
+Disc-relative timestamps for extended edition are aligned with the [Lord of the Rings food & drink marathon](https://www.reddit.com/r/lordoftherings/comments/c7h6g9/lord_of_the_rings_food_drink_marathon/) thread on r/lordoftherings. The app converts those disc times to narration-sync timestamps via `schedule-utils.ts` (offsets from "The world is changed…").
+
+Additional beats beyond the marathon list (e.g. Prancing Pony ale, Ent draught) are curator extras at the same tier system.

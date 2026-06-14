@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildShoppingList, formatShoppingListForClipboard } from '../../src/lib/feast-of-the-rings/shopping-list';
+import { buildShoppingList, formatShoppingListForClipboard, scaleIngredients } from '../../src/lib/feast-of-the-rings/shopping-list';
 
 describe('buildShoppingList', () => {
 	it('merges ingredients with the same unit', () => {
@@ -22,6 +22,16 @@ describe('buildShoppingList', () => {
 		});
 
 		expect(items).toEqual([{ name: 'Tomato soup', amount: 1, unit: 'pot' }]);
+	});
+
+	it('scales ingredients for a single dish', () => {
+		const items = scaleIngredients(
+			[{ name: 'Ale', amount: 4, unit: 'pint' }],
+			8,
+			4
+		);
+
+		expect(items).toEqual([{ name: 'Ale', amount: 8, unit: 'pint' }]);
 	});
 });
 

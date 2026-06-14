@@ -109,14 +109,12 @@ export const TWO_TOWERS_DISHES: Dish[] = [
 			{ name: 'Potatoes', amount: 6, unit: 'piece' },
 			{ name: 'Carrots', amount: 3, unit: 'piece' },
 			{ name: 'Onion', amount: 2, unit: 'piece' }
-		],
-		recipe:
-			'Brown rabbit pieces, simmer with chopped potatoes and vegetables until tender — start well before the scene.'
+		]
 	},
 	{
 		id: 'ttt-helms-deep-soup',
 		filmId: 'two-towers',
-		name: 'Chicken & dumplings',
+		name: 'Fatty fish soup',
 		scene: 'Road to Helm\'s Deep',
 		kinds: ['food'],
 		sceneRole: 'interaction',
@@ -125,9 +123,25 @@ export const TWO_TOWERS_DISHES: Dish[] = [
 		prepLeadTimeSeconds: 2700,
 		baseServings: 6,
 		ingredients: [
-			{ name: 'Chicken', amount: 1, unit: 'piece' },
-			{ name: 'Dumpling dough', amount: 400, unit: 'g' },
-			{ name: 'Vegetable stock', amount: 1, unit: 'litre' }
+			{ name: 'Oily fish (mackerel or sardines)', amount: 400, unit: 'g' },
+			{ name: 'Fish stock', amount: 1, unit: 'litre' },
+			{ name: 'Potatoes', amount: 4, unit: 'piece' }
+		]
+	},
+	{
+		id: 'ttt-helms-deep-provisions',
+		filmId: 'two-towers',
+		name: 'Helm\'s Deep provisions',
+		scene: 'Helm\'s Deep',
+		kinds: ['food'],
+		sceneRole: 'consumed',
+		tier: 'suggested',
+		timestamps: timestamps('two-towers', 2, '0:15'),
+		prepLeadTimeSeconds: 0,
+		baseServings: 4,
+		ingredients: [
+			{ name: 'Potatoes', amount: 4, unit: 'piece' },
+			{ name: 'Garlic', amount: 4, unit: 'clove' }
 		]
 	},
 	{
@@ -156,7 +170,13 @@ export const TWO_TOWERS_DISHES: Dish[] = [
 		baseServings: 6,
 		ingredients: [
 			{ name: 'Red wine', amount: 1, unit: 'bottle' },
-			{ name: 'Carrots', amount: 6, unit: 'piece' }
+			{ name: 'Apples', amount: 4, unit: 'piece' },
+			{ name: 'Smoked ham', amount: 300, unit: 'g' },
+			{ name: 'Carrots', amount: 6, unit: 'piece' },
+			{ name: 'Squash', amount: 1, unit: 'piece' },
+			{ name: 'Cauliflower', amount: 1, unit: 'head' },
+			{ name: 'Cabbage', amount: 1, unit: 'head' },
+			{ name: 'Pickled vegetables', amount: 1, unit: 'jar' }
 		]
 	}
 ];

@@ -1,13 +1,18 @@
 <script lang="ts">
 	import { feastTheme } from '$lib/feast-of-the-rings/theme';
+	import { getDishTimestamp } from '$lib/feast-of-the-rings/dishes';
+	import { scaleIngredients } from '$lib/feast-of-the-rings/shopping-list';
+	import {
+		getAllSuggestions,
+		getSelectedSuggestion,
+		getSuggestionBaseServings
+	} from '$lib/feast-of-the-rings/suggestions';
+	import { formatTimestamp } from '$lib/feast-of-the-rings/time';
+	import { getPrepStartSeconds } from '$lib/feast-of-the-rings/timeline-utils';
 	import DishKindBadges from './DishKindBadges.svelte';
 	import DishSceneImage from './DishSceneImage.svelte';
-	import {
-		formatSuggestionFoodItems,
-		getAllSuggestions,
-		getSelectedSuggestion
-	} from '$lib/feast-of-the-rings/suggestions';
-	import type { DietaryTag, Dish } from '$lib/feast-of-the-rings/types';
+	import IngredientList from './IngredientList.svelte';
+	import type { DietaryTag, Dish, Edition } from '$lib/feast-of-the-rings/types';
 
 	const DIETARY_LABELS: Record<DietaryTag, string> = {
 		vegetarian: 'Vegetarian',
@@ -16,16 +21,29 @@
 
 	interface Props {
 		dish: Dish;
+		edition: Edition;
+		headcount: number;
 		selectedSuggestionId: string | undefined;
 		onSelectSuggestion?: (suggestionId: string) => void;
 	}
 
-	let { dish, selectedSuggestionId, onSelectSuggestion }: Props = $props();
+	let { dish, edition, headcount, selectedSuggestionId, onSelectSuggestion }: Props = $props();
 
 	const suggestions = $derived(getAllSuggestions(dish));
 	const selectedSuggestion = $derived(getSelectedSuggestion(dish, selectedSuggestionId));
-	const foodItems = $derived(formatSuggestionFoodItems(selectedSuggestion));
 	const showSuggestionPicker = $derived(suggestions.length > 1);
+	const eatAt = $derived(getDishTimestamp(dish, edition));
+	const prepStart = $derived(getPrepStartSeconds(dish, edition));
+	const hasPrep = $derived(
+		eatAt !== null && dish.prepLeadTimeSeconds > 0 && prepStart !== null && prepStart < eatAt
+	);
+
+	function scaledIngredientsForSuggestion(suggestion: (typeof suggestions)[number]) {
+		const baseServings = getSuggestionBaseServings(dish, suggestion);
+		return scaleIngredients(suggestion.ingredients, headcount, baseServings);
+	}
+
+	const selectedIngredients = $derived(scaledIngredientsForSuggestion(selectedSuggestion));
 </script>
 
 <article
@@ -37,12 +55,27 @@
 			<DishSceneImage {dish} variant="list" />
 		</div>
 		<div class="min-w-0 flex-1">
-			<h3 id="feast-detail-{dish.id}-title" class="text-lg font-semibold text-gray-900 dark:text-white">
-				{dish.name}
-			</h3>
+			<div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+				<h3
+					id="feast-detail-{dish.id}-title"
+					class="text-lg font-semibold text-gray-900 dark:text-white"
+				>
+					{dish.name}
+				</h3>
+				{#if eatAt !== null}
+					<time datetime={formatTimestamp(eatAt)} class="text-sm {feastTheme.timeline.timeText}">
+						{formatTimestamp(eatAt)}
+					</time>
+				{/if}
+			</div>
 			<p class="text-sm text-gray-600 dark:text-gray-400">{dish.scene}</p>
-			<div class="mt-2">
+			<div class="mt-2 flex flex-wrap items-center gap-2">
 				<DishKindBadges kinds={dish.kinds} />
+				{#if hasPrep && prepStart !== null}
+					<span class="text-xs text-teal-700 dark:text-teal-300">
+						Start prep by {formatTimestamp(prepStart)}
+					</span>
+				{/if}
 			</div>
 		</div>
 	</div>
@@ -54,6 +87,7 @@
 			</legend>
 			<div class="space-y-2" role="radiogroup" aria-label="Serving options for {dish.name}">
 				{#each suggestions as suggestion (suggestion.id)}
+					{@const scaledIngredients = scaledIngredientsForSuggestion(suggestion)}
 					<label
 						class="flex cursor-pointer gap-3 rounded-lg border p-3 transition-colors
 							{selectedSuggestion.id === suggestion.id
@@ -77,11 +111,6 @@
 									{suggestion.description}
 								</span>
 							{/if}
-							{#if suggestion.ingredients.length > 0}
-								<span class="mt-1 block text-sm text-gray-500 dark:text-gray-400">
-									{formatSuggestionFoodItems(suggestion)}
-								</span>
-							{/if}
 							{#if suggestion.dietary?.length}
 								<span class="mt-1 flex flex-wrap gap-1">
 									{#each suggestion.dietary as tag (tag)}
@@ -93,12 +122,18 @@
 									{/each}
 								</span>
 							{/if}
+							<div class="mt-2">
+								<IngredientList ingredients={scaledIngredients} />
+							</div>
 						</span>
 					</label>
 				{/each}
 			</div>
 		</fieldset>
-	{:else if foodItems}
-		<p class="text-sm text-gray-600 dark:text-gray-400">{foodItems}</p>
+	{:else}
+		<div>
+			<h4 class="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">What you'll need</h4>
+			<IngredientList ingredients={selectedIngredients} />
+		</div>
 	{/if}
 </article>

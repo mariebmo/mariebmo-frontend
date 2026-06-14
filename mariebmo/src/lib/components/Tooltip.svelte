@@ -19,8 +19,7 @@
 		children
 	}: Props = $props();
 
-	const placementClasses =
-		placement === 'top' ? 'bottom-full mb-2' : 'top-full mt-2';
+	const placementClasses = placement === 'top' ? 'bottom-full mb-2' : 'top-full mt-2';
 </script>
 
 {#if onclick}

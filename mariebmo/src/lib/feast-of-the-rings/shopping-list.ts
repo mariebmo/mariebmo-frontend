@@ -11,6 +11,29 @@ function roundAmount(amount: number): number {
 	return Math.round(amount * 100) / 100;
 }
 
+export function scaleIngredientAmount(
+	amount: number,
+	headcount: number,
+	baseServings: number
+): number {
+	return roundAmount(scaleAmount(amount, headcount, baseServings));
+}
+
+export function scaleIngredients(
+	ingredients: Ingredient[],
+	headcount: number,
+	baseServings: number
+): Ingredient[] {
+	return ingredients.map((ingredient) => ({
+		...ingredient,
+		amount: scaleIngredientAmount(ingredient.amount, headcount, baseServings)
+	}));
+}
+
+export function formatIngredientAmount(amount: number): string {
+	return amount % 1 === 0 ? String(amount) : amount.toFixed(2).replace(/\.?0+$/, '');
+}
+
 function ingredientKey(ingredient: Ingredient): string {
 	return `${ingredient.name.toLowerCase()}::${ingredient.unit.toLowerCase()}`;
 }

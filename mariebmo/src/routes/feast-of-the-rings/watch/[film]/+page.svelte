@@ -6,11 +6,11 @@
 	import DishFilterMenu from '$lib/feast-of-the-rings/components/DishFilterMenu.svelte';
 	import FeastDetailCard from '$lib/feast-of-the-rings/components/FeastDetailCard.svelte';
 	import FilmStepper from '$lib/feast-of-the-rings/components/FilmStepper.svelte';
+	import HeadcountControl from '$lib/feast-of-the-rings/components/HeadcountControl.svelte';
 	import SyncControls from '$lib/feast-of-the-rings/components/SyncControls.svelte';
 	import Timeline from '$lib/feast-of-the-rings/components/Timeline.svelte';
 	import { feastPlan } from '$lib/feast-of-the-rings/plan-store.svelte';
 	import { getFilmRuntime } from '$lib/feast-of-the-rings/films';
-	import { getAllSuggestions } from '$lib/feast-of-the-rings/suggestions';
 	import { clampTimestamp } from '$lib/feast-of-the-rings/time';
 	import { getSyncStatus } from '$lib/feast-of-the-rings/sync-utils';
 	import type { DishViewMode, FilmStep, KindFilter } from '$lib/feast-of-the-rings/types';
@@ -20,7 +20,7 @@
 
 	const STEP_SUBTITLES: Record<FilmStep, string> = {
 		plan: 'Pick dishes — the timeline shows everything, your choices are highlighted.',
-		menu: 'Choose how to serve each food beat before you watch.',
+		menu: 'Choose how to serve each beat — ingredients scale with headcount.',
 		watch: 'Press Play when you hear "The world is changed…"'
 	};
 
@@ -43,12 +43,6 @@
 
 	const allDishes = $derived(feastPlan.getVisibleDishesForFilm(filmId));
 	const plannedDishes = $derived(feastPlan.getPlannedDishesForFilm(filmId));
-	const menuFoodDishes = $derived(
-		plannedDishes.filter((dish) => dish.kinds.includes('food'))
-	);
-	const menuDishesWithOptions = $derived(
-		menuFoodDishes.filter((dish) => getAllSuggestions(dish).length > 1)
-	);
 
 	const browseDishes = $derived.by(() => {
 		if (kindFilter === 'all') return allDishes;
@@ -56,9 +50,7 @@
 		return allDishes.filter((dish) => dish.kinds.includes(kind));
 	});
 
-	const timelineDishes = $derived(
-		plannedDishes.length > 0 ? plannedDishes : allDishes
-	);
+	const timelineDishes = $derived(plannedDishes.length > 0 ? plannedDishes : allDishes);
 
 	const syncStatus = $derived(
 		step === 'watch' ? getSyncStatus(timelineDishes, edition, elapsedSeconds) : null
@@ -171,7 +163,7 @@
 	<header class="mb-6">
 		<h1 class="mb-4 text-3xl font-bold text-gray-900 dark:text-white">{data.film.title}</h1>
 
-		<FilmStepper step={step} onchange={handleStepChange} />
+		<FilmStepper {step} onchange={handleStepChange} />
 
 		<p class="mt-3 text-sm text-gray-600 dark:text-gray-400">{STEP_SUBTITLES[step]}</p>
 	</header>
@@ -209,39 +201,53 @@
 			/>
 		</section>
 	{:else if step === 'menu'}
-		{#if menuFoodDishes.length === 0}
+		{#if plannedDishes.length === 0}
 			<div
 				class="rounded-lg border border-dashed border-gray-300 p-8 text-center dark:border-gray-600"
 			>
 				<p class="text-gray-600 dark:text-gray-400">
-					No food dishes selected yet.
-					<button
-						type="button"
-						class={feastTheme.link}
-						onclick={() => handleStepChange('plan')}
-					>
+					No dishes selected yet.
+					<button type="button" class={feastTheme.link} onclick={() => handleStepChange('plan')}>
 						Go to Plan
 					</button>
 				</p>
 			</div>
-		{:else if menuDishesWithOptions.length === 0}
-			<p class="text-sm text-gray-600 dark:text-gray-400">
-				{menuFoodDishes.length} food dish{menuFoodDishes.length === 1 ? '' : 'es'} selected —
-				serving options will appear here as we add them.
-			</p>
 		{:else}
-			<ul class="space-y-4" role="list">
-				{#each menuDishesWithOptions as dish (dish.id)}
-					<li>
-						<FeastDetailCard
-							{dish}
-							selectedSuggestionId={feastPlan.plan.selectedSuggestions[dish.id]}
-							onSelectSuggestion={(suggestionId) =>
-								feastPlan.setSuggestion(dish.id, suggestionId)}
-						/>
-					</li>
-				{/each}
-			</ul>
+			<div class="mx-auto max-w-3xl space-y-8">
+				<section aria-label="Headcount">
+					<HeadcountControl
+						headcount={feastPlan.plan.headcount}
+						onChange={(value) => feastPlan.setHeadcount(value)}
+					/>
+				</section>
+
+				<section aria-label="Menu" class="space-y-4">
+					<div>
+						<h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+							{plannedDishes.length} beat{plannedDishes.length === 1 ? '' : 's'} in your menu
+						</h2>
+						<p class="text-sm text-gray-600 dark:text-gray-400">
+							Each dish shows what you'll need for your party. Pick a serving option where
+							alternatives exist.
+						</p>
+					</div>
+
+					<ul class="space-y-4" role="list">
+						{#each plannedDishes as dish (dish.id)}
+							<li>
+								<FeastDetailCard
+									{dish}
+									{edition}
+									headcount={feastPlan.plan.headcount}
+									selectedSuggestionId={feastPlan.plan.selectedSuggestions[dish.id]}
+									onSelectSuggestion={(suggestionId) =>
+										feastPlan.setSuggestion(dish.id, suggestionId)}
+								/>
+							</li>
+						{/each}
+					</ul>
+				</section>
+			</div>
 		{/if}
 	{:else}
 		<div class="mb-6">

@@ -68,15 +68,11 @@
 			<div class="mt-auto space-y-2 border-t border-gray-100 pt-3 dark:border-gray-700">
 				{#if hasPrep && prepStart !== null}
 					<div class="flex flex-wrap items-center gap-2 text-xs">
-						<span
-							class="rounded {feastTheme.timeline.prepBadge} px-2 py-1 font-mono"
-						>
+						<span class="rounded {feastTheme.timeline.prepBadge} px-2 py-1 font-mono">
 							Prep {formatTimestamp(prepStart)}
 						</span>
 						<span class="text-gray-400" aria-hidden="true">→</span>
-						<span
-							class="rounded {feastTheme.timeline.eatBadge} px-2 py-1 font-mono"
-						>
+						<span class="rounded {feastTheme.timeline.eatBadge} px-2 py-1 font-mono">
 							Eat {formatTimestamp(eatAt)}
 						</span>
 					</div>
