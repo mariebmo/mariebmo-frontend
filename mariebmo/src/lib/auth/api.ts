@@ -1,5 +1,4 @@
-import { dev } from '$app/environment';
-import { env } from '$env/dynamic/public';
+import { API_BASE_URL } from './config';
 import type {
 	AuthResponse,
 	LoginRequest,
@@ -8,8 +7,6 @@ import type {
 	User,
 	ErrorResponse
 } from './types';
-
-const API_BASE_URL = env.PUBLIC_MARIEBMO_LOGIN_API_URL ?? (dev ? 'http://localhost:5001' : '');
 
 interface ApiError {
 	message: string;
