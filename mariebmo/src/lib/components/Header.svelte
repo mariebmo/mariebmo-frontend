@@ -3,6 +3,7 @@
 	import Logo from './Logo.svelte';
 	import DarkModeButton from './buttons/DarkModeButton.svelte';
 	import BackButton from './buttons/BackButton.svelte';
+	import AuthButton from './buttons/AuthButton.svelte';
 
 	let showBackButton = $derived($page.url.pathname !== '/');
 </script>
@@ -18,7 +19,8 @@
 		<Logo />
 	</a>
 
-	<div class="absolute right-4 sm:right-8">
+	<div class="absolute right-4 flex items-center gap-3 sm:right-8">
 		<DarkModeButton />
+		<AuthButton />
 	</div>
 </nav>
