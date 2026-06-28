@@ -1,4 +1,5 @@
 import { dev } from '$app/environment';
+import { env } from '$env/dynamic/public';
 import type {
 	AuthResponse,
 	LoginRequest,
@@ -8,8 +9,7 @@ import type {
 	ErrorResponse
 } from './types';
 
-const API_BASE_URL =
-	import.meta.env.VITE_API_URL ?? (dev ? 'http://localhost:5001' : 'https://api.mariebmo.io');
+const API_BASE_URL = env.PUBLIC_MARIEBMO_LOGIN_API_URL ?? (dev ? 'http://localhost:5001' : '');
 
 interface ApiError {
 	message: string;
