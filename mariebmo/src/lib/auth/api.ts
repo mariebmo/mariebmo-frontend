@@ -8,7 +8,8 @@ import type {
 	ErrorResponse
 } from './types';
 
-const API_BASE_URL = dev ? 'http://localhost:5001' : 'https://api.mariebmo.io';
+const API_BASE_URL =
+	import.meta.env.VITE_API_URL ?? (dev ? 'http://localhost:5001' : 'https://api.mariebmo.io');
 
 interface ApiError {
 	message: string;
